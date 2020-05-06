@@ -1,0 +1,28 @@
+FROM node:14-alpine as builder
+
+RUN  apk add --no-cache --virtual .gyp git
+
+WORKDIR /app
+
+COPY package*.json /app/
+
+RUN npm install --no-progress
+
+COPY . .
+
+RUN npx nuxt build --standalone -m
+
+#########################################################
+#########################################################
+
+FROM node:14-alpine
+
+RUN  apk add --no-cache --virtual .gyp git
+
+WORKDIR /app
+
+COPY --from=builder /app/.nuxt /app/.nuxt/
+
+RUN npm install --production nuxt && npx modclean -r
+
+CMD NUXT_HOST=0.0.0.0 npx nuxt start

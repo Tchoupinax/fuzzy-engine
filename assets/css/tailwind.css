@@ -1,0 +1,17 @@
+/* purgecss start ignore */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+/* purgecss end ignore */
+@import 'tailwindcss/utilities';
+
+* {
+  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.mini-toastr {
+  right: inherit !important;
+  top: inherit !important;
+  right: 12px !important;
+  bottom: 12px !important;
+}
