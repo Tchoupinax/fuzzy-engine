@@ -1,10 +1,10 @@
 # fuzzy-engine 🐳
 
-Fuzzy engine is beautiful ✨ and simple 🐹 UI for your private Docker. 
+Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your private Docker registry. 
 
 ## Getting started
 
-The best way to use and deploy the UI is with Docker.
+The best way to use and to deploy the UI is with Docker.
 
 ```
 docker run -d -p 3000:3000 tchoupinax/fuzzy-engine
@@ -41,6 +41,11 @@ List of your repositories
 List of the digests (with tags) for one repository
 
 ![Home page](./.github/digests.png)
+
+### Roadmap
+
+* [ ] Possibility to color tag (matching a regex)
+* [ ] Add size and date data (on repository and tags views)
 
 #### Built with
 
