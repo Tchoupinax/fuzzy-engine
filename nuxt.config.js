@@ -53,6 +53,9 @@ module.exports = {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
+    // NOTE Do not send proxy headers, if the UI is behind a reverse proxy with basic auth
+    // it will override authorization header and broke everything
+    proxyHeaders: false,
   },
   /*
   ** Build configuration
