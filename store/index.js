@@ -1,6 +1,12 @@
 import cookieparser from 'cookieparser';
 import { serialize } from 'cookie';
 
+export const state = () => {
+  return {
+    theme: 'one',
+  };
+};
+
 export const mutations = {
   isLogged (state, bool) {
     state.isLogged = bool;
@@ -19,35 +25,44 @@ export const mutations = {
       data: process.env.DOCKER_REGISTRY_PASSWORD || password.data,
     };
   },
+  setTheme (state, theme) {
+    state.theme = theme;
+  },
 };
 
 export const actions = {
   nuxtServerInit: ({ commit }, { req, res, $axios, app: { $cookies, $apolloHelpers, apolloProvider } }) => {
     const { cookie } = req.headers;
 
+    let data;
     if (cookie) {
-      const { ids } = cookieparser.parse(cookie);
+      const { 'fuzzy-engine-ids': ids, 'fuzzy-engine-theme': theme } = cookieparser.parse(cookie);
 
-      const data = JSON.parse(Buffer.from(ids, 'base64').toString('utf-8') || '{}');
+      if (ids) {
+        data = JSON.parse(Buffer.from(ids, 'base64').toString('utf-8') || '{}');
+      }
 
-      commit('authenticate', data);
-    } else {
-      const data = {
-        url: {
-          env: process.env.DOCKER_REGISTRY_URL !== undefined,
-          data: process.env.DOCKER_REGISTRY_URL,
-        },
-        username: {
-          env: process.env.DOCKER_REGISTRY_USERNAME !== undefined,
-          data: process.env.DOCKER_REGISTRY_USERNAME,
-        },
-        password: {
-          env: process.env.DOCKER_REGISTRY_PASSWORD !== undefined,
-          data: process.env.DOCKER_REGISTRY_PASSWORD,
-        },
-      };
-
-      res.setHeader('Set-Cookie', [serialize('ids', Buffer.from(JSON.stringify(data)).toString('base64'))]);
+      if (theme) {
+        commit('setTheme', theme);
+      }
     }
+
+    data = data || {
+      url: {
+        env: process.env.DOCKER_REGISTRY_URL !== undefined,
+        data: process.env.DOCKER_REGISTRY_URL,
+      },
+      username: {
+        env: process.env.DOCKER_REGISTRY_USERNAME !== undefined,
+        data: process.env.DOCKER_REGISTRY_USERNAME,
+      },
+      password: {
+        env: process.env.DOCKER_REGISTRY_PASSWORD !== undefined,
+        data: process.env.DOCKER_REGISTRY_PASSWORD,
+      },
+    };
+
+    commit('authenticate', data);
+    res.setHeader('Set-Cookie', [serialize('fuzzy-engine-ids', Buffer.from(JSON.stringify(data)).toString('base64'))]);
   },
 };

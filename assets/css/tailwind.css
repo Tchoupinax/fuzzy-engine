@@ -15,3 +15,34 @@
   right: 12px !important;
   bottom: 12px !important;
 }
+
+:root {
+  --color-theme-one: #E23676;
+  --color-theme-one-lighter: #E384A7;
+  --color-theme-two: rgb(49, 160, 251);
+  --color-theme-two-lighter: rgb(132, 199, 253);
+  --color-theme-three: rgb(26, 195, 34);
+  --color-theme-three-lighter: rgb(109, 243, 113);
+  --color-theme-fourth: #FFDB00;
+  --color-theme-fourth-lighter: rgb(224, 226, 110);
+}
+
+.one {
+  --color-theme: var(--color-theme-one);
+  --color-theme-lighter: var(--color-theme-one-lighter);
+}
+
+.two {
+  --color-theme: var(--color-theme-two);
+  --color-theme-lighter: var(--color-theme-two-lighter);
+}
+
+.three {
+  --color-theme: var(--color-theme-three);
+  --color-theme-lighter: var(--color-theme-three-lighter);
+}
+
+.fourth {
+  --color-theme: var(--color-theme-fourth);
+  --color-theme-lighter: var(--color-theme-fourth-lighter);
+}
