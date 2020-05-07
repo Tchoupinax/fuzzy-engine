@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.2 | 2020-05-07
+
+#### Features:
+
+- Add size and created date for each digest
+- Add theme color
+- Add Github link in the footer
+
+#### Fixes:
+
+- Improve credentials read from cookie
+- Improve readme with FAQ
+
+#### docker image
+
+```
+docker pull tchoupinax/fuzzy-engine:v1.0.2
+```
+
 ## 1.0.1 | 2020-05-07
 
 #### Fixes:

@@ -2,7 +2,7 @@
 
 Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your [private Docker registry](https://hub.docker.com/_/registry).
 
-demo: https://fuzzy-engine.corentinfiloche.xyz
+**demo**: https://fuzzy-engine.corentinfiloche.xyz
 
 ## Getting started
 
@@ -56,10 +56,12 @@ List of the digests (with tags) for one repository
 
 ### Roadmap
 
-* [] Possibility to color tag (matching a regex)
+* [x] List tags and regroup them for the same digest
+* [x] Be able to delete a digest
 * [x] Add size and date data (on repository and tags views)
 * [x] Add footer and github link on app
 * [x] Add title and favicon
+* [ ] Possibility to color tag (matching a regex)
 
 #### Built with
 
