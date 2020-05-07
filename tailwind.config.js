@@ -10,15 +10,9 @@ module.exports = {
   theme: {
     colors: {
       ...colors,
-      one: {
-        default: '#19E5FF',
-      },
-      two: {
-        lighter: '#E384A7',
-        default: '#E23676',
-      },
-      three: {
-        default: '#358CFF',
+      theme: {
+        lighter: 'var(--color-theme-lighter)',
+        default: 'var(--color-theme)',
       },
     },
   },

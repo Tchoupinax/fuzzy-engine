@@ -1,6 +1,12 @@
 import cookieparser from 'cookieparser';
 import { serialize } from 'cookie';
 
+export const state = () => {
+  return {
+    theme: 'one',
+  };
+};
+
 export const mutations = {
   isLogged (state, bool) {
     state.isLogged = bool;
@@ -19,6 +25,9 @@ export const mutations = {
       data: process.env.DOCKER_REGISTRY_PASSWORD || password.data,
     };
   },
+  setTheme (state, theme) {
+    state.theme = theme;
+  },
 };
 
 export const actions = {
@@ -26,11 +35,15 @@ export const actions = {
     const { cookie } = req.headers;
 
     if (cookie) {
-      const { ids } = cookieparser.parse(cookie);
+      const {
+        ids,
+        'fuzzy-engine-theme': theme,
+      } = cookieparser.parse(cookie);
 
       const data = JSON.parse(Buffer.from(ids, 'base64').toString('utf-8') || '{}');
 
       commit('authenticate', data);
+      commit('setTheme', theme);
     } else {
       const data = {
         url: {

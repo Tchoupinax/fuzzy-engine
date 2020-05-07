@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center justify-center flex-1 h-full mt-16 text-two">
+  <div class="flex flex-col items-center justify-center flex-1 h-full mt-16 text-theme">
     <div>
       <h1 class="text-center title">
         fuzzy-engine
@@ -10,10 +10,10 @@
 
       <div class="flex justify-center w-full mt-16">
         <button
-          class="px-4 py-2 font-bold text-white rounded bg-two-lighter"
+          class="px-4 py-2 font-bold text-white rounded bg-theme-lighter"
           :class="{
-            'hover:bg-two': connected,
-            'bg-two-lighter cursor-not-allowed': !connected
+            'hover:bg-theme': connected,
+            'bg-theme-lighter cursor-not-allowed': !connected
           }"
           :disabled="!connected"
           @click="openList"
@@ -31,7 +31,7 @@
             v-model="urlData"
             :disabled="urlEnv"
             type="text"
-            class="w-2/3 p-1 px-2 mb-4 text-xl font-bold border rounded text-two border-two placeholder-two-lighter"
+            class="w-2/3 p-1 px-2 mb-4 text-xl font-bold border rounded text-theme border-theme placeholder-theme-lighter"
             placeholder="registry.mydomain.com"
             @keyup="saveData"
           >
@@ -40,7 +40,7 @@
             v-model="usernameData"
             :disabled="usernameEnv"
             type="text"
-            class="w-2/3 p-1 px-2 mb-4 text-xl font-bold border rounded text-two border-two placeholder-two-lighter"
+            class="w-2/3 p-1 px-2 mb-4 text-xl font-bold border rounded text-theme border-theme placeholder-theme-lighter"
             placeholder="username"
             @keyup="saveData"
           >
@@ -48,13 +48,13 @@
           <div class="flex justify-center w-2/3">
             <input
               v-model="passwordData"
-              class="w-full p-1 px-2 text-xl font-bold text-gray-700 border rounded-l text-two border-two docker-pull placeholder-two-lighter"
+              class="w-full p-1 px-2 text-xl font-bold text-gray-700 border rounded-l text-theme border-theme docker-pull placeholder-theme-lighter"
               :type="revealed ? 'text': 'password'"
               placeholder="password"
               @keyup="saveData"
             >
             <button
-              class="p-2 px-4 text-white border border-l-0 rounded-r border-two bg-two"
+              class="p-2 px-4 text-white border border-l-0 rounded-r border-theme bg-theme"
               type="button"
               @click="revealed = !revealed"
             >
@@ -130,7 +130,6 @@ export default {
       })));
     },
     openList (e) {
-      console.log('er');
       e.preventDefault();
       window.location = '/list';
     },

@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-center mb-16">
-    <div class="w-full lg:w-8/12 text-two">
+    <div class="w-full lg:w-8/12 text-theme">
       <p class="mt-16 mb-16 text-4xl text-center">
         {{ name }}
       </p>
@@ -12,8 +12,16 @@
           :key="index"
           class="flex items-center justify-between w-full px-8 py-4 text-sm font-bold text-center border-b border-gray-600"
         >
-          <div class="truncate">
-            {{ digest.name }}
+          <div class="flex">
+            <div class="w-24 mr-8">
+              {{ digest.name }}
+            </div>
+            <div class="w-24 mr-8">
+              {{ digest.size }}
+            </div>
+            <div class="mr-8">
+              {{ timeago(digest.created) }}
+            </div>
           </div>
 
           <!-- Right -->
@@ -22,14 +30,14 @@
               <div
                 v-for="(tag, indexTags) of digest.tags"
                 :key="indexTags"
-                class="w-auto p-2 px-4 mx-2 whitespace-no-wrap bg-gray-200 rounded-lg"
+                class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
               >
                 {{ tag }}
               </div>
             </div>
 
             <button
-              class="flex items-center justify-center p-1 px-2 text-center text-red-700 bg-red-200 border-2 border-red-500 rounded"
+              class="flex items-center justify-center p-1 px-2 text-center border-2 rounded border-theme bg-theme-lighter text-theme"
               @click="deleteImage(digest.name)"
             >
               🗑️
@@ -48,6 +56,8 @@
 </template>
 
 <script>
+import prettyBytes from 'pretty-bytes';
+import * as timeago from 'timeago.js';
 import getBaseUrl from '@/functions/getBaseUrl';
 
 export default {
@@ -66,26 +76,44 @@ export default {
     }
 
     const tagsWithDigest = await Promise.all(tags.map(async (tag) => {
-      const { headers: { 'docker-content-digest': digest } } = await $axios({
-        method: 'HEAD',
+      const {
+        headers: { 'docker-content-digest': digest },
+        data: { layers },
+      } = await $axios({
+        method: 'GET',
         url: `${getBaseUrl(store.state)}/v2/${route.params.name}/manifests/${tag}`,
         headers: {
           Accept: 'application/vnd.docker.distribution.manifest.v2+json',
         },
       });
 
-      return { name: tag, digest };
+      const size = layers.reduce((acc, cur) => acc + cur.size, 0);
+
+      // Get creation date
+      const { data: { history: [{ v1Compatibility }] } } = await $axios({
+        method: 'GET',
+        url: `${getBaseUrl(store.state)}/v2/${route.params.name}/manifests/${tag}`,
+      });
+
+      return {
+        name: tag,
+        digest: digest.slice(7, 19),
+        size: prettyBytes(size),
+        created: JSON.parse(v1Compatibility).created,
+      };
     }));
 
     const finalDigests = new Map();
-    tagsWithDigest.forEach(({ name, digest }) => {
+    tagsWithDigest.forEach(({ name, digest, size, created }) => {
       if (finalDigests.has(digest)) {
         finalDigests.set(digest, {
           name: digest,
           tags: [...finalDigests.get(digest).tags, name],
+          size,
+          created,
         });
       } else {
-        finalDigests.set(digest, { name: digest, tags: [name] });
+        finalDigests.set(digest, { name: digest, tags: [name], size, created });
       }
     });
 
@@ -102,6 +130,7 @@ export default {
     }
   },
   methods: {
+    timeago: timeago.format,
     deleteImage (digesthash) {
       if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
         window.location = `/${this.name}/${digesthash}/delete`;

@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center mb-16">
     <div class="w-full lg:w-8/12">
-      <div class="flex flex-col items-center justify-center text-two">
+      <div class="flex flex-col items-center justify-center text-theme">
         <p class="mt-16 mb-16 text-4xl">
           {{ url }}
         </p>
@@ -9,7 +9,7 @@
         <div
           v-for="(repo, index) of repositories"
           :key="index"
-          class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-two"
+          class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme"
         >
           <div class="text-xl">
             {{ repo }}
