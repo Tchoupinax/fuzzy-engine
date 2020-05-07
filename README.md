@@ -1,6 +1,6 @@
 # fuzzy-engine 🐳
 
-Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your private Docker registry.
+Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your [private Docker registry](https://hub.docker.com/_/registry).
 
 demo: https://fuzzy-engine.corentinfiloche.xyz
 
@@ -30,6 +30,16 @@ docker run -d \
   tchoupinax/fuzzy-engine
 ```
 
+### FAQ
+
+#### How it works ?
+
+You set your credentials with the form on the home page. Then, they are kept in a cookie. Not elsewhere. These credentials are used to request your registry. You can set your credentials from environment variables. When a credential is setted from environment, it could not be rewrited by user. Each credential is independant.
+
+#### Why this is not an SPA ?
+
+The docker registy [image](https://hub.docker.com/_/registry) does not allow cross-origin request, so browser prevents from making the requests. The only solution is to make requests backend side.
+
 ### Screenshots 🖼
 
 Home page
@@ -46,9 +56,9 @@ List of the digests (with tags) for one repository
 
 ### Roadmap
 
-* [ ] Possibility to color tag (matching a regex)
-* [ ] Add size and date data (on repository and tags views)
-* [ ] Add footer and github link on app
+* [] Possibility to color tag (matching a regex)
+* [x] Add size and date data (on repository and tags views)
+* [x] Add footer and github link on app
 * [x] Add title and favicon
 
 #### Built with
