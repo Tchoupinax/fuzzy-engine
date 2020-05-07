@@ -1,6 +1,6 @@
 {
   "name": "fuzzy-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Docker registry UI made with love",
   "author": "Tchoupinax <corentinfiloche@hotmail.fr> (https://corentinfiloche.xyz)",
   "licence": "MIT",
@@ -9,7 +9,7 @@
     "docker-registry",
     "dockerui"
   ],
-  "homepage": "https://github.com/Tchoupinax/fuzzy-engine#readme",
+  "homepage": "https://fuzzy-engine.corentinfiloche.xyz",
   "repository": {
     "type": "git",
     "url": "https://github.com/Tchoupinax/fuzzy-engine"
