@@ -49,6 +49,7 @@ List of the digests (with tags) for one repository
 * [ ] Possibility to color tag (matching a regex)
 * [ ] Add size and date data (on repository and tags views)
 * [ ] Add footer and github link on app
+* [ ] Add title and favicon
 
 #### Built with
 
