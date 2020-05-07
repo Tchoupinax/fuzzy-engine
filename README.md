@@ -1,6 +1,8 @@
 # fuzzy-engine 🐳
 
-Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your private Docker registry. 
+Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your private Docker registry.
+
+demo: https://fuzzy-engine.corentinfiloche.xyz
 
 ## Getting started
 
