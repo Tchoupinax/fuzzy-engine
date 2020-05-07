@@ -70,15 +70,17 @@
 </template>
 
 <script>
+const { setCookie } = require('@/functions/cookies');
+
 export default {
   data () {
     return {
-      urlData: '',
-      urlEnv: '',
-      usernameData: '',
-      usernameEnv: '',
-      passwordData: '',
-      passwordEnv: '',
+      urlData: this.$store.state.url.data,
+      urlEnv: this.$store.state.url.env,
+      usernameData: this.$store.state.username.data,
+      usernameEnv: this.$store.state.username.env,
+      passwordData: this.$store.state.password.data,
+      passwordEnv: this.$store.state.password.env,
       revealed: false,
     };
   },
@@ -90,13 +92,6 @@ export default {
     },
   },
   mounted () {
-    this.urlData = this.$store.state.url.data;
-    this.urlEnv = this.$store.state.url.env;
-    this.usernameData = this.$store.state.username.data;
-    this.usernameEnv = this.$store.state.username.env;
-    this.passwordData = this.$store.state.password.data;
-    this.passwordEnv = this.$store.state.password.env;
-
     if (this.$route.query.error === '401') {
       this.unauthorized();
       this.$router.push('/');
@@ -107,17 +102,7 @@ export default {
   },
   methods: {
     saveData () {
-      function setCookie (name, value, days) {
-        let expires = '';
-        if (days) {
-          const date = new Date();
-          date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-          expires = '; expires=' + date.toUTCString();
-        }
-        document.cookie = name + '=' + (value || '') + expires + '; path=/';
-      }
-
-      setCookie('ids', btoa(JSON.stringify({
+      setCookie('fuzzy-engine-ids', btoa(JSON.stringify({
         url: {
           data: this.urlData,
         },
