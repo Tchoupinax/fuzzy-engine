@@ -8,7 +8,7 @@
     }"
   >
     <nuxt />
-    <footer class="absolute bottom-0 flex items-center justify-between w-full h-16 px-8 text-white bg-theme-lighter">
+    <footer class="fixed bottom-0 flex items-center justify-between w-full h-16 px-8 text-white bg-theme-lighter">
       <div class="flex items-center justify-center">
         <p class="mr-4 text-xl font-bold">
           Theme color:
@@ -63,7 +63,7 @@ const { setCookie } = require('@/functions/cookies');
 export default {
   data () {
     return {
-      theme: this.$store.state.theme,
+      theme: this.$store.state.theme || 'one',
     };
   },
   methods: {

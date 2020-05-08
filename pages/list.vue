@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center mb-16">
+  <div class="flex justify-center mb-32">
     <div class="w-full lg:w-8/12">
       <div class="flex flex-col items-center justify-center text-theme">
         <p class="mt-16 mb-16 text-4xl">
