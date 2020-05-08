@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.3 | 2020-05-08
+
+#### Features:
+
+- Add tooltip for size and created date
+
+#### Fixes:
+
+- Fix default color and footer position
+
+#### docker image
+
+```
+docker pull tchoupinax/fuzzy-engine:v1.0.3
+```
+
 ## 1.0.2 | 2020-05-07
 
 #### Features:
