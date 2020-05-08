@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center mb-16">
+  <div class="flex justify-center mb-32">
     <div class="w-full lg:w-8/12 text-theme">
       <p class="mt-16 mb-16 text-4xl text-center">
         {{ name }}
@@ -12,15 +12,27 @@
           :key="index"
           class="flex items-center justify-between w-full px-8 py-4 text-sm font-bold text-center border-b border-gray-600"
         >
-          <div class="flex">
+          <div class="flex items-center justify-center">
             <div class="w-24 mr-8">
               {{ digest.name }}
             </div>
-            <div class="w-24 mr-8">
+            <div class="relative z-10 flex items-center justify-center mr-8">
               {{ digest.size }}
+              <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
+                i
+              </div>
+              <div class="absolute left-0 w-48 p-2 px-1 ml-24 bg-black rounded-lg info">
+                This size is calculated by summing the image's layers, of which are compressed.
+              </div>
             </div>
-            <div class="mr-8">
+            <div class="relative flex items-center justify-center mr-8">
               {{ timeago(digest.created) }}
+              <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
+                i
+              </div>
+              <div class="absolute left-0 w-48 p-2 px-1 ml-32 bg-black rounded-lg info">
+                {{ formatFullDate(digest.created) }}
+              </div>
             </div>
           </div>
 
@@ -131,6 +143,10 @@ export default {
   },
   methods: {
     timeago: timeago.format,
+    formatFullDate (date) {
+      const dtf = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
+      return dtf.format(new Date(date));
+    },
     deleteImage (digesthash) {
       if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
         window.location = `/${this.name}/${digesthash}/delete`;
@@ -146,3 +162,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.info {
+  opacity: 0;
+  display: none;
+}
+
+.infoButton:hover + .info {
+  opacity: 1;
+  display: inline;
+}
+</style>
