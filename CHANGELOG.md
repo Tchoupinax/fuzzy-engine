@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.4 | 2020-05-13
+
+#### Fixes:
+
+- Bad digest was used to delete so it broke the delete feature
+
+#### docker image
+
+```
+docker pull tchoupinax/fuzzy-engine:v1.0.4
+```
+
 ## 1.0.3 | 2020-05-08
 
 #### Features:
