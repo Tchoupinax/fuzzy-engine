@@ -50,7 +50,7 @@
 
             <button
               class="flex items-center justify-center p-1 px-2 text-center border-2 rounded border-theme bg-theme-lighter text-theme"
-              @click="deleteImage(digest.name)"
+              @click="deleteImage(digest.fullDigest)"
             >
               🗑️
             </button>
@@ -110,22 +110,24 @@ export default {
       return {
         name: tag,
         digest: digest.slice(7, 19),
+        fullDigest: digest,
         size: prettyBytes(size),
         created: JSON.parse(v1Compatibility).created,
       };
     }));
 
     const finalDigests = new Map();
-    tagsWithDigest.forEach(({ name, digest, size, created }) => {
+    tagsWithDigest.forEach(({ name, digest, size, created, fullDigest }) => {
       if (finalDigests.has(digest)) {
         finalDigests.set(digest, {
           name: digest,
           tags: [...finalDigests.get(digest).tags, name],
           size,
           created,
+          fullDigest,
         });
       } else {
-        finalDigests.set(digest, { name: digest, tags: [name], size, created });
+        finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest });
       }
     });
 
