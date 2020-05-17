@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center justify-center flex-1 h-full mt-16 text-theme">
+  <div class="flex flex-col items-center justify-center flex-1 h-full mt-16 mb-32 text-theme">
     <div>
       <h1 class="text-center title">
         fuzzy-engine
