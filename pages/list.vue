@@ -20,8 +20,8 @@
             :key="index"
             class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme"
           >
-            <div class="text-xl">
-              {{ repo }}
+            <div class="w-5/12 text-xl text-left truncate">
+              {{ repo.name }}
             </div>
 
             <!-- Right -->
@@ -30,10 +30,10 @@
                 <input
                   class="px-2 text-gray-700 border border-gray-700 rounded-l docker-pull"
                   type="text"
-                  :value="`docker pull ${url}/${repo}`"
+                  :value="`docker pull ${url}/${repo.name}`"
                 >
                 <button
-                  v-clipboard:copy="`docker pull ${url}/${repo}`"
+                  v-clipboard:copy="`docker pull ${url}/${repo.name}`"
                   v-clipboard:success="onCopy"
                   class="p-2 px-4 bg-blue-200 border border-l-0 border-gray-700 rounded-r"
                   type="button"
@@ -46,7 +46,9 @@
                 </button>
               </div>
 
-              <a :href="`/${repo}/tags`">Show tags</a>
+              <a :href="`/${repo.name}/tags`">
+                Show tags ({{ repo.countOfTags }})
+              </a>
             </div>
           <!-- END # Right -->
           </div>
@@ -76,6 +78,19 @@ export default {
         return redirect('/?error=401');
       }
     };
+
+    repositories = await Promise.all(repositories.map((repository) => {
+      return $axios({
+        method: 'GET',
+        url: `${getBaseUrl(store.state)}/v2/${repository}/tags/list`,
+      })
+        .then(({ data }) => {
+          return {
+            name: data.name,
+            countOfTags: Array.isArray(data.tags) ? data.tags.length : 0,
+          };
+        });
+    }));
 
     return { repositories };
   },
