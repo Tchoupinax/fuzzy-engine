@@ -3,7 +3,7 @@
     <section id="actions" class="mt-6 ml-8">
       <a href="/list">
         <button class="font-bold text-theme-lighter hover:text-theme">
-          Home
+          List of repositories
         </button>
       </a>
     </section>
