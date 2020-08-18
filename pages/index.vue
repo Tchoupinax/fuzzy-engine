@@ -22,7 +22,7 @@
         </button>
       </div>
 
-      <div class="flex justify-center mt-24">
+      <div class="flex justify-center mt-8">
         <form
           class="flex flex-col items-center justify-center w-full p-4"
           @submit="openList"
@@ -31,7 +31,7 @@
             v-model="urlData"
             :disabled="urlEnv"
             type="text"
-            class="w-2/3 p-1 px-2 mb-4 text-xl font-bold border rounded text-theme border-theme placeholder-theme-lighter"
+            class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme border-theme placeholder-theme-lighter"
             placeholder="registry.mydomain.com"
             @keyup="saveData"
           >
@@ -40,12 +40,12 @@
             v-model="usernameData"
             :disabled="usernameEnv"
             type="text"
-            class="w-2/3 p-1 px-2 mb-4 text-xl font-bold border rounded text-theme border-theme placeholder-theme-lighter"
+            class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme border-theme placeholder-theme-lighter"
             placeholder="username"
             @keyup="saveData"
           >
 
-          <div class="flex justify-center w-2/3">
+          <div class="flex justify-center w-full">
             <input
               v-model="passwordData"
               class="w-full p-1 px-2 text-xl font-bold text-gray-700 border rounded-l text-theme border-theme docker-pull placeholder-theme-lighter"
@@ -138,13 +138,13 @@ export default {
 .title {
   font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 100px;
+  font-size: 80px;
   letter-spacing: 1px;
 }
 
 .subtitle {
   font-weight: 300;
-  font-size: 42px;
+  font-size: 30px;
   word-spacing: 5px;
   padding-bottom: 15px;
 }
