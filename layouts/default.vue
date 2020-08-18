@@ -8,12 +8,9 @@
     }"
   >
     <nuxt />
+
     <footer class="fixed bottom-0 flex items-center justify-between w-full h-16 px-8 text-white bg-theme-lighter">
       <div class="flex items-center justify-center">
-        <p class="mr-4 text-xl font-bold">
-          Theme color:
-        </p>
-
         <div class="flex">
           <div
             style="background-color: var(--color-theme-one)"
