@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.5 | 2020-08-18
+
+#### Features:
+
+- Add navigations button to return on the previous page
+- Change yellow theme to orange
+
+#### Fixes:
+
+- Improve UX (text size, notification place)
+- Upgrade package dependancies
+
+#### docker image
+
+```
+docker pull tchoupinax/fuzzy-engine:v1.0.3
+```
+
+
 ## 1.0.4 | 2020-05-13
 
 #### Fixes:
