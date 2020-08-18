@@ -19,7 +19,7 @@
   },
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
+    "watch": "nuxt dev",
     "build": "nuxt build",
     "start": "cross-env NODE_ENV=production node server/index.js",
     "generate": "nuxt generate",
@@ -30,7 +30,6 @@
     "@nuxtjs/axios": "^5.12.1",
     "@nuxtjs/pwa": "^3.0.1",
     "cookieparser": "^0.1.0",
-    "cross-env": "^7.0.2",
     "express": "^4.17.1",
     "js-cookie": "^2.2.1",
     "mini-toastr": "^0.8.1",
