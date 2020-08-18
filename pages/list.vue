@@ -28,14 +28,15 @@
             <div class="flex items-center">
               <div class="flex mr-8">
                 <input
-                  class="px-2 text-gray-700 border border-gray-700 rounded-l docker-pull"
+                  class="px-2 text-xs text-gray-700 border border-gray-700 rounded-l docker-pull"
                   type="text"
                   :value="`docker pull ${url}/${repo.name}`"
                 >
+
                 <button
                   v-clipboard:copy="`docker pull ${url}/${repo.name}`"
                   v-clipboard:success="onCopy"
-                  class="p-2 px-4 bg-blue-200 border border-l-0 border-gray-700 rounded-r"
+                  class="p-2 px-4 bg-gray-200 border border-l-0 border-gray-700 rounded-r"
                   type="button"
                 >
                   <img
