@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.6 | 2020-08-18
+
+#### Features:
+
+- On the view list, the count of tag for each repository is displayed
+
+#### Fixes:
+
+- Several little fixes
+
+#### docker image
+
+```
+docker pull tchoupinax/fuzzy-engine:v1.0.6
+```
+
 ## 1.0.5 | 2020-08-18
 
 #### Features:
@@ -15,9 +31,8 @@
 #### docker image
 
 ```
-docker pull tchoupinax/fuzzy-engine:v1.0.3
+docker pull tchoupinax/fuzzy-engine:v1.0.5
 ```
-
 
 ## 1.0.4 | 2020-05-13
 
