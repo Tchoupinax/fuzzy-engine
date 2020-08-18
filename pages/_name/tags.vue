@@ -1,66 +1,76 @@
 <template>
-  <div class="flex justify-center mb-32">
-    <div class="w-full lg:w-8/12 text-theme">
-      <p class="mt-16 mb-16 text-4xl text-center">
-        {{ name }}
-      </p>
+  <div>
+    <section id="actions" class="mt-6 ml-8">
+      <a href="/list">
+        <button class="font-bold text-theme-lighter hover:text-theme">
+          Home
+        </button>
+      </a>
+    </section>
 
-      <div class="flex flex-col items-center justify-center">
-        <!-- List of digests -->
-        <div
-          v-for="(digest, index) of digests"
-          :key="index"
-          class="flex items-center justify-between w-full px-8 py-4 text-sm font-bold text-center border-b border-gray-600"
-        >
-          <div class="flex items-center justify-center">
-            <div class="w-24 mr-8">
-              {{ digest.name }}
-            </div>
-            <div class="relative z-10 flex items-center justify-center mr-8">
-              {{ digest.size }}
-              <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
-                i
-              </div>
-              <div class="absolute left-0 w-48 p-2 px-1 ml-24 bg-black rounded-lg info">
-                This size is calculated by summing the image's layers, of which are compressed.
-              </div>
-            </div>
-            <div class="relative flex items-center justify-center mr-8">
-              {{ timeago(digest.created) }}
-              <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
-                i
-              </div>
-              <div class="absolute left-0 w-48 p-2 px-1 ml-32 bg-black rounded-lg info">
-                {{ formatFullDate(digest.created) }}
-              </div>
-            </div>
-          </div>
+    <div class="flex justify-center mb-32">
+      <div class="w-full lg:w-8/12 text-theme">
+        <p class="mt-16 mb-16 text-4xl text-center">
+          {{ name }}
+        </p>
 
-          <!-- Right -->
-          <div class="flex items-center">
-            <div class="flex mr-8">
-              <div
-                v-for="(tag, indexTags) of digest.tags"
-                :key="indexTags"
-                class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
+        <div class="flex flex-col items-center justify-center">
+          <!-- List of digests -->
+          <div
+            v-for="(digest, index) of digests"
+            :key="index"
+            class="flex items-center justify-between w-full px-8 py-4 text-sm font-bold text-center border-b border-gray-600"
+          >
+            <div class="flex items-center justify-center">
+              <div class="w-24 mr-8">
+                {{ digest.name }}
+              </div>
+              <div class="relative z-10 flex items-center justify-center mr-8">
+                {{ digest.size }}
+                <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
+                  i
+                </div>
+                <div class="absolute left-0 w-48 p-2 px-1 ml-24 bg-black rounded-lg info">
+                  This size is calculated by summing the image's layers, of which are compressed.
+                </div>
+              </div>
+              <div class="relative flex items-center justify-center mr-8">
+                {{ timeago(digest.created) }}
+                <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
+                  i
+                </div>
+                <div class="absolute left-0 w-48 p-2 px-1 ml-32 bg-black rounded-lg info">
+                  {{ formatFullDate(digest.created) }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Right -->
+            <div class="flex items-center">
+              <div class="flex mr-8">
+                <div
+                  v-for="(tag, indexTags) of digest.tags"
+                  :key="indexTags"
+                  class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
+                >
+                  {{ tag }}
+                </div>
+              </div>
+
+              <button
+                class="flex items-center justify-center p-1 px-2 text-center border-2 rounded border-theme bg-theme-lighter text-theme"
+                @click="deleteImage(digest.fullDigest)"
               >
-                {{ tag }}
-              </div>
+                🗑️
+              </button>
             </div>
-
-            <button
-              class="flex items-center justify-center p-1 px-2 text-center border-2 rounded border-theme bg-theme-lighter text-theme"
-              @click="deleteImage(digest.fullDigest)"
-            >
-              🗑️
-            </button>
-          </div>
           <!-- END # Right -->
-        </div>
-        <!-- END # List of digests -->
+          </div>
+          <!-- END # List of digests -->
 
-        <div v-if="digests.length === 0">
-          No tag found for this repository
+          <div v-if="digests.length === 0">
+            No tag found for this repository
+          </div>
         </div>
       </div>
     </div>
@@ -140,7 +150,7 @@ export default {
   mounted () {
     if (this.$route.query.delete === 'success') {
       this.deleteSuccess();
-      this.$router.push(`/${this.name}/tags`);
+      this.$router.push(`/${this.name}/tags/`);
     }
   },
   methods: {

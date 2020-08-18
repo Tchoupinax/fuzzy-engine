@@ -1,45 +1,55 @@
 <template>
-  <div class="flex justify-center mb-32">
-    <div class="w-full lg:w-8/12">
-      <div class="flex flex-col items-center justify-center text-theme">
-        <p class="mt-16 mb-16 text-4xl">
-          {{ url }}
-        </p>
+  <div>
+    <section id="actions" class="mt-6 ml-8">
+      <a href="/">
+        <button class="font-bold text-theme-lighter hover:text-theme">
+          Home
+        </button>
+      </a>
+    </section>
 
-        <div
-          v-for="(repo, index) of repositories"
-          :key="index"
-          class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme"
-        >
-          <div class="text-xl">
-            {{ repo }}
-          </div>
+    <div class="flex justify-center">
+      <div class="w-full lg:w-8/12">
+        <div class="flex flex-col items-center justify-center text-theme">
+          <p class="mb-24 text-4xl">
+            {{ url }}
+          </p>
 
-          <!-- Right -->
-          <div class="flex items-center">
-            <div class="flex mr-8">
-              <input
-                class="px-2 text-gray-700 border border-gray-700 rounded-l docker-pull"
-                type="text"
-                :value="`docker pull ${url}/${repo}`"
-              >
-              <button
-                v-clipboard:copy="`docker pull ${url}/${repo}`"
-                v-clipboard:success="onCopy"
-                class="p-2 px-4 bg-blue-200 border border-l-0 border-gray-700 rounded-r"
-                type="button"
-              >
-                <img
-                  class="w-4"
-                  src="https://clipboardjs.com/assets/images/clippy.svg"
-                  alt=""
-                >
-              </button>
+          <div
+            v-for="(repo, index) of repositories"
+            :key="index"
+            class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme"
+          >
+            <div class="text-xl">
+              {{ repo }}
             </div>
 
-            <a :href="`/${repo}/tags`">Show tags</a>
-          </div>
+            <!-- Right -->
+            <div class="flex items-center">
+              <div class="flex mr-8">
+                <input
+                  class="px-2 text-gray-700 border border-gray-700 rounded-l docker-pull"
+                  type="text"
+                  :value="`docker pull ${url}/${repo}`"
+                >
+                <button
+                  v-clipboard:copy="`docker pull ${url}/${repo}`"
+                  v-clipboard:success="onCopy"
+                  class="p-2 px-4 bg-blue-200 border border-l-0 border-gray-700 rounded-r"
+                  type="button"
+                >
+                  <img
+                    class="w-4"
+                    src="https://clipboardjs.com/assets/images/clippy.svg"
+                    alt=""
+                  >
+                </button>
+              </div>
+
+              <a :href="`/${repo}/tags`">Show tags</a>
+            </div>
           <!-- END # Right -->
+          </div>
         </div>
       </div>
     </div>
