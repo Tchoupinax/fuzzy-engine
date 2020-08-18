@@ -11,9 +11,9 @@
 
 .mini-toastr {
   right: inherit !important;
-  top: inherit !important;
+  top: 12px !important;
   right: 12px !important;
-  bottom: 12px !important;
+  bottom: inherit !important;
 }
 
 :root {
