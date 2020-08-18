@@ -15,7 +15,7 @@
 #### docker image
 
 ```
-docker pull tchoupinax/fuzzy-engine:v1.0.3
+docker pull tchoupinax/fuzzy-engine:v1.0.5
 ```
 
 
