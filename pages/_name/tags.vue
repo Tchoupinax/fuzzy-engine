@@ -144,7 +144,16 @@ export default {
     return {
       noTag: false,
       name: route.params.name,
-      digests: Array.from(finalDigests.values()),
+      digests: Array.from(finalDigests.values())
+        .sort((a, b) => {
+          if (a.created > b.created) {
+            return -1;
+          } else if (a.created > b.created) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }),
     };
   },
   mounted () {

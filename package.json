@@ -1,6 +1,6 @@
 {
   "name": "fuzzy-engine",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Docker registry UI made with love",
   "author": "Tchoupinax <corentinfiloche@hotmail.fr> (https://corentinfiloche.xyz)",
   "licence": "MIT",
@@ -27,14 +27,14 @@
     "test": "jest"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.12.1",
-    "@nuxtjs/pwa": "^3.0.1",
+    "@nuxtjs/axios": "^5.12.2",
+    "@nuxtjs/pwa": "^3.0.2",
     "cookieparser": "^0.1.0",
     "express": "^4.17.1",
     "js-cookie": "^2.2.1",
     "mini-toastr": "^0.8.1",
-    "nuxt": "^2.14.3",
-    "pretty-bytes": "^5.3.0",
+    "nuxt": "^2.14.4",
+    "pretty-bytes": "^5.4.1",
     "timeago.js": "^4.0.2",
     "vue-clipboard2": "^0.3.1",
     "vue-notifications": "^1.0.2"
@@ -42,13 +42,13 @@
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.1.0",
     "@nuxtjs/eslint-module": "^2.0.0",
-    "@nuxtjs/tailwindcss": "^3.0.0",
-    "@vue/test-utils": "^1.0.4",
+    "@nuxtjs/tailwindcss": "^3.0.2",
+    "@vue/test-utils": "^1.0.5",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
-    "eslint": "^7.7.0",
+    "eslint": "^7.8.1",
     "eslint-plugin-nuxt": ">=1.0.0",
-    "jest": "^26.4.0",
+    "jest": "^26.4.2",
     "nodemon": "^2.0.4",
     "vue-jest": "^4.0.0-beta.3"
   }

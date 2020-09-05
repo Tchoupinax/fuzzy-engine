@@ -62,6 +62,7 @@ List of the digests (with tags) for one repository
 * [x] Add footer and github link on app
 * [x] Add title and favicon
 * [x] Improve navigation (with buttons)
+* [x] Sort tag by created date
 * [ ] Possibility to color tag (matching a regex)
 
 #### Built with

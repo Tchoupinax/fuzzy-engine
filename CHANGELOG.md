@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.7 | 2020-09-05
+
+#### Features:
+
+- Sort tag by created date on repository view
+
+#### Fixes:
+
+- Upgrade dependencies
+- Add bottom margin on list view
+
+#### docker image
+
+```
+docker pull tchoupinax/fuzzy-engine:v1.0.7
+```
+
 ## 1.0.6 | 2020-08-18
 
 #### Features:
