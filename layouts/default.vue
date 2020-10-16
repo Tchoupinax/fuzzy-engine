@@ -4,7 +4,9 @@
       'one': theme === 'one',
       'two': theme === 'two',
       'three': theme === 'three',
-      'fourth': theme === 'fourth'
+      'fourth': theme === 'fourth',
+      'fifth': theme === 'fifth',
+      'sixth': theme === 'sixth'
     }"
   >
     <nuxt />
@@ -31,6 +33,16 @@
             style="background-color: var(--color-theme-fourth)"
             class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
             @click="changeColor('fourth')"
+          />
+          <div
+            style="background-color: var(--color-theme-fifth)"
+            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
+            @click="changeColor('fifth')"
+          />
+          <div
+            style="background-color: var(--color-theme-sixth)"
+            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
+            @click="changeColor('sixth')"
           />
         </div>
       </div>

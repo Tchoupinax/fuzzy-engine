@@ -1,3 +1,9 @@
 export default function ({ url, username, password }) {
-  return `https://${username.data}:${password.data}@${url.data}`;
+  let protocol = 'https';
+
+  if (url.data.includes('localhost')) {
+    protocol = 'http';
+  }
+
+  return `${protocol}://${username.data}:${password.data}@${url.data}`;
 }

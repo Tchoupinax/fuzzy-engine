@@ -13,12 +13,12 @@ module.exports = {
   ],
   rules: {
     'nuxt/no-cjs-in-config': 'off',
-    'semi': [
+    semi: [
       'error',
-      'always', 
+      'always',
     ],
     'comma-dangle': [
-      'error', 
+      'error',
       'always-multiline',
     ],
   },

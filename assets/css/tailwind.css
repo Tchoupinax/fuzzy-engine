@@ -25,6 +25,10 @@
   --color-theme-three-lighter: rgb(109, 243, 113);
   --color-theme-fourth: #ed8936;
   --color-theme-fourth-lighter: #fbd38d;
+  --color-theme-fifth: #9D38EB;
+  --color-theme-fifth-lighter: #b779e6;
+  --color-theme-sixth: #37E6CE;
+  --color-theme-sixth-lighter:#72e6d7;
 }
 
 .one {
@@ -45,4 +49,14 @@
 .fourth {
   --color-theme: var(--color-theme-fourth);
   --color-theme-lighter: var(--color-theme-fourth-lighter);
+}
+
+.fifth {
+  --color-theme: var(--color-theme-fifth);
+  --color-theme-lighter: var(--color-theme-fifth-lighter);
+}
+
+.sixth {
+  --color-theme: var(--color-theme-sixth);
+  --color-theme-lighter: var(--color-theme-sixth-lighter);
 }
