@@ -19,8 +19,6 @@ docker run -d -p 3000:3000 tchoupinax/fuzzy-engine
 | DOCKER_REGISTRY_URL      | Specify the url to access the registry      |
 | DOCKER_REGISTRY_USERNAME | Specify the username to access the registry |
 | DOCKER_REGISTRY_PASSWORD | Specify the password to access the registry |
-
-
 Environment variable can be passed to the container with `-e` option 
 
 ```
@@ -48,11 +46,15 @@ Home page
 
 List of your repositories
 
-![Home page](./.github/images.png)
+![Repository list](./.github/list.png)
+
+List of your repositories with hidden repository
+
+![Home page](./.github/list-filtered.png)
 
 List of the digests (with tags) for one repository
 
-![Home page](./.github/digests.png)
+![Home page](./.github/tags.png)
 
 ### Roadmap
 
@@ -64,6 +66,7 @@ List of the digests (with tags) for one repository
 * [x] Improve navigation (with buttons)
 * [x] Sort tag by created date
 * [ ] Possibility to color tag (matching a regex)
+* [x] Hide repository on the repository list
 
 #### Built with
 

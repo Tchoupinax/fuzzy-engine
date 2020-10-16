@@ -25,4 +25,6 @@ COPY --from=builder /app/.nuxt /app/.nuxt/
 
 RUN npm install --production nuxt && npx modclean -r
 
+EXPOSE 3000
+
 CMD NUXT_HOST=0.0.0.0 npx nuxt start

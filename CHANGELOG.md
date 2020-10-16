@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.8 | 2020-10-16
+
+#### Features:
+
+- You can now hide repositories on the list to keep the most important repository you want in the list
+- Add several color for the theme and improve icons
+- Allow to connect to localhost repository (with http)
+
+#### Fixes:
+
+- CSS alignment when tag count is higher than 10
+
 ## 1.0.7 | 2020-09-05
 
 #### Features:
