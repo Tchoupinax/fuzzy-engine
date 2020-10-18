@@ -46,10 +46,6 @@ Home page
 
 List of your repositories
 
-![Repository list](./.github/list.png)
-
-List of your repositories with hidden repository
-
 ![Home page](./.github/list-filtered.png)
 
 List of the digests (with tags) for one repository

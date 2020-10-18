@@ -169,7 +169,7 @@ export default {
     },
   },
   mounted () {
-    this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories'));
+    this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]');
     this.loading = false;
   },
   methods: {
