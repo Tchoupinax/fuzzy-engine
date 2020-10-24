@@ -46,10 +46,6 @@ Home page
 
 List of your repositories
 
-![Repository list](./.github/list.png)
-
-List of your repositories with hidden repository
-
 ![Home page](./.github/list-filtered.png)
 
 List of the digests (with tags) for one repository
@@ -72,3 +68,11 @@ List of the digests (with tags) for one repository
 
 * [Nuxt.js](https://nuxtjs.org/) - Vue.js framework
 * [Tailwindcss](https://tailwindcss.com/) - Utility-first CSS framework
+
+## Docker informations
+
+### Trigger the garbage collector
+
+```bash
+docker exec -it container-name bin/registry garbage-collect /etc/docker/registry/config.yml
+```
