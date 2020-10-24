@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.9 | 2020-10-24
+
+#### Features:
+
+- Empty repository (with no tag) are no longer displayed on the list view
+- Add the feature to remove all the tag for a repository
+
+#### Fixes:
+
+- Add a default value for the localstorage (feature for hiding repositories)
+- Repair url display in the list view
+
+#### Chores:
+
+- Upgrade npm dependancies
+
 ## 1.0.8 | 2020-10-16
 
 #### Features:
