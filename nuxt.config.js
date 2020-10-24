@@ -1,6 +1,6 @@
 
 module.exports = {
-  mode: 'universal',
+  ssr: 'true',
   head: {
     title: 'Docker registry UI',
     meta: [
