@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.10 | 2021-03-23
+
+#### Fixes:
+
+- Allow docker image to contains a slash
+
 ## 1.0.9 | 2020-10-24
 
 #### Features:
