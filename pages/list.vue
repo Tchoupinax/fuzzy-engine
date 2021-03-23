@@ -73,7 +73,7 @@
               </div>
 
               <div class="flex items-center justify-end w-32 text-right">
-                <a :href="`/${repo.name}/tags`">
+                <a :href="`/${repo.name.replace(/\//g, '-')}/tags`">
                   Show tags ({{ repo.countOfTags }})
                 </a>
               </div>

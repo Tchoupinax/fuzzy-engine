@@ -88,9 +88,11 @@ import getBaseUrl from '@/functions/getBaseUrl';
 
 export default {
   async asyncData ({ $axios, route, store, app }) {
+    const name = route.params.name.replace(/-/g, '/');
+
     const { data: { tags } } = await $axios({
       method: 'GET',
-      url: `${getBaseUrl(store.state)}/v2/${route.params.name}/tags/list`,
+      url: `${getBaseUrl(store.state)}/v2/${name}/tags/list`,
     });
 
     if (tags === null) {
@@ -107,7 +109,7 @@ export default {
         data: { layers },
       } = await $axios({
         method: 'GET',
-        url: `${getBaseUrl(store.state)}/v2/${route.params.name}/manifests/${tag}`,
+        url: `${getBaseUrl(store.state)}/v2/${name}/manifests/${tag}`,
         headers: {
           Accept: 'application/vnd.docker.distribution.manifest.v2+json',
         },
@@ -118,7 +120,7 @@ export default {
       // Get creation date
       const { data: { history: [{ v1Compatibility }] } } = await $axios({
         method: 'GET',
-        url: `${getBaseUrl(store.state)}/v2/${route.params.name}/manifests/${tag}`,
+        url: `${getBaseUrl(store.state)}/v2/${name}/manifests/${tag}`,
       });
 
       return {
@@ -147,7 +149,7 @@ export default {
 
     return {
       noTag: false,
-      name: route.params.name,
+      name,
       digests: Array.from(finalDigests.values())
         .sort((a, b) => {
           if (a.created > b.created) {

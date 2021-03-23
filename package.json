@@ -27,14 +27,14 @@
     "test": "jest"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.12.2",
-    "@nuxtjs/pwa": "^3.2.2",
+    "@nuxtjs/axios": "^5.13.1",
+    "@nuxtjs/pwa": "^3.3.5",
     "cookieparser": "^0.1.0",
     "express": "^4.17.1",
     "js-cookie": "^2.2.1",
     "mini-toastr": "^0.8.1",
-    "nuxt": "^2.14.7",
-    "pretty-bytes": "^5.4.1",
+    "nuxt": "^2.15.3",
+    "pretty-bytes": "^5.6.0",
     "timeago.js": "^4.0.2",
     "vue-clipboard2": "^0.3.1",
     "vue-notifications": "^1.0.2"
