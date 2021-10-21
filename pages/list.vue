@@ -2,14 +2,14 @@
   <div>
     <section id="actions" class="flex justify-between mt-6 ml-8">
       <a href="/">
-        <button class="font-bold text-theme-lighter hover:text-theme">
+        <button class="font-bold text-theme-default hover:text-theme-default">
           Home
         </button>
       </a>
 
       <div class="mr-8">
         <button
-          class="flex items-center font-bold text-theme-lighter hover:text-theme"
+          class="flex items-center font-bold text-theme-default hover:text-theme-default"
           @click="toggleHiddingRepoMode"
         >
           <div v-if="!hiddingRepoMode" class="w-4 mr-1">
@@ -29,7 +29,7 @@
 
     <div class="flex flex-col items-center justify-center mb-40">
       <div class="w-full lg:w-8/12">
-        <div class="flex flex-col items-center justify-center mb-40 text-theme">
+        <div class="flex flex-col items-center justify-center mb-40 text-theme-default">
           <p class="mb-24 text-4xl">
             {{ url }}
           </p>
@@ -42,7 +42,7 @@
             v-for="(repo, index) of filteredRepositories"
             v-else
             :key="index"
-            class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme"
+            class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
             :class="{ 'opacity-50': hiddingRepositories.includes(repo.name) }"
           >
             <div class="w-5/12 text-xl text-left truncate">
@@ -55,7 +55,7 @@
                 <input
                   class="px-2 text-xs text-gray-700 border border-gray-700 rounded-l docker-pull"
                   type="text"
-                  :value="`docker pull ${url}/${repo.name}`"
+                  :value="downloadUrl(repo.name)"
                 >
 
                 <button
@@ -118,61 +118,36 @@
 </template>
 
 <script>
-import getBaseUrl from '@/functions/getBaseUrl';
+import listRepository from '@/functions/api/list-repositories';
 
 export default {
-  async asyncData ({ $axios, store, redirect }) {
-    let repositories;
+  async asyncData ({ $axios, store, redirect, $aws }) {
+    const repositories = await listRepository(store.state.provider, redirect, { $axios, $aws }, store);
 
-    try {
-      ({ data: { repositories } } = await $axios({
-        method: 'GET',
-        url: `${getBaseUrl(store.state)}/v2/_catalog`,
-      }));
-    } catch (err) {
-      if (err.errno) {
-        return redirect('/?error=ENOTFOUND');
-      }
-      if (err.response.status === 401) {
-        return redirect('/?error=401');
-      }
-
-      return { repositories: [] };
+    return {
+      repositories: repositories.sort((a, b) => {
+        if (a.name > b.name) { return 1; }
+        if (a.name < b.name) { return -1; }
+      }),
     };
-
-    repositories = await Promise.all(repositories.map((repository) => {
-      return $axios({
-        method: 'GET',
-        url: `${getBaseUrl(store.state)}/v2/${repository}/tags/list`,
-      })
-        .then(({ data }) => {
-          return {
-            name: data.name,
-            countOfTags: Array.isArray(data.tags) ? data.tags.length : 0,
-          };
-        })
-        // eslint-disable-next-line handle-callback-err
-        .catch((err) => {
-          return null;
-        });
-    }));
-
-    // Remove empty repository from the list
-    const filteredRepositories = repositories.filter(r => r).filter(r => r.countOfTags > 0);
-
-    return { repositories: filteredRepositories };
   },
   data () {
     return {
       loading: true,
       hiddingRepoMode: false,
       hiddingRepositories: [],
+      repositories: [],
     };
   },
   computed: {
     url () {
+      if (this.$store.state.provider === 'aws-ecr') {
+        return `AWS - ${this.$store.state.awsEcr.region}`;
+      }
+
       return this.$store.state.url.data;
     },
+
     filteredRepositories () {
       if (this.hiddingRepoMode) {
         return this.repositories;
@@ -193,6 +168,13 @@ export default {
     }
   },
   methods: {
+    downloadUrl (repo) {
+      if (this.$store.state.provider === 'aws-ecr') {
+        return `docker pull 440562349563.dkr.ecr.${this.$store.state.awsEcr.region}.amazonaws.com/${repo}`;
+      }
+
+      return `docker pull ${this.$store.state.url.data}/${repo}`;
+    },
     toggleHiddingRepoMode () {
       this.hiddingRepoMode = !this.hiddingRepoMode;
       if (!this.hiddingRepoMode) {

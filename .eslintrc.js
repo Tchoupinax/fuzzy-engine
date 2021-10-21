@@ -21,5 +21,7 @@ module.exports = {
       'error',
       'always-multiline',
     ],
+    'prefer-template': 'error',
+    'vue/comment-directive': 'off',
   },
 };

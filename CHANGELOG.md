@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 | 2021-10-20
+
+#### Features:
+
+- Now supports AWS container registry ! 🎉🎉
+
+#### Chores:
+
+- Upgrade tailwindCSS
+
 ## 1.0.10 | 2021-03-23
 
 #### Fixes:

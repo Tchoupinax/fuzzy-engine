@@ -2,14 +2,14 @@
   <div>
     <section id="actions" class="mt-6 ml-8">
       <a href="/list">
-        <button class="font-bold text-theme-lighter hover:text-theme">
+        <button class="font-bold text-theme-default hover:text-theme-default">
           List of repositories
         </button>
       </a>
     </section>
 
     <div class="flex justify-center mb-32">
-      <div class="w-full lg:w-8/12 text-theme">
+      <div class="w-full lg:w-8/12 text-theme-default">
         <p class="mt-16 mb-16 text-4xl text-center">
           {{ name }}
         </p>
@@ -27,7 +27,7 @@
               </div>
               <div class="relative z-10 flex items-center justify-center mr-8">
                 {{ digest.size }}
-                <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
+                <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:bg-theme hover:text-white hover:border-white">
                   i
                 </div>
                 <div class="absolute left-0 w-48 p-2 px-1 ml-24 bg-black rounded-lg info">
@@ -36,7 +36,7 @@
               </div>
               <div class="relative flex items-center justify-center mr-8">
                 {{ timeago(digest.created) }}
-                <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme hover:bg-theme hover:text-white hover:border-white">
+                <div class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:bg-theme hover:text-white hover:border-white">
                   i
                 </div>
                 <div class="absolute left-0 w-48 p-2 px-1 ml-32 bg-black rounded-lg info">
@@ -47,7 +47,7 @@
 
             <!-- Right -->
             <div class="flex items-center">
-              <div class="flex mr-8">
+              <div class="flex">
                 <div
                   v-for="(tag, indexTags) of digest.tags"
                   :key="indexTags"
@@ -58,7 +58,8 @@
               </div>
 
               <button
-                class="flex items-center justify-center p-1 px-2 text-center bg-gray-200 border-2 rounded border-theme text-theme"
+                v-if="$store.state.provided === 'docker-registry-v2'"
+                class="flex items-center justify-center p-1 px-2 ml-8 text-center bg-gray-200 border-2 rounded border-theme-default text-theme-default"
                 @click="deleteImage(digest.fullDigest)"
               >
                 <div class="w-4">
@@ -82,85 +83,12 @@
 </template>
 
 <script>
-import prettyBytes from 'pretty-bytes';
 import * as timeago from 'timeago.js';
-import getBaseUrl from '@/functions/getBaseUrl';
+import listTags from '@/functions/api/list-tags';
 
 export default {
-  async asyncData ({ $axios, route, store, app }) {
-    const name = route.params.name.replace(/-/g, '/');
-
-    const { data: { tags } } = await $axios({
-      method: 'GET',
-      url: `${getBaseUrl(store.state)}/v2/${name}/tags/list`,
-    });
-
-    if (tags === null) {
-      return {
-        noTag: true,
-        name: route.params.name,
-        digests: [],
-      };
-    }
-
-    const tagsWithDigest = await Promise.all(tags.map(async (tag) => {
-      const {
-        headers: { 'docker-content-digest': digest },
-        data: { layers },
-      } = await $axios({
-        method: 'GET',
-        url: `${getBaseUrl(store.state)}/v2/${name}/manifests/${tag}`,
-        headers: {
-          Accept: 'application/vnd.docker.distribution.manifest.v2+json',
-        },
-      });
-
-      const size = layers.reduce((acc, cur) => acc + cur.size, 0);
-
-      // Get creation date
-      const { data: { history: [{ v1Compatibility }] } } = await $axios({
-        method: 'GET',
-        url: `${getBaseUrl(store.state)}/v2/${name}/manifests/${tag}`,
-      });
-
-      return {
-        name: tag,
-        digest: digest.slice(7, 19),
-        fullDigest: digest,
-        size: prettyBytes(size),
-        created: JSON.parse(v1Compatibility).created,
-      };
-    }));
-
-    const finalDigests = new Map();
-    tagsWithDigest.forEach(({ name, digest, size, created, fullDigest }) => {
-      if (finalDigests.has(digest)) {
-        finalDigests.set(digest, {
-          name: digest,
-          tags: [...finalDigests.get(digest).tags, name],
-          size,
-          created,
-          fullDigest,
-        });
-      } else {
-        finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest });
-      }
-    });
-
-    return {
-      noTag: false,
-      name,
-      digests: Array.from(finalDigests.values())
-        .sort((a, b) => {
-          if (a.created > b.created) {
-            return -1;
-          } else if (a.created > b.created) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }),
-    };
+  asyncData ({ $axios, route, store, $aws }) {
+    return listTags(store.state.provider, route.params.name, { $axios, $aws }, store);
   },
   mounted () {
     if (this.$route.query.delete === 'success') {

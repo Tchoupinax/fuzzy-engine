@@ -78,6 +78,7 @@ export default {
   methods: {
     changeColor (name) {
       this.theme = name;
+
       setCookie('fuzzy-engine-theme', name);
     },
   },
