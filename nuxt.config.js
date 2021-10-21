@@ -1,6 +1,6 @@
 
 module.exports = {
-  ssr: 'true',
+  ssr: true,
   head: {
     title: 'Docker registry UI',
     meta: [
@@ -15,8 +15,9 @@ module.exports = {
   loading: { color: '#fff' },
   css: [],
   plugins: [
-    { src: '~/plugins/notifications', ssr: false },
-    { src: '~/plugins/clipboard.js', ssr: false },
+    '~/plugins/aws-ecr.server.js',
+    '~/plugins/clipboard.client.js',
+    '~/plugins/notifications.client.js',
   ],
   buildModules: [
     '@nuxtjs/eslint-module',

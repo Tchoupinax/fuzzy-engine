@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center mt-40">
     <div class="w-full lg:w-8/12">
-      <div class="flex flex-col items-center justify-center mb-40 text-theme">
+      <div class="flex flex-col items-center justify-center mb-40 text-theme-default">
         <p class="mb-24 text-4xl">
           deleting all image for {{ repoName }} ...
         </p>
