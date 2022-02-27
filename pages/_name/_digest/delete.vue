@@ -6,6 +6,7 @@
 import getBaseUrl from '@/functions/getBaseUrl';
 
 export default {
+  name: 'DeletePage',
   async asyncData ({ $axios, route, store }) {
     await $axios({
       method: 'DELETE',
