@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 | 2022-02-27
+
+#### Features:
+
+- A page has been added to view the ten latest image which has been pushed to the registry 🚀
+
+#### Chores:
+
+- Upgrade dependancies
+
 ## 1.1.0 | 2021-10-20
 
 #### Features:

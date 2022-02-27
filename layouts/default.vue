@@ -70,6 +70,7 @@
 const { setCookie } = require('@/functions/cookies');
 
 export default {
+  name: 'DefaultLayout',
   data () {
     return {
       theme: this.$store.state.theme || 'one',

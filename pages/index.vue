@@ -193,6 +193,7 @@
 const { setCookie } = require('@/functions/cookies');
 
 export default {
+  name: 'IndexPage',
   asyncData ({ store }) {
     return {
       awsEcr: store.state.awsEcr ?? {},
