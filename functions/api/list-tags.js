@@ -73,6 +73,8 @@ export default async function (provider, name, { $axios, $aws }, store) {
           },
         });
 
+        const architecures = await getArchitecture($axios, store, name, tag);
+
         const size = layers.reduce((acc, cur) => acc + cur.size, 0);
 
         // Get creation date
@@ -87,11 +89,12 @@ export default async function (provider, name, { $axios, $aws }, store) {
           fullDigest: digest,
           size: prettyBytes(size),
           created: JSON.parse(v1Compatibility).created,
+          architecures,
         };
       }));
 
       const finalDigests = new Map();
-      tagsWithDigest.forEach(({ name, digest, size, created, fullDigest }) => {
+      tagsWithDigest.forEach(({ name, digest, size, created, fullDigest, architecures }) => {
         if (finalDigests.has(digest)) {
           finalDigests.set(digest, {
             name: digest,
@@ -99,9 +102,10 @@ export default async function (provider, name, { $axios, $aws }, store) {
             size,
             created,
             fullDigest,
+            architecures,
           });
         } else {
-          finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest });
+          finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest, architecures });
         }
       });
 
@@ -121,4 +125,24 @@ export default async function (provider, name, { $axios, $aws }, store) {
       };
     }
   }
+}
+
+async function getArchitecture ($axios, store, name, tag) {
+  const {
+    data,
+  } = await $axios({
+    method: 'GET',
+    url: `${getBaseUrl(store.state)}/v2/${name}/manifests/${tag}`,
+    headers: {
+      Accept: 'application/vnd.docker.distribution.manifest.list.v2+json', // Manifest list, aka “fat manifest”
+    },
+  });
+
+  if (!data.manifests) {
+    return [data.architecture];
+  }
+
+  return data.manifests.map((m) => {
+    return `${m.platform.os}/${m.platform.architecture}${m.platform.variant ?? ''}`;
+  });
 }

@@ -54,6 +54,7 @@
             <!-- Right -->
             <div class="flex items-center">
               <div class="flex">
+                {{ digest.architecures }}
                 <div
                   v-for="(tag, indexTags) of digest.tags"
                   :key="indexTags"
