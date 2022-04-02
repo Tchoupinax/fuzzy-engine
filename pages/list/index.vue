@@ -63,7 +63,7 @@
                 >
 
                 <button
-                  v-clipboard:copy="`docker pull ${url}/${repo.name}`"
+                  v-clipboard:copy="`${url}/${repo.name}`"
                   v-clipboard:success="onCopy"
                   class="p-2 px-4 bg-gray-200 border border-l-0 border-gray-700 rounded-r"
                   type="button"
@@ -76,7 +76,7 @@
                 </button>
               </div>
 
-              <div class="flex items-center justify-end w-32 text-right">
+              <div class="flex items-center justify-end text-right w-28">
                 <a :href="`/${repo.name.replace(/\//g, '-')}/tags`">
                   Show tags ({{ repo.countOfTags }})
                 </a>
@@ -147,7 +147,7 @@ export default {
   computed: {
     url () {
       if (this.$store.state.provider === 'aws-ecr') {
-        return `AWS - ${this.$store.state.awsEcr.region}`;
+        return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.$store.state.awsEcr.region}`;
       }
 
       return this.$store.state.url.data;
@@ -175,17 +175,19 @@ export default {
   methods: {
     downloadUrl (repo) {
       if (this.$store.state.provider === 'aws-ecr') {
-        return `docker pull 440562349563.dkr.ecr.${this.$store.state.awsEcr.region}.amazonaws.com/${repo}`;
+        return `${this.repositories[0].url}.dkr.ecr.${this.$store.state.awsEcr.region}.amazonaws.com/${repo}`;
       }
 
-      return `docker pull ${this.$store.state.url.data}/${repo}`;
+      return `${this.$store.state.url.data}/${repo}`;
     },
+
     toggleHiddingRepoMode () {
       this.hiddingRepoMode = !this.hiddingRepoMode;
       if (!this.hiddingRepoMode) {
         localStorage.setItem('hiddingRepositories', JSON.stringify(this.hiddingRepositories));
       }
     },
+
     onCopy (e) {
       this.copiedSuccesfully();
     },
@@ -217,7 +219,7 @@ export default {
 
 <style scoped>
 .docker-pull {
-  width: 22rem;
+  width: 20rem;
 }
 .lds-ring {
   display: inline-block;

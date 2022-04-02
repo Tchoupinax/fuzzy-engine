@@ -17,34 +17,43 @@
           <div
             v-for="(digest, index) of digests"
             :key="index"
-            class="flex items-center justify-between w-full px-8 py-4 text-sm font-bold text-center border-b border-gray-600"
+            class="flex items-center justify-between w-full px-8 py-4 text-sm font-bold text-center"
+            :class="{
+              'border-b border-theme-default': index !== digests.length - 1,
+              'border-none': index === digests.length - 1,
+            }"
           >
             <div class="flex items-center justify-center">
               <div class="w-24 mr-8">
                 {{ digest.name }}
               </div>
-              <div class="relative z-10 flex items-center justify-center mr-8">
+
+              <div class="relative flex items-center justify-center mr-8">
                 {{ digest.size }}
+
                 <div
                   class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500"
                 >
                   i
                 </div>
                 <div
-                  class="absolute left-0 w-48 p-2 px-1 ml-24 bg-black rounded-lg info"
+                  class="absolute left-0 z-10 w-48 p-2 px-1 ml-24 bg-black rounded-lg info"
                 >
                   This size is calculated by summing the image's layers, of which are compressed.
                 </div>
               </div>
+
               <div class="relative flex items-center justify-center mr-8">
                 {{ timeago(digest.created) }}
+
                 <div
                   class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500"
                 >
                   i
                 </div>
+
                 <div
-                  class="absolute left-0 w-48 p-2 px-1 ml-32 bg-black rounded-lg info"
+                  class="absolute left-0 z-10 w-48 p-2 px-1 ml-32 bg-black rounded-lg info"
                 >
                   {{ formatFullDate(digest.created) }}
                 </div>
@@ -54,7 +63,14 @@
             <!-- Right -->
             <div class="flex items-center">
               <div class="flex">
-                {{ digest.architecures }}
+                <div
+                  v-for="(architecture, indexArchitecture) of digest.architecures"
+                  :key="indexArchitecture"
+                  class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-blue-100 rounded-lg"
+                >
+                  {{ architecture }}
+                </div>
+
                 <div
                   v-for="(tag, indexTags) of digest.tags"
                   :key="indexTags"
@@ -116,10 +132,13 @@ export default {
   },
   methods: {
     timeago: timeago.format,
+
     formatFullDate (date) {
       const dtf = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
+
       return dtf.format(new Date(date));
     },
+
     deleteImage (digesthash) {
       if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
         window.location = `/${this.name}/${digesthash}/delete`;

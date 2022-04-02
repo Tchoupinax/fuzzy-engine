@@ -13,6 +13,7 @@ export default async function (provider, redirect, { $axios, $aws }, store) {
 
       repositoriesAws = await Promise.all(repositoriesAws.map(async ({
         repositoryName,
+        repositoryUri,
       }) => {
         const {
           imageIds,
@@ -23,6 +24,7 @@ export default async function (provider, redirect, { $axios, $aws }, store) {
         return {
           name: repositoryName,
           countOfTags: imageIds.length,
+          url: repositoryUri,
         };
       }));
 
