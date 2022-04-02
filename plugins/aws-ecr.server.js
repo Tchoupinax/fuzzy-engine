@@ -2,6 +2,12 @@ import { ECRClient } from '@aws-sdk/client-ecr';
 import cookieparser from 'cookieparser';
 
 export default ({ req }, inject) => {
+  const { cookie } = req.headers;
+
+  if (!cookie) {
+    return;
+  }
+
   const { 'fuzzy-engine-aws-ecr': awsEcr } = cookieparser.parse(req.headers.cookie);
 
   if (!awsEcr) {

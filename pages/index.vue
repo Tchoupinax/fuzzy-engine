@@ -196,7 +196,7 @@ export default {
   name: 'IndexPage',
   asyncData ({ store }) {
     return {
-      awsEcr: store.state.awsEcr ?? {},
+      awsEcr: { ...store.state.awsEcr } ?? {},
       provider: store.state.provider ?? 'docker-registry-v2',
     };
   },
