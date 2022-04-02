@@ -50,9 +50,7 @@ export default async function (provider, redirect, { $axios, $aws }, store) {
           return redirect('/?error=401');
         }
 
-        return {
-          repositories: [],
-        };
+        return [];
       };
 
       repositories = await Promise.all(repositories.map((repository) => {
