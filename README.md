@@ -1,6 +1,12 @@
 # fuzzy-engine 🐳
 
-Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your [private Docker registry](https://hub.docker.com/_/registry).
+Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your [private Docker registry](https://hub.docker.com/_/registry) or another registries.
+
+List of supporting docker registry:
+
+- [x] self-hostable registry
+- [x] AWS ECR
+- [ ] Google Cloud
 
 **demo**: https://fuzzy-engine.corentinfiloche.xyz
 

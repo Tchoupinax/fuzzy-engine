@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.3.1 | 2022-04-02
+
+#### Style
+
+- Improve style of title of a repository
+#### Chores:
+
+- Upgrade to Node.js v16
+- Improve README
+
+## 1.3.0 | 2022-04-02
+
+#### Features:
+
+- Now display each architecture available for a an image
+
+#### Chores:
+
+- Several improvements
+
 ## 1.2.0 | 2022-02-27
 
 #### Features:

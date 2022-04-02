@@ -8,9 +8,11 @@
 
     <div class="flex justify-center mb-32">
       <div class="w-full lg:w-8/12 text-theme-default">
-        <p class="mt-16 mb-16 text-4xl text-center">
-          {{ name }}
-        </p>
+        <div class="flex justify-center w-full">
+          <p class="inline-block w-auto mt-16 mb-16 text-4xl text-center border-blue-400 border-b-10 title">
+            {{ name }}
+          </p>
+        </div>
 
         <div class="flex flex-col items-center justify-center">
           <!-- List of digests -->
@@ -156,6 +158,10 @@ export default {
 </script>
 
 <style scoped>
+.title {
+  font-size: 70px;
+  border-bottom: 20px solid rgb(255, 183, 48);
+}
 .info {
   opacity: 0;
   display: none;
