@@ -1,4 +1,4 @@
-FROM node:14-alpine as builder
+FROM node:16-alpine as builder
 
 RUN  apk add --no-cache --virtual .gyp git
 
@@ -15,7 +15,7 @@ RUN npx nuxt build --standalone -m
 #########################################################
 #########################################################
 
-FROM node:14-alpine
+FROM node:16-alpine
 
 RUN  apk add --no-cache --virtual .gyp git
 
