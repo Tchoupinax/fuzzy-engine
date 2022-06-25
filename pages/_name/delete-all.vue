@@ -18,6 +18,7 @@ export default {
     const { data: { tags } } = await $axios({
       method: 'GET',
       url: `${getBaseUrl(store.state)}/v2/${route.params.name}/tags/list`,
+      withCredentials: true,
     });
 
     await Promise.all([
@@ -30,11 +31,13 @@ export default {
           headers: {
             Accept: 'application/vnd.docker.distribution.manifest.v2+json',
           },
+          withCredentials: true,
         });
 
         $axios({
           method: 'DELETE',
           url: `${getBaseUrl(store.state)}/v2/${route.params.name}/manifests/${digest}`,
+          withCredentials: true,
         });
       },
       ),

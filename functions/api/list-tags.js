@@ -4,7 +4,7 @@ import getBaseUrl from '../getBaseUrl';
 
 export default async function (provider, name, { $axios, $aws }, store) {
   switch (provider) {
-    case 'aws-ecr': {
+    case 'aws-ecr2': {
       const { imageDetails } = await $aws.send(new DescribeImagesCommand({ repositoryName: name }));
 
       const digests = imageDetails.map((i) => {
@@ -51,6 +51,7 @@ export default async function (provider, name, { $axios, $aws }, store) {
       const { data: { tags } } = await $axios({
         method: 'GET',
         url: `${getBaseUrl(store.state)}/v2/${name}/tags/list`,
+        withCredentials: true,
       });
 
       if (tags === null) {
@@ -71,6 +72,7 @@ export default async function (provider, name, { $axios, $aws }, store) {
           headers: {
             Accept: 'application/vnd.docker.distribution.manifest.v2+json',
           },
+          withCredentials: true,
         });
 
         const architecures = await getArchitecture($axios, store, name, tag);
@@ -81,6 +83,7 @@ export default async function (provider, name, { $axios, $aws }, store) {
         const { data: { history: [{ v1Compatibility }] } } = await $axios({
           method: 'GET',
           url: `${getBaseUrl(store.state)}/v2/${name}/manifests/${tag}`,
+          withCredentials: true,
         });
 
         return {
@@ -136,6 +139,7 @@ async function getArchitecture ($axios, store, name, tag) {
     headers: {
       Accept: 'application/vnd.docker.distribution.manifest.list.v2+json', // Manifest list, aka “fat manifest”
     },
+    withCredentials: true,
   });
 
   if (!data.manifests) {

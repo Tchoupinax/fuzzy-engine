@@ -122,22 +122,22 @@
 </template>
 
 <script>
-import listRepository from '@/functions/api/list-repositories';
+const { getCookie } = require('@/functions/cookies');
 
 export default {
   name: 'ListPage',
-  async asyncData ({ $axios, store, redirect, $aws }) {
-    const repositories = await listRepository(store.state.provider, redirect, { $axios, $aws }, store);
-
-    return {
-      repositories: repositories.sort((a, b) => {
-        if (a.name > b.name) { return 1; }
-        if (a.name < b.name) { return -1; }
-      }),
-    };
-  },
   data () {
     return {
+      provider: undefined,
+      awsEcr: {
+        accessKey: '',
+        secretKey: '',
+        region: '',
+      },
+      githubRegistry: {
+        nickname: '',
+        token: '',
+      },
       loading: true,
       hiddingRepoMode: false,
       hiddingRepositories: [],
@@ -146,11 +146,15 @@ export default {
   },
   computed: {
     url () {
-      if (this.$store.state.provider === 'aws-ecr') {
-        return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.$store.state.awsEcr.region}`;
+      if (this.repositories.length > 0) {
+        if (this.provider === 'aws-ecr') {
+          return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`;
+        }
+
+        return 'Github repository';
       }
 
-      return this.$store.state.url.data;
+      return '';
     },
 
     filteredRepositories () {
@@ -163,7 +167,18 @@ export default {
       });
     },
   },
-  mounted () {
+  async mounted () {
+    const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
+    this.githubRegistry.nickname = nickname;
+    this.githubRegistry.token = token;
+
+    const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
+    this.awsEcr.accessKey = accessKey;
+    this.awsEcr.secretKey = secretKey;
+    this.awsEcr.region = region;
+
+    this.provider = getCookie('fuzzy-engine-provider');
+
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]');
     this.loading = false;
 
@@ -171,14 +186,21 @@ export default {
       this.deleteAllSuccess();
       this.$router.push('/list');
     }
+
+    const { data } = await this.$axios.get('/api/repositories', { withCredentials: true });
+
+    this.repositories = data.sort((a, b) => {
+      if (a.name > b.name) { return 1; }
+      if (a.name < b.name) { return -1; }
+    });
   },
   methods: {
     downloadUrl (repo) {
-      if (this.$store.state.provider === 'aws-ecr') {
-        return `${this.repositories[0].url}.dkr.ecr.${this.$store.state.awsEcr.region}.amazonaws.com/${repo}`;
+      if (this.provider === 'aws-ecr') {
+        return `${this.repositories[0].url}.dkr.ecr.${this.awsEcr.region}.amazonaws.com/${repo}`;
       }
 
-      return `${this.$store.state.url.data}/${repo}`;
+      return `grzegrgreg/${repo}`;
     },
 
     toggleHiddingRepoMode () {
@@ -188,7 +210,7 @@ export default {
       }
     },
 
-    onCopy (e) {
+    onCopy () {
       this.copiedSuccesfully();
     },
     hideRepo (name) {

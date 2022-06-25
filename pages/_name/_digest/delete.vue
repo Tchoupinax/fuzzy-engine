@@ -11,6 +11,7 @@ export default {
     await $axios({
       method: 'DELETE',
       url: `${getBaseUrl(store.state)}/v2/${route.params.name}/manifests/${route.params.digest}`,
+      withCredentials: true,
     });
 
     return {

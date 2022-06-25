@@ -1,9 +1,8 @@
-import listRepository from '@/functions/api/list-repositories';
 import listTag from '@/functions/api/list-tags';
 
 export default async function (provider, redirect, { $axios, $aws }, store) {
-  const names = (await listRepository(provider, redirect, { $axios, $aws }, store)).map(zz => zz.name);
-
+  // const names = (await listRepository(provider, redirect, { $axios, $aws }, store)).map(zz => zz.name);
+  const names = [];
   const aa = await Promise.all(names.map(n => listTag(provider, n, { $axios, $aws }, store)));
 
   return aa
