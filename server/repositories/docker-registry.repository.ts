@@ -1,4 +1,4 @@
-import { RegistryApiRepository } from "../gateways/registry-api";
+import { RegistryApiRepository } from "../gateways/registry-api.gateway";
 import axios from 'axios';
 
 export class DockerApiRepository implements RegistryApiRepository {

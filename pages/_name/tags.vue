@@ -126,6 +126,8 @@ export default {
       withCredentials: true,
     });
 
+    console.log(data);
+
     this.name = data.name;
     this.noTag = data.noTag;
     this.digests = data.digests;

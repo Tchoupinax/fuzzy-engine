@@ -1,4 +1,4 @@
-import { RegistryApiRepository } from "../gateways/registry-api";
+import { RegistryApiRepository } from "../gateways/registry-api.gateway";
 
 export class ListRepositoryUseCase {
   constructor(private repository: RegistryApiRepository) {}

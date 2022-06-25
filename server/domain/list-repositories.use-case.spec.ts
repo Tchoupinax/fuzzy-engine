@@ -8,13 +8,13 @@ let useCase: ListRepositoryUseCase;
 describe('list-repositories.use-case', () => {
   describe('with an AWS repository', () => {
     beforeEach(() => {
-      const data: AwsRepositoryConfig = {
-        accessKey: process.env.AWS_ACCESS_KEY ?? "",
-        secretKey: process.env.AWS_SECRET_KEY ?? "",
-        region: "eu-west-3"
-      };
-
-      useCase = new ListRepositoryUseCase(new AwsRepository(data));
+      useCase = new ListRepositoryUseCase(
+        new AwsRepository({
+          accessKey: process.env.AWS_ACCESS_KEY ?? "",
+          secretKey: process.env.AWS_SECRET_KEY ?? "",
+          region: "eu-west-3"
+        }),
+      );
     });
 
     it('should list the repositories', async () => {
@@ -27,7 +27,10 @@ describe('list-repositories.use-case', () => {
   describe('with a Github repository', () => {
     beforeEach(() => {
       useCase = new ListRepositoryUseCase(
-        new GithubRepository({ nickname: 'Tchoupinax', token: process.env.GITHUB_TOKEN ?? "" })
+        new GithubRepository({
+          nickname: 'Tchoupinax',
+          token: process.env.GITHUB_TOKEN ?? ""
+        }),
       );
     });
 

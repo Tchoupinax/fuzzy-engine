@@ -49,8 +49,9 @@
             v-if="provider === 'docker-registry-v2'"
             class="flex flex-col items-center justify-center w-full p-4"
           >
+            {{ dockerRegistry }}
             <input
-              v-model="urlData"
+              v-model="dockerRegistry.url"
               :disabled="urlEnv"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
@@ -59,7 +60,7 @@
             >
 
             <input
-              v-model="usernameData"
+              v-model="dockerRegistry.username"
               :disabled="usernameEnv"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
@@ -69,7 +70,7 @@
 
             <div class="flex justify-center w-full">
               <input
-                v-model="passwordData"
+                v-model="dockerRegistry.password"
                 class="w-full p-1 px-2 text-xl font-bold border rounded-l text-theme-default border-theme-default docker-pull placeholder-theme-lighter"
                 :type="revealed ? 'text' : 'password'"
                 placeholder="password"
@@ -273,6 +274,11 @@ export default {
         },
       ],
       revealed: false,
+      dockerRegistry: {
+        url: '',
+        username: '',
+        password: '',
+      },
       awsEcr: {
         accessKey: '',
         secretKey: '',
@@ -300,12 +306,9 @@ export default {
       }
 
       return (
-        this.urlData &&
-        this.urlData.length > 0 &&
-        this.usernameData &&
-        this.usernameData.length > 0 &&
-        this.passwordData &&
-        this.passwordData.length > 0
+        this.dockerRegistry.url?.length > 0 &&
+          this.dockerRegistry.username?.length > 0 &&
+          this.dockerRegistry.password?.length > 0
       );
     },
   },
