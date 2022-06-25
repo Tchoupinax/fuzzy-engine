@@ -19,11 +19,11 @@
   },
   "private": true,
   "scripts": {
-    "watch": "nuxt dev",
-    "build": "nuxt build",
+    "watch": "bash -c 'source .env && nuxi dev'",
+    "test": "bash -c 'source .env && vitest'",
+    "build": "nuxi build",
     "docker:build": "docker buildx build --platform linux/amd64,linux/arm64 -t tchoupinax/fuzzy-engine . --push",
     "start": "cross-env NODE_ENV=production node server/index.js",
-    "generate": "nuxt generate",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
   },
   "dependencies": {
@@ -34,13 +34,14 @@
     "express": "^4.17.3",
     "js-cookie": "^2.2.1",
     "mini-toastr": "^0.8.1",
-    "nuxt": "^2.13.3",
+    "nuxt-edge": "^2.16.0-27600500.123206cb",
     "pretty-bytes": "^5.6.0",
     "timeago.js": "^4.0.2",
     "vue-clipboard2": "^0.3.3",
     "vue-notifications": "^1.0.2"
   },
   "devDependencies": {
+    "@nuxt/bridge": "npm:@nuxt/bridge-edge@^3.0.0-27566698.2b0045e",
     "@nuxtjs/eslint-config": "^4.0.0",
     "@nuxtjs/eslint-module": "^3.0.0",
     "@nuxtjs/tailwindcss": "^5.0.2",
@@ -48,12 +49,14 @@
     "autoprefixer": "^9.8.8",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.1",
+    "defu": "^6.0.0",
     "eslint": "^7.12.0",
     "eslint-plugin-nuxt": ">=1.0.0",
     "jest": "^26.6.1",
     "nodemon": "^2.0.6",
     "postcss": "^7.0.39",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17",
+    "vitest": "^0.16.0",
     "vue-jest": "^4.0.0-beta.3"
   }
 }

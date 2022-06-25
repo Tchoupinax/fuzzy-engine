@@ -1,6 +1,7 @@
+import { defineNuxtConfig } from '@nuxt/bridge';
 
-module.exports = {
-  ssr: true,
+export default defineNuxtConfig({
+  ssr: false,
   head: {
     title: 'Docker registry UI',
     meta: [
@@ -15,7 +16,6 @@ module.exports = {
   loading: { color: '#fff' },
   css: [],
   plugins: [
-    '~/plugins/aws-ecr.server.js',
     '~/plugins/clipboard.client.js',
     '~/plugins/notifications.client.js',
   ],
@@ -31,9 +31,10 @@ module.exports = {
     // NOTE Do not send proxy headers, if the UI is behind a reverse proxy with basic auth
     // it will override authorization header and broke everything
     proxyHeaders: false,
+    credentials: true,
   },
   build: {
     extend (config, ctx) {
     },
   },
-};
+});
