@@ -1,11 +1,11 @@
 <template>
   <div>
     <section id="actions" class="flex justify-between mt-6 ml-8">
-      <a href="/">
+      <NuxtLink to="/">
         <button class="font-bold text-theme-default hover:text-theme-default">
           Home
         </button>
-      </a>
+      </NuxtLink>
     </section>
 
     <div class="flex flex-col items-center justify-center mb-40">

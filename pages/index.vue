@@ -49,7 +49,6 @@
             v-if="provider === 'docker-registry-v2'"
             class="flex flex-col items-center justify-center w-full p-4"
           >
-            {{ dockerRegistry }}
             <input
               v-model="dockerRegistry.url"
               :disabled="urlEnv"
@@ -322,6 +321,13 @@ export default {
     this.awsEcr.secretKey = secretKey;
     this.awsEcr.region = region;
 
+    if (getCookie('fuzzy-engine-docker-v2')) {
+      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}');
+      this.dockerRegistry.url = url;
+      this.dockerRegistry.username = username;
+      this.dockerRegistry.password = password;
+    }
+
     this.provider = getCookie('fuzzy-engine-provider');
   },
   methods: {
@@ -360,11 +366,20 @@ export default {
           }),
         ),
       );
+
+      setCookie(
+        'fuzzy-engine-docker-v2',
+        btoa(
+          JSON.stringify({
+            ...this.dockerRegistry,
+          }),
+        ),
+      );
     },
 
     openList (e) {
       e.preventDefault();
-      window.location = '/list';
+      this.$router.push('/list');
     },
 
     changeProvider (provider) {

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ContainerRepository, listRepositoriesTagsAnswer, RegistryApiRepository } from "../gateways/registry-api.gateway";
 import prettyBytes from "pretty-bytes";
 
-export type GithubRepositoryConfig = { nickname: string, token: string }
+export type GithubRepositoryConfig = { nickname: string, token: string };
 
 export class GithubRepository implements RegistryApiRepository {
   constructor(private config: GithubRepositoryConfig) {}
@@ -80,7 +80,6 @@ export class GithubRepository implements RegistryApiRepository {
   }
 
   private githubRepositoryDetailsToContainerRepositoryTag (repositoryName, details): listRepositoriesTagsAnswer {
-    console.log(details)
     return {
       name: repositoryName,
       noTag: false,

@@ -1,6 +1,6 @@
 import prettyBytes from 'pretty-bytes';
 import { ECRClient, DescribeRepositoriesCommand, ListImagesCommand, DescribeImagesCommand } from '@aws-sdk/client-ecr';
-import { ContainerRepository } from '../gateways/registry-api.gateway';
+import { ContainerRepository, RegistryApiRepository } from '../gateways/registry-api.gateway';
 export type AwsRepositoryConfig = { accessKey: string, secretKey: string, region: string }
 
 export class AwsRepository implements RegistryApiRepository {
@@ -55,7 +55,6 @@ export class AwsRepository implements RegistryApiRepository {
     const finalDigests = new Map();
     digests.forEach(({ name, digest, size, created, fullDigest }) => {
       if (finalDigests.has(digest)) {
-        console.log(digest);
         finalDigests.set(digest, {
           name: digest,
           tags: [...finalDigests.get(digest).tags, name],
