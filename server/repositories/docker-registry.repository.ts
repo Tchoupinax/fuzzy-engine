@@ -143,7 +143,7 @@ export class DockerApiRepository implements RegistryApiRepository {
     return `${protocol}://${this.config.username}:${this.config.password}@${this.config.url}`;
   }
 
-  private async getArchitecture (name: string, tag: string) {
+  private async getArchitecture(name: string, tag: string) {
     const {
       data,
     } = await axios({

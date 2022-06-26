@@ -1,7 +1,7 @@
 import { defineNuxtConfig } from '@nuxt/bridge';
 
 export default defineNuxtConfig({
-  ssr: false,
+  ssr: true,
   head: {
     title: 'Docker registry UI',
     meta: [

@@ -35,7 +35,9 @@
               {{ url }}
             </p>
 
-            <a href="/list/last" class="text-sm underline">View last pushed images</a>
+            <NuxtLink to="/list/last" class="text-sm underline">
+              View last pushed images
+            </NuxtLink>
           </div>
 
           <div v-if="loading" class="lds-ring">
@@ -77,9 +79,9 @@
               </div>
 
               <div class="flex items-center justify-end text-right w-28">
-                <a :href="`/${repo.name.replace(/\//g, '-')}/tags`">
+                <NuxtLink :to="`/${repo.name.replace(/\//g, '-')}/tags`">
                   Show tags ({{ repo.countOfTags }})
-                </a>
+                </NuxtLink>
               </div>
 
               <button v-show="hiddingRepoMode" class="w-6 ml-4">
@@ -129,6 +131,11 @@ export default {
   data () {
     return {
       provider: undefined,
+      dockerRegistry: {
+        url: '',
+        username: '',
+        password: '',
+      },
       awsEcr: {
         accessKey: '',
         secretKey: '',
@@ -151,10 +158,14 @@ export default {
           return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`;
         }
 
+        if (this.provider === 'docker-registry-v2') {
+          return this.dockerRegistry.url;
+        }
+
         return 'Github repository';
       }
 
-      return '';
+      return '-';
     },
 
     filteredRepositories () {
@@ -168,14 +179,25 @@ export default {
     },
   },
   async mounted () {
-    const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
-    this.githubRegistry.nickname = nickname;
-    this.githubRegistry.token = token;
+    if (getCookie('fuzzy-engine-github-ecr')) {
+      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
+      this.githubRegistry.nickname = nickname;
+      this.githubRegistry.token = token;
+    }
 
-    const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
-    this.awsEcr.accessKey = accessKey;
-    this.awsEcr.secretKey = secretKey;
-    this.awsEcr.region = region;
+    if (getCookie('fuzzy-engine-aws-ecr')) {
+      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
+      this.awsEcr.accessKey = accessKey;
+      this.awsEcr.secretKey = secretKey;
+      this.awsEcr.region = region;
+    }
+
+    if (getCookie('fuzzy-engine-docker-v2')) {
+      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}');
+      this.dockerRegistry.url = url;
+      this.dockerRegistry.username = username;
+      this.dockerRegistry.password = password;
+    }
 
     this.provider = getCookie('fuzzy-engine-provider');
 

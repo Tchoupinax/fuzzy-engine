@@ -312,14 +312,18 @@ export default {
     },
   },
   mounted () {
-    const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
-    this.githubRegistry.nickname = nickname;
-    this.githubRegistry.token = token;
+    if (getCookie('fuzzy-engine-github-ecr')) {
+      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
+      this.githubRegistry.nickname = nickname;
+      this.githubRegistry.token = token;
+    }
 
-    const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
-    this.awsEcr.accessKey = accessKey;
-    this.awsEcr.secretKey = secretKey;
-    this.awsEcr.region = region;
+    if (getCookie('fuzzy-engine-aws-ecr')) {
+      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
+      this.awsEcr.accessKey = accessKey;
+      this.awsEcr.secretKey = secretKey;
+      this.awsEcr.region = region;
+    }
 
     if (getCookie('fuzzy-engine-docker-v2')) {
       const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}');

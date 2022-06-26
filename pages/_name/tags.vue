@@ -1,9 +1,11 @@
 <template>
   <div>
     <section id="actions" class="mt-6 ml-8">
-      <a href="/list">
-        <button class="font-bold text-theme-default hover:text-theme-default">List of repositories</button>
-      </a>
+      <NuxtLink to="/list">
+        <button class="font-bold text-theme-default hover:text-theme-default">
+          List of repositories
+        </button>
+      </NuxtLink>
     </section>
 
     <div class="flex justify-center mb-32">
