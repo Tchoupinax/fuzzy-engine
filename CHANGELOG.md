@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.4.0 | 2022-06-26
+
+On the way to Nuxt 3 💚
+
+This version brings a big refacto of the project and a step to migrate to Nuxt 3.
+
+Welcome to [Github Container registry!](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
+
+#### Features
+
+- Now use Nuxt 3 Bride
+- Refacto the API, love SPA 🔥
+- Skeleton of API tests with vitest
+- Improve client navigation and speed
+
+
 ## 1.3.1 | 2022-04-02
 
 #### Style
