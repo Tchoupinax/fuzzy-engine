@@ -10,21 +10,19 @@ RUN npm install --no-progress
 
 COPY . .
 
-RUN npx nuxt build --standalone -m
+RUN npm run build
 
 #########################################################
 #########################################################
 
 FROM node:16-alpine
 
-RUN  apk add --no-cache --virtual .gyp git
-
 WORKDIR /app
 
-COPY --from=builder /app/.nuxt /app/.nuxt/
+COPY --from=builder /app/.output /app/.output/
 
-RUN npm install --production nuxt && npx modclean -r
+RUN npm install --omit=dev nuxt
 
 EXPOSE 3000
 
-CMD NUXT_HOST=0.0.0.0 npx nuxt start
+CMD NITRO_HOST=0.0.0.0 node .output/server/index.mjs
