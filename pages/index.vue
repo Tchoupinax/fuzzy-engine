@@ -51,7 +51,6 @@
           >
             <input
               v-model="dockerRegistry.url"
-              :disabled="urlEnv"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
               placeholder="registry.mydomain.com"
@@ -60,7 +59,6 @@
 
             <input
               v-model="dockerRegistry.username"
-              :disabled="usernameEnv"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
               placeholder="username"
@@ -120,7 +118,6 @@
           >
             <input
               v-model="awsEcr.region"
-              :disabled="urlEnv"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
               placeholder="region"
@@ -129,7 +126,6 @@
 
             <input
               v-model="awsEcr.accessKey"
-              :disabled="usernameEnv"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
               placeholder="access-key"
@@ -189,7 +185,6 @@
           >
             <input
               v-model="githubRegistry.nickname"
-              :disabled="usernameEnv"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
               placeholder="Github nickname"
