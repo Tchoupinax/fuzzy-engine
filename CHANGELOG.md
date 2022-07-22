@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.4.1 | 2022-07-2021
+## 1.4.2 | 2022-07-22
+
+Allow passwordless auth for docker-registry v2 [#28](https://github.com/Tchoupinax/fuzzy-engine/issues/28)
+
+## 1.4.1 | 2022-07-21
 
 Fix [#25](https://github.com/Tchoupinax/fuzzy-engine/issues/25) by fixing the Dockerfile
 
