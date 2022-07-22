@@ -58,6 +58,7 @@
             >
 
             <input
+              v-if="!dockerRegistry.passwordless"
               v-model="dockerRegistry.username"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
@@ -65,7 +66,10 @@
               @keyup="saveData"
             >
 
-            <div class="flex justify-center w-full">
+            <div
+              v-if="!dockerRegistry.passwordless"
+              class="flex justify-center w-full mb-4"
+            >
               <input
                 v-model="dockerRegistry.password"
                 class="w-full p-1 px-2 text-xl font-bold border rounded-l text-theme-default border-theme-default docker-pull placeholder-theme-lighter"
@@ -109,6 +113,20 @@
                   </svg>
                 </div>
               </button>
+            </div>
+
+            <div class="flex">
+              <input
+                id="passwordless"
+                v-model="dockerRegistry.passwordless"
+                type="checkbox"
+                class="mr-2"
+                @keyup="saveData"
+              >
+
+              <label for="passwordless" class="flex w-full italic font-bold cursor-pointer">
+                Use passwordless auth
+              </label>
             </div>
           </div>
 
@@ -272,6 +290,7 @@ export default {
         url: '',
         username: '',
         password: '',
+        passwordless: false,
       },
       awsEcr: {
         accessKey: '',
@@ -301,8 +320,10 @@ export default {
 
       return (
         this.dockerRegistry.url?.length > 0 &&
-          this.dockerRegistry.username?.length > 0 &&
-          this.dockerRegistry.password?.length > 0
+          (this.dockerRegistry.passwordless || (
+            this.dockerRegistry.username?.length > 0 &&
+            this.dockerRegistry.password?.length > 0)
+          )
       );
     },
   },
