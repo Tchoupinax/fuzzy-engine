@@ -77,7 +77,7 @@
               </div>
 
               <button
-                v-if="$store.state.provided === 'docker-registry-v2'"
+                v-if="false"
                 class="flex items-center justify-center p-1 px-2 ml-8 text-center bg-gray-200 border-2 rounded border-theme-default text-theme-default"
                 @click="deleteImage(digest.fullDigest)">
                 <div class="w-4">
