@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AwsRepository, AwsRepositoryConfig } from '../repositories/aws.repository';
+import { DockerhubRepository } from '../repositories/dockerhub.repository';
 import { GithubRepository } from '../repositories/github.repository';
 import { ListRepositoryTagsUseCase } from './list-repositories-tags.use-case';
 
@@ -46,6 +47,35 @@ describe('list-repositories.use-case', () => {
 
     it('should list the tag of the repository called test', async () => {
       expect(await useCase.execute("fuzzy-robot-crawler")).toEqual(
+        {
+          name: "test",
+          noTag: false,
+          digests: expect.arrayContaining([
+            expect.objectContaining({
+              name: expect.any(String),
+              size: expect.any(String),
+              tags: ["test"],
+              created: expect.any(Date),
+              fullDigest: expect.any(String),
+            })
+          ])
+        }
+      );
+    });
+  });
+
+  describe.only('with a Dockerhub repository', () => {
+    beforeEach(() => {
+      useCase = new ListRepositoryTagsUseCase(
+        new DockerhubRepository({
+          username: 'tchoupinax',
+          password: process.env.DOCKERHUB_TOKEN ?? ""
+        })
+      );
+    });
+
+    it.only('should list the tag of the repository called fuzzy-engine', async () => {
+      expect(await useCase.execute("fuzzy-engine")).toEqual(
         {
           name: "test",
           noTag: false,

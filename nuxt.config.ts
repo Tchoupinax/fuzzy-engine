@@ -16,8 +16,8 @@ export default defineNuxtConfig({
   loading: { color: '#fff' },
   css: [],
   plugins: [
-    '~/plugins/clipboard.client.js',
-    '~/plugins/notifications.client.js',
+    '~/plugins/clipboard.client.ts',
+    '~/plugins/notifications.client.ts',
   ],
   buildModules: [
     '@nuxtjs/eslint-module',
@@ -34,7 +34,7 @@ export default defineNuxtConfig({
     credentials: true,
   },
   build: {
-    extend (config, ctx) {
+    extend(config, ctx) {
     },
   },
 });

@@ -1,4 +1,5 @@
 import { defineEventHandler, useCookies } from 'h3';
+import { DockerhubRepository, DockerhubRepositoryConfig } from '~~/server/repositories/dockerhub.repository';
 import { ListRepositoryTagsUseCase } from '../../../domain/list-repositories-tags.use-case';
 import { AwsRepository, AwsRepositoryConfig } from "../../../repositories/aws.repository";
 import { DockerApiRepository, DockerApiRepositoryConfig } from '../../../repositories/docker-registry.repository';
@@ -12,15 +13,16 @@ export default defineEventHandler(async (request) => {
     'fuzzy-engine-aws-ecr': awsCredentials,
     'fuzzy-engine-github-ecr': githubCredentials,
     'fuzzy-engine-docker-v2': dockerCredentials,
+    'fuzzy-engine-dockerhub': dockerhubCredentials,
   } = useCookies(request);
 
   if (provider === 'aws-ecr') {
-    const { secretKey, accessKey } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'));
+    const { secretKey, accessKey, region } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'));
 
     const awsConfig: AwsRepositoryConfig = {
       accessKey,
       secretKey,
-      region: "eu-west-3"
+      region,
     };
 
 
@@ -34,6 +36,15 @@ export default defineEventHandler(async (request) => {
     };
 
     listRepositoryTagsUseCase = new ListRepositoryTagsUseCase(new GithubRepository(githubConfig));
+  } else if (provider === "dockerhub") {
+    const { username, password } = JSON.parse(Buffer.from(dockerhubCredentials, 'base64').toString('ascii'));
+
+    const dockerhubConfig: DockerhubRepositoryConfig = {
+      username,
+      password
+    };
+
+    listRepositoryTagsUseCase = new ListRepositoryTagsUseCase(new DockerhubRepository(dockerhubConfig));
   } else {
     const { url, username, password } = JSON.parse(Buffer.from(dockerCredentials, 'base64').toString('ascii'));
 

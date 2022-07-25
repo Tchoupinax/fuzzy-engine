@@ -2,10 +2,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { GithubRepository } from '../repositories/github.repository';
 import { AwsRepository, AwsRepositoryConfig } from '../repositories/aws.repository';
 import { ListRepositoryUseCase } from './list-repositories.use-case';
+import { DockerhubRepository } from '../repositories/dockerhub.repository';
 
 let useCase: ListRepositoryUseCase;
 
-describe('list-repositories.use-case', () => {
+describe.skip('list-repositories.use-case', () => {
   describe('with an AWS repository', () => {
     beforeEach(() => {
       useCase = new ListRepositoryUseCase(
@@ -41,6 +42,28 @@ describe('list-repositories.use-case', () => {
             name: expect.any(String),
             countOfTags: expect.any(Number),
             url: expect.any(String),
+          })
+        ])
+      );
+    });
+  });
+
+  describe('with a Dockerhub repository', () => {
+    beforeEach(() => {
+      useCase = new ListRepositoryUseCase(
+        new DockerhubRepository({
+          username: 'tchoupinax',
+          password: process.env.DOCKERHUB_TOKEN ?? ""
+        }),
+      );
+    });
+
+    it('should list the repositories', async () => {
+      expect(await useCase.execute()).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: expect.any(String),
+            countOfTags: expect.any(Number),
           })
         ])
       );
