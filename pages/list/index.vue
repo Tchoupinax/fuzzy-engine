@@ -145,6 +145,10 @@ export default {
         nickname: '',
         token: '',
       },
+      dockerhub: {
+        username: '',
+        password: '',
+      },
       loading: true,
       hiddingRepoMode: false,
       hiddingRepositories: [],
@@ -160,6 +164,10 @@ export default {
 
         if (this.provider === 'docker-registry-v2') {
           return this.dockerRegistry.url;
+        }
+
+        if (this.provider === 'dockerhub') {
+          return `DockerHub - ${this.dockerhub.username}`;
         }
 
         return 'Github repository';
@@ -199,6 +207,12 @@ export default {
       this.dockerRegistry.password = password;
     }
 
+    if (getCookie('fuzzy-engine-dockerhub')) {
+      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}');
+      this.dockerhub.username = username;
+      this.dockerhub.password = password;
+    }
+
     this.provider = getCookie('fuzzy-engine-provider');
 
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]');
@@ -222,7 +236,11 @@ export default {
         return `${this.repositories[0].url}.dkr.ecr.${this.awsEcr.region}.amazonaws.com/${repo}`;
       }
 
-      return `grzegrgreg/${repo}`;
+      if (this.provider === 'dockerhub') {
+        return `docker.io/${this.dockerhub.username}/${repo}`;
+      }
+
+      return `/${repo}`;
     },
 
     toggleHiddingRepoMode () {

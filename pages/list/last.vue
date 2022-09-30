@@ -94,6 +94,10 @@ export default {
           return this.dockerRegistry.url;
         }
 
+        if (this.provider === 'dockerhub') {
+          return `DockerHub - ${this.dockerhub.username}`;
+        }
+
         return 'Github repository';
       }
 

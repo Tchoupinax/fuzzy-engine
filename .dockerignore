@@ -13,5 +13,5 @@
 !static
 !store
 !.babelrc
-!nuxt.config.js
+!nuxt.config.ts
 !tailwind.config.js

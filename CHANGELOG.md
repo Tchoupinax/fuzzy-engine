@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0 | 2022-09-30
+
+#### Features
+
+- Allow to connect to DockerHub
+
 ## 1.4.2 | 2022-07-22
 
 Allow passwordless auth for docker-registry v2 [#28](https://github.com/Tchoupinax/fuzzy-engine/issues/28)

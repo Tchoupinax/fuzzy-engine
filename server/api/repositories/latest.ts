@@ -15,12 +15,12 @@ export default defineEventHandler(async (request) => {
   } = useCookies(request);
 
   if (provider === 'aws-ecr') {
-    const { secretKey, accessKey } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'));
+    const { secretKey, accessKey, region } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'));
 
     const awsConfig: AwsRepositoryConfig = {
       accessKey,
       secretKey,
-      region: "eu-west-3"
+      region,
     };
 
     listLatest10TagsUseCase = new ListLatest10TagsUseCase(new AwsRepository(awsConfig));

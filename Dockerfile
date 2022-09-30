@@ -19,7 +19,7 @@ FROM node:16-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/.output /app/.output/
+COPY --from=builder /app/.output /app/.output
 
 RUN npm install --omit=dev nuxt
 
