@@ -145,7 +145,7 @@ export default {
       this.$router.push('/list');
     }
 
-    const { data } = await this.$axios.get('/api/repositories/latest', { withCredentials: true });
+    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories/latest`, { withCredentials: true });
     this.repositories = data;
   },
   methods: {

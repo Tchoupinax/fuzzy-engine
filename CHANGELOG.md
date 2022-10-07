@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.1 | 2022-10-07
+
+### Fixes
+
+- Compute the real endpoint for hitting the API
+
 ## 1.5.0 | 2022-09-30
 
 #### Features

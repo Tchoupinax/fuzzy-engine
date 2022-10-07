@@ -223,7 +223,7 @@ export default {
       this.$router.push('/list');
     }
 
-    const { data } = await this.$axios.get('/api/repositories', { withCredentials: true });
+    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories`, { withCredentials: true });
 
     this.repositories = data.sort((a, b) => {
       if (a.name > b.name) { return 1; }
