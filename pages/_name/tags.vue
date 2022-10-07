@@ -36,7 +36,8 @@
                 {{ digest.size }}
 
                 <div
-                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500">
+                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500"
+                >
                   i
                 </div>
                 <div class="absolute left-0 z-10 w-48 p-2 px-1 ml-24 bg-black rounded-lg info">
@@ -48,7 +49,8 @@
                 {{ timeago(digest.created) }}
 
                 <div
-                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500">
+                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500"
+                >
                   i
                 </div>
 
@@ -64,14 +66,16 @@
                 <div
                   v-for="(architecture, indexArchitecture) of digest.architecures"
                   :key="indexArchitecture"
-                  class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-blue-100 rounded-lg">
+                  class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-blue-100 rounded-lg"
+                >
                   {{ architecture }}
                 </div>
 
                 <div
                   v-for="(tag, indexTags) of digest.tags"
                   :key="indexTags"
-                  class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg">
+                  class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
+                >
                   {{ tag }}
                 </div>
               </div>
@@ -79,14 +83,16 @@
               <button
                 v-if="false"
                 class="flex items-center justify-center p-1 px-2 ml-8 text-center bg-gray-200 border-2 rounded border-theme-default text-theme-default"
-                @click="deleteImage(digest.fullDigest)">
+                @click="deleteImage(digest.fullDigest)"
+              >
                 <div class="w-4">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                 </div>
               </button>
@@ -123,7 +129,7 @@ export default {
     }
 
     const { data } = await this.$axios({
-      url: `/api/repositories/${this.$route.params.name}/tags`,
+      url: `${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`,
       method: 'GET',
       withCredentials: true,
     });
