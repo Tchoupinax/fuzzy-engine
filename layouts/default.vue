@@ -67,21 +67,21 @@
 </template>
 
 <script>
-const { setCookie } = require('@/functions/cookies');
+const { setCookie } = require('@/functions/cookies')
 
 export default {
   name: 'DefaultLayout',
   data () {
     return {
       theme: 'one',
-    };
+    }
   },
   methods: {
     changeColor (name) {
-      this.theme = name;
+      this.theme = name
 
-      setCookie('fuzzy-engine-theme', name);
+      setCookie('fuzzy-engine-theme', name)
     },
   },
-};
+}
 </script>

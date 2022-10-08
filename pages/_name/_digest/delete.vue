@@ -19,7 +19,7 @@ export default {
     // };
   },
   mounted () {
-    window.location = `/${this.name}/tags?delete=success`;
+    window.location = `/${this.name}/tags?delete=success`
   },
-};
+}
 </script>

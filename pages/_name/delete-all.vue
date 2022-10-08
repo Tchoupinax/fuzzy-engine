@@ -43,10 +43,10 @@ export default {
     // ]);
   },
   computed: {
-    repoName () { return this.$route.params.name; },
+    repoName () { return this.$route.params.name },
   },
   mounted () {
-    window.location = '/list?delete-all=success';
+    window.location = '/list?delete-all=success'
   },
-};
+}
 </script>

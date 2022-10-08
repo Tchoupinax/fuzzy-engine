@@ -43,6 +43,7 @@
   "devDependencies": {
     "@nuxt/bridge": "npm:@nuxt/bridge-edge@^3.0.0-27566698.2b0045e",
     "@nuxtjs/eslint-config": "^4.0.0",
+    "@nuxtjs/eslint-config-typescript": "^11.0.0",
     "@nuxtjs/eslint-module": "^3.0.0",
     "@nuxtjs/tailwindcss": "^5.0.2",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
@@ -51,7 +52,7 @@
     "autoprefixer": "^9.8.8",
     "babel-eslint": "^10.1.0",
     "defu": "^6.0.0",
-    "eslint": "^7.12.0",
+    "eslint": "^7.32.0",
     "eslint-plugin-nuxt": ">=1.0.0",
     "nodemon": "^2.0.20",
     "postcss": "^7.0.39",

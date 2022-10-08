@@ -55,8 +55,8 @@
 </template>
 
 <script>
-import * as timeago from 'timeago.js';
-const { getCookie } = require('@/functions/cookies');
+import * as timeago from 'timeago.js'
+const { getCookie } = require('@/functions/cookies')
 
 export default {
   name: 'ListPage',
@@ -81,100 +81,100 @@ export default {
       hiddingRepoMode: false,
       hiddingRepositories: [],
       repositories: [],
-    };
+    }
   },
   computed: {
     url () {
       if (this.repositories.length > 0) {
         if (this.provider === 'aws-ecr') {
-          return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`;
+          return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`
         }
 
         if (this.provider === 'docker-registry-v2') {
-          return this.dockerRegistry.url;
+          return this.dockerRegistry.url
         }
 
         if (this.provider === 'dockerhub') {
-          return `DockerHub - ${this.dockerhub.username}`;
+          return `DockerHub - ${this.dockerhub.username}`
         }
 
-        return 'Github repository';
+        return 'Github repository'
       }
 
-      return '-';
+      return '-'
     },
 
     filteredRepositories () {
       if (this.hiddingRepoMode) {
-        return this.repositories;
+        return this.repositories
       }
 
       return this.repositories.filter((n) => {
-        return !this.hiddingRepositories.includes(n.name);
-      });
+        return !this.hiddingRepositories.includes(n.name)
+      })
     },
   },
   async mounted () {
     if (getCookie('fuzzy-engine-github-ecr')) {
-      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
-      this.githubRegistry.nickname = nickname;
-      this.githubRegistry.token = token;
+      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'))
+      this.githubRegistry.nickname = nickname
+      this.githubRegistry.token = token
     }
 
     if (getCookie('fuzzy-engine-aws-ecr')) {
-      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
-      this.awsEcr.accessKey = accessKey;
-      this.awsEcr.secretKey = secretKey;
-      this.awsEcr.region = region;
+      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'))
+      this.awsEcr.accessKey = accessKey
+      this.awsEcr.secretKey = secretKey
+      this.awsEcr.region = region
     }
 
     if (getCookie('fuzzy-engine-docker-v2')) {
-      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}');
-      this.dockerRegistry.url = url;
-      this.dockerRegistry.username = username;
-      this.dockerRegistry.password = password;
+      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}')
+      this.dockerRegistry.url = url
+      this.dockerRegistry.username = username
+      this.dockerRegistry.password = password
     }
 
-    this.provider = getCookie('fuzzy-engine-provider');
+    this.provider = getCookie('fuzzy-engine-provider')
 
-    this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]');
-    this.loading = false;
+    this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
+    this.loading = false
 
     if (this.$route.query['delete-all'] === 'success') {
-      this.deleteAllSuccess();
-      this.$router.push('/list');
+      this.deleteAllSuccess()
+      this.$router.push('/list')
     }
 
-    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories/latest`, { withCredentials: true });
-    this.repositories = data;
+    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories/latest`, { withCredentials: true })
+    this.repositories = data
   },
   methods: {
     timeago: timeago.format,
     downloadUrl (repo) {
       if (this.$store.state.provider === 'aws-ecr') {
-        return `docker pull 440562349563.dkr.ecr.${this.$store.state.awsEcr.region}.amazonaws.com/${repo}`;
+        return `docker pull 440562349563.dkr.ecr.${this.$store.state.awsEcr.region}.amazonaws.com/${repo}`
       }
 
-      return `docker pull ${this.$store.state.url.data}/${repo}`;
+      return `docker pull ${this.$store.state.url.data}/${repo}`
     },
     toggleHiddingRepoMode () {
-      this.hiddingRepoMode = !this.hiddingRepoMode;
+      this.hiddingRepoMode = !this.hiddingRepoMode
       if (!this.hiddingRepoMode) {
-        localStorage.setItem('hiddingRepositories', JSON.stringify(this.hiddingRepositories));
+        localStorage.setItem('hiddingRepositories', JSON.stringify(this.hiddingRepositories))
       }
     },
     onCopy (e) {
-      this.copiedSuccesfully();
+      this.copiedSuccesfully()
     },
     hideRepo (name) {
-      this.hiddingRepositories.push(name);
+      this.hiddingRepositories.push(name)
     },
     showRepo (name) {
-      this.hiddingRepositories.splice(this.hiddingRepositories.findIndex(n => n === name), 1);
+      this.hiddingRepositories.splice(this.hiddingRepositories.findIndex(n => n === name), 1)
     },
     deleteAllImage (repoName) {
       if (window.confirm(`Do you really want to delete all tags in ${repoName}`)) {
-        window.location = `/${repoName}/delete-all`;
+        window.location = `/${repoName}/delete-all`
       }
     },
   },
@@ -189,7 +189,7 @@ export default {
       type: 'success',
     },
   },
-};
+}
 </script>
 
 <style scoped>

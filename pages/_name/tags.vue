@@ -36,7 +36,7 @@
                 {{ digest.size }}
 
                 <div
-                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500"
+                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-theme-default"
                 >
                   i
                 </div>
@@ -49,7 +49,7 @@
                 {{ timeago(digest.created) }}
 
                 <div
-                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-red-500"
+                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-theme-default"
                 >
                   i
                 </div>
@@ -60,17 +60,27 @@
               </div>
             </div>
 
-            <!-- Right -->
             <div class="flex items-center">
-              <div class="flex">
+              <div class="relative flex items-center justify-center mr-4">
                 <div
-                  v-for="(architecture, indexArchitecture) of digest.architecures"
-                  :key="indexArchitecture"
-                  class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-blue-100 rounded-lg"
+                  class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-theme-default"
                 >
-                  {{ architecture }}
+                  architectures
                 </div>
 
+                <div class="absolute left-0 z-10 flex p-2 px-1 ml-24 bg-black rounded-lg w-28 info">
+                  <div>
+                    <div
+                      v-for="(architecture, indexArchitecture) of digest.architecures"
+                      :key="indexArchitecture"
+                      >
+                      {{ architecture }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex">
                 <div
                   v-for="(tag, indexTags) of digest.tags"
                   :key="indexTags"
@@ -111,7 +121,7 @@
 </template>
 
 <script>
-import * as timeago from 'timeago.js';
+import * as timeago from 'timeago.js'
 
 export default {
   name: 'TagsComponent',
@@ -120,36 +130,36 @@ export default {
       name: '',
       notag: '',
       digests: [],
-    };
+    }
   },
   async mounted () {
     if (this.$route.query.delete === 'success') {
-      this.deleteSuccess();
-      this.$router.push(`/${this.name}/tags/`);
+      this.deleteSuccess()
+      this.$router.push(`/${this.name}/tags/`)
     }
 
     const { data } = await this.$axios({
       url: `${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`,
       method: 'GET',
       withCredentials: true,
-    });
+    })
 
-    this.name = data.name;
-    this.noTag = data.noTag;
-    this.digests = data.digests;
+    this.name = data.name
+    this.noTag = data.noTag
+    this.digests = data.digests
   },
   methods: {
     timeago: timeago.format,
 
     formatFullDate (date) {
-      const dtf = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false });
+      const dtf = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
 
-      return dtf.format(new Date(date));
+      return dtf.format(new Date(date))
     },
 
     deleteImage (digesthash) {
       if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
-        window.location = `/${this.name}/${digesthash}/delete`;
+        window.location = `/${this.name}/${digesthash}/delete`
       }
     },
   },
@@ -160,7 +170,7 @@ export default {
       type: 'success',
     },
   },
-};
+}
 </script>
 
 <style scoped>

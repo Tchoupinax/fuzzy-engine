@@ -325,7 +325,7 @@
 </template>
 
 <script>
-const { setCookie, getCookie } = require('@/functions/cookies');
+const { setCookie, getCookie } = require('@/functions/cookies')
 
 export default {
   name: 'IndexPage',
@@ -370,7 +370,7 @@ export default {
         nickname: '',
         token: '',
       },
-    };
+    }
   },
   computed: {
     connected () {
@@ -379,17 +379,17 @@ export default {
           this.awsEcr.region?.length > 0 &&
           this.awsEcr.accessKey?.length > 0 &&
           this.awsEcr.secretKey?.length > 0
-        );
+        )
       }
 
       if (this.provider === 'github-ecr') {
         return this.githubRegistry.token.length > 0 &&
-          this.githubRegistry.nickname.length > 0;
+          this.githubRegistry.nickname.length > 0
       }
 
       if (this.provider === 'dockerhub') {
         return this.dockerhub.username.length > 0 &&
-          this.dockerhub.password.length > 0;
+          this.dockerhub.password.length > 0
       }
 
       return (
@@ -398,37 +398,37 @@ export default {
             this.dockerRegistry.username?.length > 0 &&
             this.dockerRegistry.password?.length > 0)
           )
-      );
+      )
     },
   },
   mounted () {
     if (getCookie('fuzzy-engine-github-ecr')) {
-      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
-      this.githubRegistry.nickname = nickname;
-      this.githubRegistry.token = token;
+      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'))
+      this.githubRegistry.nickname = nickname
+      this.githubRegistry.token = token
     }
 
     if (getCookie('fuzzy-engine-aws-ecr')) {
-      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
-      this.awsEcr.accessKey = accessKey;
-      this.awsEcr.secretKey = secretKey;
-      this.awsEcr.region = region;
+      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'))
+      this.awsEcr.accessKey = accessKey
+      this.awsEcr.secretKey = secretKey
+      this.awsEcr.region = region
     }
 
     if (getCookie('fuzzy-engine-dockerhub')) {
-      const { username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}');
-      this.dockerhub.username = username;
-      this.dockerhub.password = password;
+      const { username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}')
+      this.dockerhub.username = username
+      this.dockerhub.password = password
     }
 
     if (getCookie('fuzzy-engine-docker-v2')) {
-      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}');
-      this.dockerRegistry.url = url;
-      this.dockerRegistry.username = username;
-      this.dockerRegistry.password = password;
+      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}')
+      this.dockerRegistry.url = url
+      this.dockerRegistry.username = username
+      this.dockerRegistry.password = password
     }
 
-    this.provider = getCookie('fuzzy-engine-provider');
+    this.provider = getCookie('fuzzy-engine-provider')
   },
   methods: {
     saveData () {
@@ -447,7 +447,7 @@ export default {
             },
           }),
         ),
-      );
+      )
 
       setCookie(
         'fuzzy-engine-aws-ecr',
@@ -456,7 +456,7 @@ export default {
             ...this.awsEcr,
           }),
         ),
-      );
+      )
 
       setCookie(
         'fuzzy-engine-github-ecr',
@@ -465,7 +465,7 @@ export default {
             ...this.githubRegistry,
           }),
         ),
-      );
+      )
 
       setCookie(
         'fuzzy-engine-dockerhub',
@@ -474,7 +474,7 @@ export default {
             ...this.dockerhub,
           }),
         ),
-      );
+      )
 
       setCookie(
         'fuzzy-engine-docker-v2',
@@ -483,17 +483,17 @@ export default {
             ...this.dockerRegistry,
           }),
         ),
-      );
+      )
     },
 
     openList (e) {
-      e.preventDefault();
-      this.$router.push('/list');
+      e.preventDefault()
+      this.$router.push('/list')
     },
 
     changeProvider (provider) {
-      this.provider = provider;
-      setCookie('fuzzy-engine-provider', this.provider);
+      this.provider = provider
+      setCookie('fuzzy-engine-provider', this.provider)
     },
   },
   notifications: {
@@ -508,7 +508,7 @@ export default {
       type: 'error',
     },
   },
-};
+}
 </script>
 
 <style>

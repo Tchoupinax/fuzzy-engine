@@ -46,7 +46,6 @@
 
           <div
             v-for="(repo, index) of filteredRepositories"
-            v-else
             :key="index"
             class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
             :class="{ 'opacity-50': hiddingRepositories.includes(repo.name) }"
@@ -124,7 +123,7 @@
 </template>
 
 <script>
-const { getCookie } = require('@/functions/cookies');
+import { getCookie } from '@/functions/cookies'
 
 export default {
   name: 'ListPage',
@@ -153,115 +152,120 @@ export default {
       hiddingRepoMode: false,
       hiddingRepositories: [],
       repositories: [],
-    };
+    }
   },
   computed: {
     url () {
       if (this.repositories.length > 0) {
         if (this.provider === 'aws-ecr') {
-          return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`;
+          return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`
         }
 
         if (this.provider === 'docker-registry-v2') {
-          return this.dockerRegistry.url;
+          return this.dockerRegistry.url
         }
 
         if (this.provider === 'dockerhub') {
-          return `DockerHub - ${this.dockerhub.username}`;
+          return `DockerHub - ${this.dockerhub.username}`
         }
 
-        return 'Github repository';
+        return 'Github repository'
       }
 
-      return '-';
+      return '-'
     },
 
     filteredRepositories () {
       if (this.hiddingRepoMode) {
-        return this.repositories;
+        return this.repositories
       }
 
       return this.repositories.filter((n) => {
-        return !this.hiddingRepositories.includes(n.name);
-      });
+        return !this.hiddingRepositories.includes(n.name)
+      })
     },
   },
   async mounted () {
     if (getCookie('fuzzy-engine-github-ecr')) {
-      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'));
-      this.githubRegistry.nickname = nickname;
-      this.githubRegistry.token = token;
+      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'))
+      this.githubRegistry.nickname = nickname
+      this.githubRegistry.token = token
     }
 
     if (getCookie('fuzzy-engine-aws-ecr')) {
-      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'));
-      this.awsEcr.accessKey = accessKey;
-      this.awsEcr.secretKey = secretKey;
-      this.awsEcr.region = region;
+      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'))
+      this.awsEcr.accessKey = accessKey
+      this.awsEcr.secretKey = secretKey
+      this.awsEcr.region = region
     }
 
     if (getCookie('fuzzy-engine-docker-v2')) {
-      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}');
-      this.dockerRegistry.url = url;
-      this.dockerRegistry.username = username;
-      this.dockerRegistry.password = password;
+      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}')
+      this.dockerRegistry.url = url
+      this.dockerRegistry.username = username
+      this.dockerRegistry.password = password
     }
 
     if (getCookie('fuzzy-engine-dockerhub')) {
-      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}');
-      this.dockerhub.username = username;
-      this.dockerhub.password = password;
+      const { username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}')
+      this.dockerhub.username = username
+      this.dockerhub.password = password
     }
 
-    this.provider = getCookie('fuzzy-engine-provider');
+    this.provider = getCookie('fuzzy-engine-provider')
 
-    this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]');
-    this.loading = false;
+    this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
+    this.loading = false
 
     if (this.$route.query['delete-all'] === 'success') {
-      this.deleteAllSuccess();
-      this.$router.push('/list');
+      this.deleteAllSuccess()
+      this.$router.push('/list')
     }
 
-    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories`, { withCredentials: true });
+    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories`, { withCredentials: true })
 
     this.repositories = data.sort((a, b) => {
-      if (a.name > b.name) { return 1; }
-      if (a.name < b.name) { return -1; }
-    });
+      if (a.name > b.name) { return 1 }
+      if (a.name < b.name) { return -1 }
+      return 1
+    })
   },
   methods: {
     downloadUrl (repo) {
       if (this.provider === 'aws-ecr') {
-        return `${this.repositories[0].url}.dkr.ecr.${this.awsEcr.region}.amazonaws.com/${repo}`;
+        return `${this.repositories[0].url}.dkr.ecr.${this.awsEcr.region}.amazonaws.com/${repo}`
       }
 
       if (this.provider === 'dockerhub') {
-        return `docker.io/${this.dockerhub.username}/${repo}`;
+        return `docker.io/${this.dockerhub.username}/${repo}`
       }
 
-      return `/${repo}`;
+      if (this.provider === 'docker-registry-v2') {
+        return `${this.dockerRegistry.url}/${repo}`
+      }
+
+      return `/${repo}`
     },
 
     toggleHiddingRepoMode () {
-      this.hiddingRepoMode = !this.hiddingRepoMode;
+      this.hiddingRepoMode = !this.hiddingRepoMode
       if (!this.hiddingRepoMode) {
-        localStorage.setItem('hiddingRepositories', JSON.stringify(this.hiddingRepositories));
+        localStorage.setItem('hiddingRepositories', JSON.stringify(this.hiddingRepositories))
       }
     },
 
     onCopy () {
-      this.copiedSuccesfully();
+      this.copiedSuccesfully()
     },
     hideRepo (name) {
-      this.hiddingRepositories.push(name);
+      this.hiddingRepositories.push(name)
     },
     showRepo (name) {
-      this.hiddingRepositories.splice(this.hiddingRepositories.findIndex(n => n === name), 1);
+      this.hiddingRepositories.splice(this.hiddingRepositories.findIndex(n => n === name), 1)
     },
     deleteAllImage (repoName) {
       if (window.confirm(`Do you really want to delete all tags in ${repoName}`)) {
-        window.location = `/${repoName}/delete-all`;
+        window.location = `/${repoName}/delete-all`
       }
     },
   },
@@ -276,7 +280,7 @@ export default {
       type: 'success',
     },
   },
-};
+}
 </script>
 
 <style scoped>
