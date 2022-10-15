@@ -56,7 +56,7 @@
 
 <script>
 import * as timeago from 'timeago.js'
-const { getCookie } = require('@/functions/cookies')
+import { getCookie } from '@/functions/cookies'
 
 export default {
   name: 'ListPage',
@@ -163,7 +163,7 @@ export default {
         localStorage.setItem('hiddingRepositories', JSON.stringify(this.hiddingRepositories))
       }
     },
-    onCopy (e) {
+    onCopy () {
       this.copiedSuccesfully()
     },
     hideRepo (name) {
