@@ -25,4 +25,4 @@ RUN npm install --omit=dev nuxt
 
 EXPOSE 3000
 
-CMD NITRO_HOST=0
+CMD NITRO_HOST=0.0.0.0 node .output/server/index.mjs
