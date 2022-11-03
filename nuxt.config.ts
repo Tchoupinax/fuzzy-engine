@@ -1,4 +1,6 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
+import eslint from 'vite-plugin-eslint'
+
 export default defineNuxtConfig({
   ssr: true,
   typescript: {
@@ -23,4 +25,9 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/pwa'
   ],
+  vite: {
+    plugins: [
+      eslint()
+    ]
+  }
 });
