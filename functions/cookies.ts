@@ -1,4 +1,4 @@
-export function setCookie (name, value, days) {
+export function setCookie (name: string, value: any, days?: any) {
   let expires = ''
 
   if (days) {

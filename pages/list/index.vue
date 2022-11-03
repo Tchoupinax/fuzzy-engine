@@ -122,8 +122,8 @@
   </div>
 </template>
 
-<script>
-import { getCookie } from '@/functions/cookies'
+<script lang="ts">
+import { getCookie } from "~~/functions/cookies"
 
 export default {
   name: 'ListPage',
@@ -186,31 +186,31 @@ export default {
     },
   },
   async mounted () {
-    if (getCookie('fuzzy-engine-github-ecr')) {
-      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'))
-      this.githubRegistry.nickname = nickname
-      this.githubRegistry.token = token
-    }
+    //if (getCookie('fuzzy-engine-github-ecr')) {
+    //  const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'))
+    //  this.githubRegistry.nickname = nickname
+    //  this.githubRegistry.token = token
+    //}
 
-    if (getCookie('fuzzy-engine-aws-ecr')) {
-      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'))
-      this.awsEcr.accessKey = accessKey
-      this.awsEcr.secretKey = secretKey
-      this.awsEcr.region = region
-    }
+    //if (getCookie('fuzzy-engine-aws-ecr')) {
+    //  const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'))
+    //  this.awsEcr.accessKey = accessKey
+    //  this.awsEcr.secretKey = secretKey
+    //  this.awsEcr.region = region
+    //}
 
-    if (getCookie('fuzzy-engine-docker-v2')) {
-      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}')
-      this.dockerRegistry.url = url
-      this.dockerRegistry.username = username
-      this.dockerRegistry.password = password
-    }
+    //if (getCookie('fuzzy-engine-docker-v2')) {
+    //  const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}')
+    //  this.dockerRegistry.url = url
+    //  this.dockerRegistry.username = username
+    //  this.dockerRegistry.password = password
+    //}
 
-    if (getCookie('fuzzy-engine-dockerhub')) {
-      const { username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}')
-      this.dockerhub.username = username
-      this.dockerhub.password = password
-    }
+    //if (getCookie('fuzzy-engine-dockerhub')) {
+    //  const { username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}')
+    //  this.dockerhub.username = username
+    //  this.dockerhub.password = password
+    //}
 
     this.provider = getCookie('fuzzy-engine-provider')
 
@@ -222,7 +222,8 @@ export default {
       this.$router.push('/list')
     }
 
-    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories`, { withCredentials: true })
+    const data = await $fetch(`${new URL(window.location).origin}/api/repositories`, { credentials: 'include' });
+    console.log(data)
 
     this.repositories = data.sort((a, b) => {
       if (a.name > b.name) { return 1 }

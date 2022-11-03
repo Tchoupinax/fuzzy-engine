@@ -133,15 +133,15 @@ export default {
     }
   },
   async mounted () {
+    console.log('fe')
     if (this.$route.query.delete === 'success') {
       this.deleteSuccess()
       this.$router.push(`/${this.name}/tags/`)
     }
 
-    const { data } = await this.$axios({
-      url: `${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`,
+    const data = await $fetch(`${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`, {
       method: 'GET',
-      withCredentials: true,
+      credentials: 'include',
     })
 
     this.name = data.name

@@ -19,6 +19,7 @@
   },
   "private": true,
   "scripts": {
+    "nuke": "rm -rf yarn.lock node_modules/ .dist .output .nuxt",
     "watch": "bash -c 'source .env && nuxi dev'",
     "test": "bash -c 'source .env && vitest'",
     "build": "nuxi build",
@@ -31,20 +32,15 @@
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/pwa": "^3.3.5",
     "cookieparser": "^0.1.0",
-    "express": "^4.18.1",
+    "express": "^4.18.2",
     "js-cookie": "^2.2.1",
     "mini-toastr": "^0.8.1",
-    "nuxt-edge": "^2.16.0-27603381.123206cb",
     "pretty-bytes": "^5.6.0",
     "timeago.js": "^4.0.2",
     "vue-clipboard2": "^0.3.3",
     "vue-notifications": "^1.0.2"
   },
   "devDependencies": {
-    "@nuxt/bridge": "npm:@nuxt/bridge-edge@^3.0.0-27566698.2b0045e",
-    "@nuxtjs/eslint-config": "^11.0.0",
-    "@nuxtjs/eslint-config-typescript": "^11.0.0",
-    "@nuxtjs/eslint-module": "^3.0.0",
     "@nuxtjs/tailwindcss": "^5.0.2",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
@@ -52,11 +48,9 @@
     "autoprefixer": "^9.8.8",
     "babel-eslint": "^10.1.0",
     "defu": "^6.0.0",
-    "eslint": "^8.25.0",
-    "eslint-plugin-nuxt": ">=1.0.0",
+    "eslint": "^8.26.0",
     "nodemon": "^2.0.20",
-    "postcss": "^7.0.39",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17",
-    "vitest": "^0.19.0"
+    "nuxt": "3.0.0-rc.11",
+    "vitest": "^0.24.5"
   }
 }
