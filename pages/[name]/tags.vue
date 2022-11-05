@@ -73,7 +73,7 @@
                     <div
                       v-for="(architecture, indexArchitecture) of digest.architecures"
                       :key="indexArchitecture"
-                      >
+                    >
                       {{ architecture }}
                     </div>
                   </div>
@@ -133,7 +133,6 @@ export default {
     }
   },
   async mounted () {
-    console.log('fe')
     if (this.$route.query.delete === 'success') {
       this.deleteSuccess()
       this.$router.push(`/${this.name}/tags/`)

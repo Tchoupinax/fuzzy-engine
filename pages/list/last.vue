@@ -56,7 +56,7 @@
 
 <script lang="ts">
 import * as timeago from 'timeago.js'
-import { getCookie } from "~~/functions/cookies"
+import { getCookie } from '~~/functions/cookies'
 
 export default {
   name: 'ListPage',

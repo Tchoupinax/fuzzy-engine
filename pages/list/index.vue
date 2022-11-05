@@ -123,7 +123,7 @@
 </template>
 
 <script lang="ts">
-import { getCookie } from "~~/functions/cookies"
+import { getCookie } from '~~/functions/cookies'
 
 export default {
   name: 'ListPage',
@@ -222,8 +222,7 @@ export default {
       this.$router.push('/list')
     }
 
-    const data = await $fetch(`${new URL(window.location).origin}/api/repositories`, { credentials: 'include' });
-    console.log(data)
+    const data = await $fetch(`${new URL(window.location).origin}/api/repositories`, { credentials: 'include' })
 
     this.repositories = data.sort((a, b) => {
       if (a.name > b.name) { return 1 }

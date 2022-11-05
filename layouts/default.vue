@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { setCookie } from "~~/functions/cookies"
+import { setCookie } from '~~/functions/cookies'
 
 export default {
   name: 'DefaultLayout',

@@ -325,7 +325,7 @@
 </template>
 
 <script lang="ts">
-import { getCookie, setCookie } from "~~/functions/cookies"
+import { getCookie, setCookie } from '~~/functions/cookies'
 
 export default {
   name: 'IndexPage',
