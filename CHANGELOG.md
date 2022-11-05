@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.6.0 | 2022-11-05
+
+Nuxt.js v3 is definitively coming. The bridge has been removed and the framework has been updated to the last current version (Nuxt.js v3-rc13).
+
+Also, the project supports Amazon ECR but now it supports the authentication from the CLI.
+⚠️ That means use the `aws` CLI with a child process to perform operations.
+
+#### Features
+
+- You can authenticate yourself to ECR via aws CLI
+
+#### Chores
+
+- Upgrade to the latest version of Nuxt.js (v3-rc13)
+- Upgrade dependencies
+- Improve usage of Typescript, types and code architecture
+
 ## 1.5.1 | 2022-10-07
 
 ### Fixes

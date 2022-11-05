@@ -32,7 +32,10 @@
                 {{ digest.name }}
               </div>
 
-              <div class="relative flex items-center justify-center mr-8">
+              <div
+                v-if="provider.getWithDefault('_') !== 'github-ecr'"
+                class="relative flex items-center justify-center mr-8"
+              >
                 {{ digest.size }}
 
                 <div
@@ -86,7 +89,7 @@
                   :key="indexTags"
                   class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
                 >
-                  {{ tag }}
+                  {{ tag && tag.slice(0, 16) }}
                 </div>
               </div>
 
@@ -122,17 +125,22 @@
 
 <script>
 import * as timeago from 'timeago.js'
+import { Option } from '@swan-io/boxed'
+import { getCookie } from '../../functions/cookies'
 
 export default {
   name: 'TagsComponent',
   data () {
     return {
+      provider: Option.None(),
       name: '',
       notag: '',
       digests: [],
     }
   },
   async mounted () {
+    this.provider = Option.Some(getCookie('fuzzy-engine-provider'))
+
     if (this.$route.query.delete === 'success') {
       this.deleteSuccess()
       this.$router.push(`/${this.name}/tags/`)

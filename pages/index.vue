@@ -195,7 +195,17 @@
             v-if="provider === 'aws-ecr'"
             class="flex flex-col items-center justify-center w-full p-4"
           >
+            <label class="text-xl mb-4">
+              <input
+                v-model="awsEcr.useCLI"
+                type="checkbox"
+                @change="saveData"
+              >
+              Use local AWS CLI for the authentication
+            </label>
+
             <input
+              v-if="!awsEcr.useCLI"
               v-model="awsEcr.region"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
@@ -204,6 +214,7 @@
             >
 
             <input
+              v-if="!awsEcr.useCLI"
               v-model="awsEcr.accessKey"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
@@ -211,7 +222,7 @@
               @keyup="saveData"
             >
 
-            <div class="flex justify-center w-full">
+            <div v-if="!awsEcr.useCLI" class="flex justify-center w-full">
               <input
                 v-model="awsEcr.secretKey"
                 class="w-full p-1 px-2 text-xl font-bold border rounded-l text-theme-default border-theme-default docker-pull placeholder-theme-lighter"
@@ -365,6 +376,7 @@ export default {
         accessKey: '',
         secretKey: '',
         region: '',
+        useCLI: false,
       },
       githubRegistry: {
         nickname: '',

@@ -1,4 +1,4 @@
-import { RegistryApiRepository } from "../gateways/registry-api.gateway";
+import { RegistryApiRepository } from '../gateways/registry-api.gateway'
 
 export type listLatest10TagsAnswer = {
   name: string;
@@ -8,11 +8,11 @@ export type listLatest10TagsAnswer = {
 };
 
 export class ListLatest10TagsUseCase {
-  constructor(private repository: RegistryApiRepository) {}
+  constructor (private repository: RegistryApiRepository) {}
 
-  async execute() {
-    const names = (await this.repository.listRepositories()).map(zz => zz.name);
-    const aa = await Promise.all(names.map(n => this.repository.listRepositoriesTags(n)));
+  async execute () {
+    const names = (await this.repository.listRepositories()).map(zz => zz.name)
+    const aa = await Promise.all(names.map(n => this.repository.listRepositoriesTags(n)))
 
     return aa
       .reduce((acc, cur) => {
@@ -21,15 +21,15 @@ export class ListLatest10TagsUseCase {
           tag: d.tags[0],
           size: d.size,
           created: d.created,
-        }))].flat();
+        }))].flat()
       }, [])
       .sort((a, b) => {
         if (new Date(a.created) < new Date(b.created)) {
-          return 1;
+          return 1
         }
 
-        return -1;
+        return -1
       })
-      .slice(0, 15);
+      .slice(0, 15)
   }
 }
