@@ -89,7 +89,7 @@
                   :key="indexTags"
                   class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
                 >
-                  {{ tag }}
+                  {{ tag && tag.slice(0, 16) }}
                 </div>
               </div>
 

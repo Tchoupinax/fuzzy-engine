@@ -116,6 +116,14 @@
             </div>
           <!-- END # Right -->
           </div>
+
+          <button
+            v-if="filteredRepositories.length > 0"
+            class="text-xl italic mt-4 font-light"
+            @click="fetchRepositories"
+          >
+            {{ fetchAdditionalRepositoriesLoading ? 'Loading...' : 'List more...' }}
+          </button>
         </div>
       </div>
     </div>
@@ -142,6 +150,7 @@ export default {
     hiddingRepoMode: false,
     hiddingRepositories: Array<any>,
     repositories: Array<any>,
+    fetchAdditionalRepositoriesLoading: boolean,
     } {
     return {
       provider: Option.None(),
@@ -167,6 +176,7 @@ export default {
       hiddingRepoMode: false,
       hiddingRepositories: [],
       repositories: [],
+      fetchAdditionalRepositoriesLoading: false,
     }
   },
   computed: {
@@ -232,9 +242,7 @@ export default {
       this.$router.push('/list')
     }
 
-    const data = await $fetch(`${new URL(window.location).origin}/api/repositories`, { credentials: 'include' })
-
-    console.log(data)
+    const data = await $fetch(`${new URL(window.location).origin}/api/repositories?offset=0&limit=10`, { credentials: 'include' })
 
     this.repositories = data.sort((a, b) => {
       if (a.name > b.name) { return 1 }
@@ -254,6 +262,18 @@ export default {
         None: () => 'Non available'
       })
     },
+
+    async fetchRepositories () {
+      this.fetchAdditionalRepositoriesLoading = true
+
+      const data = await $fetch(
+        `${new URL(window.location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
+        { credentials: 'include' }
+      )
+
+      this.repositories = [...this.repositories, ...data]
+      this.fetchAdditionalRepositoriesLoading = false
+    }
   },
 }
 </script>

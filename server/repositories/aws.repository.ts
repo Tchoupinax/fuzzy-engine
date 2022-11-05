@@ -43,30 +43,46 @@ export class AwsRepository implements RegistryApiRepository {
   }
 
   async listRepositoriesTags (repositoryName: string): Promise<any> {
-    const { imageDetails } = await this.ecrClient.send(new DescribeImagesCommand({ repositoryName }))
+    let digests
 
-    const digests = imageDetails!.map((i) => {
-      return {
-        name: repositoryName,
-        digest: i?.imageDigest?.replace('sha256:', '').slice(7, 19),
-        fullDigest: i.imageDigest,
-        created: i.imagePushedAt,
-        size: prettyBytes(i?.imageSizeInBytes || 0),
-      }
-    })
+    if (this.useCLI) {
+      const a = await this.describeImages(repositoryName)
+
+      digests = a.imageDetails.map((i) => {
+        return {
+          name: i.imageTags,
+          digest: i?.imageDigest?.replace('sha256:', '').slice(7, 19),
+          fullDigest: i.imageDigest,
+          created: i.imagePushedAt ?? new Date(),
+          size: prettyBytes(i?.imageSizeInBytes || 0),
+        }
+      })
+    } else {
+      const { imageDetails } = await this.ecrClient.send(new DescribeImagesCommand({ repositoryName }))
+
+      digests = imageDetails!.map((i) => {
+        return {
+          name: repositoryName,
+          digest: i?.imageDigest?.replace('sha256:', '').slice(7, 19),
+          fullDigest: i.imageDigest,
+          created: i.imagePushedAt,
+          size: prettyBytes(i?.imageSizeInBytes || 0),
+        }
+      })
+    }
 
     const finalDigests = new Map()
     digests.forEach(({ name, digest, size, created, fullDigest }) => {
       if (finalDigests.has(digest)) {
         finalDigests.set(digest, {
           name: digest,
-          tags: [...finalDigests.get(digest).tags, name],
+          tags: [...finalDigests.get(digest).tags, name].flat(),
           size,
           created,
           fullDigest,
         })
       } else {
-        finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest })
+        finalDigests.set(digest, { name: digest, tags: [name].flat(), size, created, fullDigest })
       }
     })
 
@@ -112,6 +128,17 @@ export class AwsRepository implements RegistryApiRepository {
   private async listImages (repositoryName: string) {
     if (this.useCLI) {
       const { stdout } = await execa('aws', ['ecr', 'list-images', '--repository-name', repositoryName])
+      return JSON.parse(stdout)
+    }
+
+    return this.ecrClient.send(new ListImagesCommand({
+      repositoryName,
+    }))
+  }
+
+  private async describeImages (repositoryName: string) {
+    if (this.useCLI) {
+      const { stdout } = await execa('aws', ['ecr', 'describe-images', '--repository-name', repositoryName])
       return JSON.parse(stdout)
     }
 
