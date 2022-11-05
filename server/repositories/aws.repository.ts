@@ -1,23 +1,23 @@
-import prettyBytes from 'pretty-bytes';
-import { ECRClient, DescribeRepositoriesCommand, ListImagesCommand, DescribeImagesCommand } from '@aws-sdk/client-ecr';
-import { ContainerRepository, RegistryApiRepository } from '../gateways/registry-api.gateway';
+import prettyBytes from 'pretty-bytes'
+import { ECRClient, DescribeRepositoriesCommand, ListImagesCommand, DescribeImagesCommand } from '@aws-sdk/client-ecr'
+import { ContainerRepository, RegistryApiRepository } from '../gateways/registry-api.gateway'
 export type AwsRepositoryConfig = { accessKey: string, secretKey: string, region: string }
 
 export class AwsRepository implements RegistryApiRepository {
-  private ecrClient: ECRClient;
+  private ecrClient: ECRClient
 
-  constructor(data: AwsRepositoryConfig) {
+  constructor (data: AwsRepositoryConfig) {
     this.ecrClient = new ECRClient({
       credentials: {
         accessKeyId: data.accessKey,
         secretAccessKey: data.secretKey,
       },
       region: data.region,
-    });
+    })
   }
 
-  async listRepositories(): Promise<ContainerRepository[]> {
-    let { repositories } = await this.ecrClient.send(new DescribeRepositoriesCommand({}));
+  async listRepositories (): Promise<ContainerRepository[]> {
+    const { repositories } = await this.ecrClient.send(new DescribeRepositoriesCommand({}))
 
     const repositoriesAws = await Promise.all(repositories!.map(async ({
       repositoryName,
@@ -27,20 +27,20 @@ export class AwsRepository implements RegistryApiRepository {
         imageIds,
       } = await this.ecrClient.send(new ListImagesCommand({
         repositoryName,
-      }));
+      }))
 
       return {
-        name: repositoryName ?? "",
+        name: repositoryName ?? '',
         countOfTags: imageIds!.length ?? 0,
-        url: repositoryUri ?? "",
-      };
-    }));
+        url: repositoryUri ?? '',
+      }
+    }))
 
-    return repositoriesAws!;
+    return repositoriesAws
   }
 
-  async listRepositoriesTags(repositoryName: string): Promise<any> {
-    const { imageDetails } = await this.ecrClient.send(new DescribeImagesCommand({ repositoryName }));
+  async listRepositoriesTags (repositoryName: string): Promise<any> {
+    const { imageDetails } = await this.ecrClient.send(new DescribeImagesCommand({ repositoryName }))
 
     const digests = imageDetails!.map((i) => {
       return {
@@ -49,10 +49,10 @@ export class AwsRepository implements RegistryApiRepository {
         fullDigest: i.imageDigest,
         created: i.imagePushedAt,
         size: prettyBytes(i?.imageSizeInBytes || 0),
-      };
-    });
+      }
+    })
 
-    const finalDigests = new Map();
+    const finalDigests = new Map()
     digests.forEach(({ name, digest, size, created, fullDigest }) => {
       if (finalDigests.has(digest)) {
         finalDigests.set(digest, {
@@ -61,11 +61,11 @@ export class AwsRepository implements RegistryApiRepository {
           size,
           created,
           fullDigest,
-        });
+        })
       } else {
-        finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest });
+        finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest })
       }
-    });
+    })
 
     return {
       noTag: false,
@@ -73,13 +73,13 @@ export class AwsRepository implements RegistryApiRepository {
       digests: Array.from(finalDigests.values())
         .sort((a, b) => {
           if (a.created > b.created) {
-            return -1;
-          } else if (a.created > b.created) {
-            return 1;
+            return -1
+          } else if (a.created < b.created) {
+            return 1
           } else {
-            return 0;
+            return 0
           }
         }),
-    };
+    }
   }
 }

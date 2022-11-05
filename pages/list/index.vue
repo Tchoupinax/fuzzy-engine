@@ -234,6 +234,8 @@ export default {
 
     const data = await $fetch(`${new URL(window.location).origin}/api/repositories`, { credentials: 'include' })
 
+    console.log(data)
+
     this.repositories = data.sort((a, b) => {
       if (a.name > b.name) { return 1 }
       if (a.name < b.name) { return -1 }

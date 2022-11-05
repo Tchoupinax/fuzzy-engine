@@ -23,6 +23,7 @@
   ],
   "rules": {
     "comma-dangle": "off",
-    "Extra semicolon": "off"
+    "Extra semicolon": "off",
+    "no-useless-constructor": "off"
   }
 }

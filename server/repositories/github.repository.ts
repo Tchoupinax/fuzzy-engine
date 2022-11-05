@@ -1,34 +1,38 @@
-import axios from 'axios';
-import { ContainerRepository, listRepositoriesTagsAnswer, RegistryApiRepository } from "../gateways/registry-api.gateway";
-import prettyBytes from "pretty-bytes";
+import axios from 'axios'
+import prettyBytes from 'pretty-bytes'
+import { ContainerRepository, listRepositoriesTagsAnswer, RegistryApiRepository } from '../gateways/registry-api.gateway'
 
 export type GithubRepositoryConfig = { nickname: string, token: string };
 
 export class GithubRepository implements RegistryApiRepository {
-  constructor(private config: GithubRepositoryConfig) {}
+  constructor (private config: GithubRepositoryConfig) {}
 
-  async listRepositories(): Promise<ContainerRepository[]> {
+  async listRepositories (): Promise<ContainerRepository[]> {
     const { data } = await axios({
-      url: "https://api.github.com/user/packages?package_type=container",
+      url: 'https://api.github.com/user/packages?package_type=container',
       method: 'GET',
       headers: {
-        Accept: "application/vnd.github.v3+json",
+        Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${this.config.token}`
       },
     })
 
-    return data.map(this.githubRepositoryToContainerRepository.bind(this))
+    return Promise.all(
+      data.map(
+        this.githubRepositoryToContainerRepository.bind(this)
+      )
+    )
   }
 
-  async listRepositoriesTags(repositoryName: string): Promise<listRepositoriesTagsAnswer> {
+  async listRepositoriesTags (repositoryName: string): Promise<listRepositoriesTagsAnswer> {
     const { data } = await axios({
       url: `https://api.github.com/users/Tchoupinax/packages/container/${repositoryName}/versions`,
       method: 'GET',
       headers: {
-        Accept: "application/vnd.github.v3+json",
+        Accept: 'application/vnd.github.v3+json',
         Authorization: `token ${this.config.token}`
       },
-    });
+    })
 
     const digests = data.map((i) => {
       return {
@@ -37,10 +41,10 @@ export class GithubRepository implements RegistryApiRepository {
         fullDigest: i.name,
         created: i.created_at,
         size: prettyBytes(0),
-      };
-    });
+      }
+    })
 
-    const finalDigests = new Map();
+    const finalDigests = new Map()
     digests.forEach(({ name, digest, size, created, fullDigest }) => {
       if (finalDigests.has(created)) {
         finalDigests.set(created, {
@@ -49,11 +53,11 @@ export class GithubRepository implements RegistryApiRepository {
           size,
           created,
           fullDigest,
-        });
+        })
       } else {
-        finalDigests.set(created, { name: digest, tags: [name], size, created, fullDigest });
+        finalDigests.set(created, { name: digest, tags: [name], size, created, fullDigest })
       }
-    });
+    })
 
     return {
       name: repositoryName,
@@ -61,20 +65,31 @@ export class GithubRepository implements RegistryApiRepository {
       digests: Array.from(finalDigests.values())
         .sort((a, b) => {
           if (a.created > b.created) {
-            return -1;
-          } else if (a.created > b.created) {
-            return 1;
+            return -1
+          } else if (a.created < b.created) {
+            return 1
           } else {
-            return 0;
+            return 0
           }
         }),
     }
   }
 
-  private githubRepositoryToContainerRepository (githubRepository): ContainerRepository {
+  private async githubRepositoryToContainerRepository (
+    githubRepository: { name: string }
+  ): Promise<ContainerRepository> {
+    const { data } = await axios({
+      url: `https://api.github.com/users/Tchoupinax/packages/container/${githubRepository.name}/versions`,
+      method: 'GET',
+      headers: {
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: `token ${this.config.token}`
+      },
+    })
+
     return {
       name: githubRepository.name,
-      countOfTags: 0,
+      countOfTags: data.length,
       url: `https://ghcr.io/${this.config.nickname}/${githubRepository.name}`,
     }
   }
