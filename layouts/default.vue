@@ -9,7 +9,7 @@
       'sixth': theme === 'sixth'
     }"
   >
-    <nuxt />
+    <slot />
 
     <footer class="fixed bottom-0 flex items-center justify-between w-full h-16 px-8 text-white bg-theme-lighter">
       <div class="flex items-center justify-center">
@@ -66,8 +66,8 @@
   </div>
 </template>
 
-<script>
-const { setCookie } = require('@/functions/cookies')
+<script lang="ts">
+import { setCookie } from '~~/functions/cookies'
 
 export default {
   name: 'DefaultLayout',
@@ -77,7 +77,7 @@ export default {
     }
   },
   methods: {
-    changeColor (name) {
+    changeColor (name: string) {
       this.theme = name
 
       setCookie('fuzzy-engine-theme', name)

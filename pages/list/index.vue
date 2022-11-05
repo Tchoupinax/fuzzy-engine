@@ -122,14 +122,29 @@
   </div>
 </template>
 
-<script>
-import { getCookie } from '@/functions/cookies'
+<script lang="ts">
+import { Option } from '@swan-io/boxed'
+import { match } from 'ts-pattern'
+
+import { Provider } from '../../types/provider'
+
+import { getCookie } from '~~/functions/cookies'
 
 export default {
   name: 'ListPage',
-  data () {
+  data () : {
+    provider: Provider,
+    dockerRegistry: any,
+    awsEcr: any,
+    githubRegistry: any,
+    dockerhub: any;
+    loading: boolean;
+    hiddingRepoMode: false,
+    hiddingRepositories: Array<any>,
+    repositories: Array<any>,
+    } {
     return {
-      provider: undefined,
+      provider: Option.None(),
       dockerRegistry: {
         url: '',
         username: '',
@@ -155,26 +170,21 @@ export default {
     }
   },
   computed: {
-    url () {
+    url (): string {
       if (this.repositories.length > 0) {
-        if (this.provider === 'aws-ecr') {
-          return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`
-        }
-
-        if (this.provider === 'docker-registry-v2') {
-          return this.dockerRegistry.url
-        }
-
-        if (this.provider === 'dockerhub') {
-          return `DockerHub - ${this.dockerhub.username}`
-        }
-
-        return 'Github repository'
+        return this.provider.match({
+          Some: provider => match(provider)
+            .with('aws-ecr', () => `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`)
+            .with('docker-registry-v2', () => this.dockerRegistry.url)
+            .with('dockerhub', () => `DockerHub - ${this.dockerhub.username}`)
+            .with('github-ecr', () => 'Github repository')
+            .exhaustive(),
+          None: () => ''
+        })
       }
 
-      return '-'
+      return ''
     },
-
     filteredRepositories () {
       if (this.hiddingRepoMode) {
         return this.repositories
@@ -187,32 +197,32 @@ export default {
   },
   async mounted () {
     if (getCookie('fuzzy-engine-github-ecr')) {
-      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'))
+      const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
       this.githubRegistry.nickname = nickname
       this.githubRegistry.token = token
     }
 
     if (getCookie('fuzzy-engine-aws-ecr')) {
-      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'))
+      const { accessKey, secretKey, region } = JSON.parse(atob(getCookie('fuzzy-engine-aws-ecr')))
       this.awsEcr.accessKey = accessKey
       this.awsEcr.secretKey = secretKey
       this.awsEcr.region = region
     }
 
+    if (getCookie('fuzzy-engine-dockerhub')) {
+      const { username, password } = JSON.parse(atob(getCookie('fuzzy-engine-dockerhub')))
+      this.dockerhub.username = username
+      this.dockerhub.password = password
+    }
+
     if (getCookie('fuzzy-engine-docker-v2')) {
-      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}')
+      const { url, username, password } = JSON.parse(atob(getCookie('fuzzy-engine-docker-v2')))
       this.dockerRegistry.url = url
       this.dockerRegistry.username = username
       this.dockerRegistry.password = password
     }
 
-    if (getCookie('fuzzy-engine-dockerhub')) {
-      const { username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-dockerhub'), 'base64') ?? '{}')
-      this.dockerhub.username = username
-      this.dockerhub.password = password
-    }
-
-    this.provider = getCookie('fuzzy-engine-provider')
+    this.provider = Option.Some(getCookie('fuzzy-engine-provider')) as Provider
 
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
     this.loading = false
@@ -222,7 +232,7 @@ export default {
       this.$router.push('/list')
     }
 
-    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories`, { withCredentials: true })
+    const data = await $fetch(`${new URL(window.location).origin}/api/repositories`, { credentials: 'include' })
 
     this.repositories = data.sort((a, b) => {
       if (a.name > b.name) { return 1 }
@@ -231,53 +241,16 @@ export default {
     })
   },
   methods: {
-    downloadUrl (repo) {
-      if (this.provider === 'aws-ecr') {
-        return `${this.repositories[0].url}.dkr.ecr.${this.awsEcr.region}.amazonaws.com/${repo}`
-      }
-
-      if (this.provider === 'dockerhub') {
-        return `docker.io/${this.dockerhub.username}/${repo}`
-      }
-
-      if (this.provider === 'docker-registry-v2') {
-        return `${this.dockerRegistry.url}/${repo}`
-      }
-
-      return `/${repo}`
-    },
-
-    toggleHiddingRepoMode () {
-      this.hiddingRepoMode = !this.hiddingRepoMode
-      if (!this.hiddingRepoMode) {
-        localStorage.setItem('hiddingRepositories', JSON.stringify(this.hiddingRepositories))
-      }
-    },
-
-    onCopy () {
-      this.copiedSuccesfully()
-    },
-    hideRepo (name) {
-      this.hiddingRepositories.push(name)
-    },
-    showRepo (name) {
-      this.hiddingRepositories.splice(this.hiddingRepositories.findIndex(n => n === name), 1)
-    },
-    deleteAllImage (repoName) {
-      if (window.confirm(`Do you really want to delete all tags in ${repoName}`)) {
-        window.location = `/${repoName}/delete-all`
-      }
-    },
-  },
-  notifications: {
-    copiedSuccesfully: {
-      title: 'Copied!',
-      type: 'success',
-    },
-    deleteAllSuccess: {
-      title: 'Delete',
-      message: 'Sucessfully deleted all the image for this repo',
-      type: 'success',
+    downloadUrl (repositoryName: Provider): string {
+      return this.provider.match({
+        Some: provider => match(provider)
+          .with('aws-ecr', () => `${this.repositories[0].url}.dkr.ecr.${this.awsEcr.region}.amazonaws.com/${repositoryName}`)
+          .with('docker-registry-v2', () => `${this.dockerRegistry.url}/${repositoryName}`)
+          .with('dockerhub', () => `docker.io/${this.dockerhub.username}/${repositoryName}`)
+          .with('github-ecr', () => `ghcr.io/${this.githubRegistry.nickname}/${repositoryName}`)
+          .exhaustive(),
+        None: () => 'Non available'
+      })
     },
   },
 }

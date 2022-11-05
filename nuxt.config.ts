@@ -1,32 +1,33 @@
-import { defineNuxtConfig } from "@nuxt/bridge";
+// https://v3.nuxtjs.org/api/configuration/nuxt.config
+import eslint from 'vite-plugin-eslint'
 
 export default defineNuxtConfig({
-  target: "server",
+  ssr: true,
+  typescript: {
+    shim: false
+  },
   head: {
-    title: "Docker registry UI",
+    title: 'Docker registry UI',
     meta: [
-      { charset: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
-        hid: "description",
-        name: "description",
-        content: process.env.npm_package_description || ""
+
+        hid: 'description',
+        name: 'description',
+        content: process.env.npm_package_description || ''
       }
     ],
-    link: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }]
+    link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]
   },
-  loading: { color: "#fff" },
-  css: [],
-  plugins: [
-    "~/plugins/clipboard.client.ts",
-    "~/plugins/notifications.client.ts"
+  loading: { color: '#fff' },
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/pwa'
   ],
-  buildModules: ["@nuxtjs/eslint-module", "@nuxtjs/tailwindcss"],
-  modules: ["@nuxtjs/axios", "@nuxtjs/pwa"],
-  axios: {
-    // NOTE Do not send proxy headers, if the UI is behind a reverse proxy with basic auth
-    // it will override authorization header and broke everything
-    proxyHeaders: false,
-    credentials: true,
+  vite: {
+    plugins: [
+      eslint()
+    ]
   }
-});
+})

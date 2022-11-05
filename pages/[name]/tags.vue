@@ -73,7 +73,7 @@
                     <div
                       v-for="(architecture, indexArchitecture) of digest.architecures"
                       :key="indexArchitecture"
-                      >
+                    >
                       {{ architecture }}
                     </div>
                   </div>
@@ -138,10 +138,9 @@ export default {
       this.$router.push(`/${this.name}/tags/`)
     }
 
-    const { data } = await this.$axios({
-      url: `${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`,
+    const data = await $fetch(`${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`, {
       method: 'GET',
-      withCredentials: true,
+      credentials: 'include',
     })
 
     this.name = data.name

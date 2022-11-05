@@ -1,5 +1,6 @@
-import Vue from 'vue';
-import VueClipboard from 'vue-clipboard2';
+import VueClipboard from 'vue-clipboard2'
 
-VueClipboard.config.autoSetContainer = true;
-Vue.use(VueClipboard);
+export default defineNuxtPlugin((nuxtApp) => {
+  VueClipboard.config.autoSetContainer = true
+  nuxtApp.vueApp.use(VueClipboard)
+})

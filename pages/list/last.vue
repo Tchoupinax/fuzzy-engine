@@ -54,9 +54,9 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import * as timeago from 'timeago.js'
-import { getCookie } from '@/functions/cookies'
+import { getCookie } from '~~/functions/cookies'
 
 export default {
   name: 'ListPage',
@@ -116,20 +116,26 @@ export default {
   },
   async mounted () {
     if (getCookie('fuzzy-engine-github-ecr')) {
-      const { nickname, token } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-github-ecr'), 'base64'))
+      const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
       this.githubRegistry.nickname = nickname
       this.githubRegistry.token = token
     }
 
     if (getCookie('fuzzy-engine-aws-ecr')) {
-      const { accessKey, secretKey, region } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-aws-ecr'), 'base64'))
+      const { accessKey, secretKey, region } = JSON.parse(atob(getCookie('fuzzy-engine-aws-ecr')))
       this.awsEcr.accessKey = accessKey
       this.awsEcr.secretKey = secretKey
       this.awsEcr.region = region
     }
 
+    if (getCookie('fuzzy-engine-dockerhub')) {
+      const { username, password } = JSON.parse(atob(getCookie('fuzzy-engine-dockerhub')))
+      this.dockerhub.username = username
+      this.dockerhub.password = password
+    }
+
     if (getCookie('fuzzy-engine-docker-v2')) {
-      const { url, username, password } = JSON.parse(Buffer.from(getCookie('fuzzy-engine-docker-v2'), 'base64') ?? '{}')
+      const { url, username, password } = JSON.parse(atob(getCookie('fuzzy-engine-docker-v2')))
       this.dockerRegistry.url = url
       this.dockerRegistry.username = username
       this.dockerRegistry.password = password
@@ -174,7 +180,7 @@ export default {
     },
     deleteAllImage (repoName) {
       if (window.confirm(`Do you really want to delete all tags in ${repoName}`)) {
-        window.location = `/${repoName}/delete-all`
+        window.location = `/${repoName}/delete-all)`
       }
     },
   },
