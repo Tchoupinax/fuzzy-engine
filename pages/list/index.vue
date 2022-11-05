@@ -77,7 +77,7 @@
                 </button>
               </div>
 
-              <div class="flex items-center justify-end text-right w-28">
+              <div class="flex items-center justify-end text-right w-40">
                 <NuxtLink :to="`/${repo.name.replace(/\//g, '-')}/tags`">
                   Show tags ({{ repo.countOfTags }})
                 </NuxtLink>

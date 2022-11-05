@@ -19,6 +19,6 @@ export type listRepositoriesTagsAnswer = {
 }
 
 export abstract class RegistryApiRepository {
-  abstract listRepositories(): Promise<ContainerRepository[]>;
+  abstract listRepositories(limit: number, offset: number): Promise<ContainerRepository[]>;
   abstract listRepositoriesTags(repositoryName: string): Promise<listRepositoriesTagsAnswer>;
 }

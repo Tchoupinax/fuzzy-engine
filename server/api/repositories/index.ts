@@ -5,7 +5,7 @@ import { DockerApiRepository, DockerApiRepositoryConfig } from '../../repositori
 import { GithubRepository, GithubRepositoryConfig } from '../../repositories/github.repository'
 import { DockerhubRepository, DockerhubRepositoryConfig } from '~~/server/repositories/dockerhub.repository'
 
-export default defineEventHandler(async (request) => {
+export default defineEventHandler((request) => {
   let listRepositoryUseCase: ListRepositoryUseCase
 
   const {
@@ -23,6 +23,7 @@ export default defineEventHandler(async (request) => {
       accessKey,
       secretKey,
       region,
+      useCLI: true
     }
 
     listRepositoryUseCase = new ListRepositoryUseCase(new AwsRepository(awsConfig))
