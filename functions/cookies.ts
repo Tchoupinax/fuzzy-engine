@@ -1,4 +1,4 @@
-export function setCookie (name: string, value: any, days?: any) {
+export function setCookie<T> (name: string, value: T, days?: number) {
   let expires = ''
 
   if (days) {
@@ -10,7 +10,7 @@ export function setCookie (name: string, value: any, days?: any) {
   document.cookie = `${name}=${value || ''}${expires}; path=/`
 }
 
-export function getCookie (cname) {
+export function getCookie (cname: string) {
   const name = `${cname}=`
   const decodedCookie = decodeURIComponent(document.cookie)
   const ca = decodedCookie.split(';')
@@ -23,5 +23,6 @@ export function getCookie (cname) {
       return c.substring(name.length, c.length)
     }
   }
+
   return ''
 }
