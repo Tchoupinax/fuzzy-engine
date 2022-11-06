@@ -1,28 +1,28 @@
 FROM node:16-alpine as builder
 
-RUN  apk add --no-cache --virtual .gyp git
+#RUN  apk add --no-cache --virtual .gyp git
 
-WORKDIR /app
+#WORKDIR /app
 
-COPY package*.json /app/
+#COPY package*.json /app/
 
-RUN npm install --no-progress
+#RUN npm install --no-progress
 
-COPY . .
+#COPY . .
 
-RUN npm run build
+#RUN npm run build
 
-#########################################################
-#########################################################
+##########################################################
+##########################################################
 
-FROM node:16-alpine
+#FROM node:16-alpine
 
-WORKDIR /app
+#WORKDIR /app
 
-COPY --from=builder /app/.output /app/.output
+#COPY --from=builder /app/.output /app/.output
 
-RUN npm install --omit=dev nuxt
+#RUN npm install --omit=dev nuxt
 
-EXPOSE 3000
+#EXPOSE 3000
 
-CMD NITRO_HOST=0.0.0.0 node .output/server/index.mjs
+#CMD NITRO_HOST=0.0.0.0 node .output/server/index.mjs
