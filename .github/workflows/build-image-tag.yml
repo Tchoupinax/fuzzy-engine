@@ -36,4 +36,4 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ fromJson(steps.gen_tags.outputs.tags) }}
+          tags: tchoupinax/fuzzy-engine:${{ fromJson(steps.gen_tags.outputs.tags) }}
