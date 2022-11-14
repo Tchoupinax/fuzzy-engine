@@ -64,10 +64,9 @@
                 >
 
                 <button
-                  v-clipboard:copy="`${url}/${repo.name}`"
-                  v-clipboard:success="onCopy"
                   class="p-2 px-4 bg-gray-200 border border-l-0 border-gray-700 rounded-r"
                   type="button"
+                  @click="onCopy(repo.name)"
                 >
                   <img
                     class="w-4"
@@ -142,10 +141,10 @@ export default {
   name: 'ListPage',
   data () : {
     provider: Provider,
-    dockerRegistry: any,
-    awsEcr: any,
-    githubRegistry: any,
-    dockerhub: any;
+    dockerRegistry: { url: string, username: string, password: string },
+    awsEcr: { accessKey: string, secretKey: string, region: string },
+    githubRegistry: { nickname: string, token: string },
+    dockerhub: { username: string, password: string };
     loading: boolean;
     hiddingRepoMode: false,
     hiddingRepositories: Array<any>,
@@ -181,19 +180,15 @@ export default {
   },
   computed: {
     url (): string {
-      if (this.repositories.length > 0) {
-        return this.provider.match({
-          Some: provider => match(provider)
-            .with('aws-ecr', () => `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`)
-            .with('docker-registry-v2', () => this.dockerRegistry.url)
-            .with('dockerhub', () => `DockerHub - ${this.dockerhub.username}`)
-            .with('github-ecr', () => 'Github repository')
-            .exhaustive(),
-          None: () => ''
-        })
-      }
-
-      return ''
+      return this.provider.match({
+        Some: provider => match(provider)
+          .with('aws-ecr', () => `AWS - ${this.repositories?.[0]?.url?.split('.')?.[0]} - ${this.awsEcr.region}`)
+          .with('docker-registry-v2', () => this.dockerRegistry.url)
+          .with('dockerhub', () => `DockerHub - ${this.dockerhub.username}`)
+          .with('github-ecr', () => 'Github repository')
+          .exhaustive(),
+        None: () => ''
+      })
     },
     filteredRepositories () {
       if (this.hiddingRepoMode) {
@@ -251,7 +246,7 @@ export default {
     })
   },
   methods: {
-    downloadUrl (repositoryName: Provider): string {
+    downloadUrl (repositoryName: string): string {
       return this.provider.match({
         Some: provider => match(provider)
           .with('aws-ecr', () => `${this.repositories[0].url}.dkr.ecr.${this.awsEcr.region}.amazonaws.com/${repositoryName}`)
@@ -261,6 +256,12 @@ export default {
           .exhaustive(),
         None: () => 'Non available'
       })
+    },
+
+    onCopy (repositoryName: string) {
+      this.copiedSuccesfully()
+
+      navigator.clipboard.writeText(this.downloadUrl(repositoryName))
     },
 
     async fetchRepositories () {
@@ -274,6 +275,17 @@ export default {
       this.repositories = [...this.repositories, ...data]
       this.fetchAdditionalRepositoriesLoading = false
     }
+  },
+  notifications: {
+    copiedSuccesfully: {
+      title: 'Copied!',
+      type: 'success',
+    },
+    deleteAllSuccess: {
+      title: 'Delete',
+      message: 'Sucessfully deleted all the image for this repo',
+      type: 'success',
+    },
   },
 }
 </script>
