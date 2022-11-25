@@ -46,7 +46,7 @@ List of the digests (with tags) for one repository
 
 #### Built with
 
-* [Nuxt.js](https://nuxtjs.org/) - Vue.js framework
+* [Nuxt.js 3](https://nuxtjs.org/) - Vue.js framework
 * [Tailwindcss](https://tailwindcss.com/) - Utility-first CSS framework
 
 ## Docker informations

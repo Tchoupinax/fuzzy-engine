@@ -44,6 +44,16 @@
             <div /><div /><div /><div />
           </div>
 
+          <div class="w-1/2 mb-16">
+            <input
+              v-model="imageName"
+              type="text"
+              class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
+              placeholder="image name"
+              @keyup="searchImageByNameDebounce"
+            >
+          </div>
+
           <div
             v-for="(repo, index) of filteredRepositories"
             :key="index"
@@ -133,6 +143,7 @@
 import { Option } from '@swan-io/boxed'
 import { match } from 'ts-pattern'
 
+import debounce from 'lodash.debounce'
 import { Provider } from '../../types/provider'
 
 import { getCookie } from '~~/functions/cookies'
@@ -150,6 +161,7 @@ export default {
     hiddingRepositories: Array<any>,
     repositories: Array<any>,
     fetchAdditionalRepositoriesLoading: boolean,
+    imageName: string,
     } {
     return {
       provider: Option.None(),
@@ -158,6 +170,7 @@ export default {
         username: '',
         password: '',
       },
+      imageName: '',
       awsEcr: {
         accessKey: '',
         secretKey: '',
@@ -201,6 +214,8 @@ export default {
     },
   },
   async mounted () {
+    this.searchImageByNameDebounce = debounce(this.searchImage, 400)
+
     if (getCookie('fuzzy-engine-github-ecr')) {
       const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
       this.githubRegistry.nickname = nickname
@@ -246,6 +261,7 @@ export default {
     })
   },
   methods: {
+    debounce,
     downloadUrl (repositoryName: string): string {
       return this.provider.match({
         Some: provider => match(provider)
@@ -273,6 +289,18 @@ export default {
       )
 
       this.repositories = [...this.repositories, ...data]
+      this.fetchAdditionalRepositoriesLoading = false
+    },
+
+    async searchImage () {
+      this.fetchAdditionalRepositoriesLoading = true
+
+      const data = await $fetch(
+        `${new URL(window.location).origin}/api/repositories?limit=10&name=${this.imageName}`,
+        { credentials: 'include' }
+      )
+
+      this.repositories = [...data]
       this.fetchAdditionalRepositoriesLoading = false
     }
   },

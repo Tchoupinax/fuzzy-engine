@@ -205,7 +205,6 @@
             </label>
 
             <input
-              v-if="!awsEcr.useCLI"
               v-model="awsEcr.region"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
@@ -388,9 +387,14 @@ export default {
     connected () {
       if (this.provider === 'aws-ecr') {
         return (
-          this.awsEcr.region?.length > 0 &&
-          this.awsEcr.accessKey?.length > 0 &&
-          this.awsEcr.secretKey?.length > 0
+          (
+            this.awsEcr.region?.length > 0 &&
+            this.awsEcr.accessKey?.length > 0 &&
+            this.awsEcr.secretKey?.length > 0
+          ) || (
+            this.awsEcr.region?.length > 0 &&
+            this.awsEcr.useCLI
+          )
         )
       }
 

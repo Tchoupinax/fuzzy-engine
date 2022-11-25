@@ -1,6 +1,6 @@
 {
   "name": "fuzzy-engine",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Docker registry UI made with love",
   "author": "Tchoupinax <corentinfiloche@hotmail.fr> (https://corentinfiloche.xyz)",
   "licence": "MIT",
@@ -37,6 +37,7 @@
     "execa": "^6.1.0",
     "express": "^4.18.2",
     "js-cookie": "^3.0.1",
+    "lodash.debounce": "^4.0.8",
     "mini-toastr": "^0.8.1",
     "pretty-bytes": "^6.0.0",
     "timeago.js": "^4.0.2",
