@@ -114,7 +114,7 @@
           </div>
           <!-- END # List of digests -->
 
-          <div v-if="digests.length === 0">
+          <div v-if="loaded && digests.length === 0">
             No tag found for this repository
           </div>
         </div>
@@ -132,6 +132,7 @@ export default {
   name: 'TagsComponent',
   data () {
     return {
+      loaded: false,
       provider: Option.None(),
       name: '',
       notag: '',
@@ -154,6 +155,7 @@ export default {
     this.name = data.name
     this.noTag = data.noTag
     this.digests = data.digests
+    this.loaded = true
   },
   methods: {
     timeago: timeago.format,
