@@ -1,3 +1,4 @@
+import { Option } from '@swan-io/boxed'
 import prettyBytes from 'pretty-bytes'
 import { ECR, DescribeRepositoriesCommand, ListImagesCommand, DescribeImagesCommand } from '@aws-sdk/client-ecr'
 import { execa } from 'execa'
@@ -26,8 +27,8 @@ export class AwsRepository implements RegistryApiRepository {
     this.useCLI = data.useCLI
   }
 
-  async listRepositories (limit: number, offset: number): Promise<ContainerRepository[]> {
-    const { repositories } = await this.getRepositories(limit, offset)
+  async listRepositories (limit: number, offset: number, name: Option<string>): Promise<ContainerRepository[]> {
+    const { repositories } = await this.getRepositories(limit, offset, name)
 
     const arrayImageIds = await Promise.all(
       repositories.map(async (repository: any) => {
@@ -102,7 +103,7 @@ export class AwsRepository implements RegistryApiRepository {
     }
   }
 
-  private async getRepositories (limit: number, offset: number): Promise<any> {
+  private async getRepositories (limit: number, offset: number, name: Option<string>): Promise<any> {
     if (this.useCLI) {
       const { stdout } = await execa('aws', ['ecr', 'describe-repositories'])
       const { repositories } = JSON.parse(stdout)
@@ -117,6 +118,13 @@ export class AwsRepository implements RegistryApiRepository {
             } else {
               return 0
             }
+          })
+          .filter((data: any) => {
+            if (name.isSome()) {
+              return data.repositoryName.includes(name.get())
+            }
+
+            return true
           })
           .slice(offset, offset + limit)
       }

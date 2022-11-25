@@ -1,4 +1,5 @@
 import { defineEventHandler, parseCookies, getQuery } from 'h3'
+import { Option } from '@swan-io/boxed'
 import { ListRepositoryUseCase } from '../../domain/list-repositories.use-case'
 import { AwsRepository, AwsRepositoryConfig } from '../../repositories/aws.repository'
 import { DockerApiRepository, DockerApiRepositoryConfig } from '../../repositories/docker-registry.repository'
@@ -8,7 +9,7 @@ import { DockerhubRepository, DockerhubRepositoryConfig } from '~~/server/reposi
 export default defineEventHandler((request) => {
   let listRepositoryUseCase: ListRepositoryUseCase
 
-  const { limit, offset } = getQuery(request)
+  const { limit, offset, name } = getQuery(request)
 
   const {
     'fuzzy-engine-provider': provider,
@@ -61,6 +62,7 @@ export default defineEventHandler((request) => {
 
   return listRepositoryUseCase.execute({
     limit: parseInt(limit as unknown as string ?? '2', 10),
-    offset: parseInt(offset as unknown as string ?? '0', 10)
+    offset: parseInt(offset as unknown as string ?? '0', 10),
+    name: Option.fromNullable(name as unknown as string),
   })
 })
