@@ -25,7 +25,6 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/pwa',
     '@nuxtjs/robots',
   ],
   vite: {
