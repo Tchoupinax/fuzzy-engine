@@ -7,10 +7,14 @@ import { DockerApiRepositoryConfig, DockerApiRepository } from '../repositories/
 
 collectDefaultMetrics()
 
-const gauge = new Gauge({
-  name: 'docker_registry_v2_tags_per_repository',
+const countTagByRepository = new Gauge({
+  name: 'docker_registry_v2_per_repository_tags_count',
   help: 'Give the count of tag per repository',
   labelNames: ['repositoryName']
+})
+const countRepositories = new Gauge({
+  name: 'docker_registry_v2_repository_count',
+  help: 'Give the count of repository',
 })
 
 export default defineEventHandler(async (request) => {
@@ -49,9 +53,11 @@ export default defineEventHandler(async (request) => {
     offset: 1
   })
 
+  countRepositories.set(repositories.length)
+
   repositories.forEach(
     (repository) => {
-      gauge.labels(repository.name).set(repository.countOfTags)
+      countTagByRepository.labels(repository.name).set(repository.countOfTags)
     }
   )
 
