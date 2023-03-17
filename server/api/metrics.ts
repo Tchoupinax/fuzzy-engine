@@ -1,3 +1,4 @@
+/* eslint-disable brace-style */
 import { defineEventHandler, getRequestHeader } from 'h3'
 import { Option } from '@swan-io/boxed'
 import { Gauge, collectDefaultMetrics, register } from 'prom-client'
@@ -19,12 +20,16 @@ export default defineEventHandler(async (request) => {
 
   const { 'fuzzy-engine-docker-v2': dockerCredentials } = parseCookies(request)
 
+  // For the cookie way
   if (dockerCredentials) {
     ({ url, username, password } = JSON.parse(Buffer.from(dockerCredentials, 'base64').toString('ascii')))
-  } else {
-    const bearerToken = getRequestHeader(request, 'Authorization')
+  }
+  // For the prometheus token way
+  else {
+    const bearerToken = getRequestHeader(request, 'authorization')
     if (bearerToken) {
-      const json = JSON.parse(Buffer.from(bearerToken, 'base64').toString('ascii'));
+      const token = bearerToken.split(' ').at(1)!
+      const json = JSON.parse(Buffer.from(token, 'base64').toString('ascii'));
       ({ url, username, password } = json['fuzzy-engine-docker-v2'])
     } else {
       return createError({ statusCode: 401 })
