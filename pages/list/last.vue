@@ -55,19 +55,35 @@
 </template>
 
 <script lang="ts">
+import { match } from 'ts-pattern'
+import { Option } from '@swan-io/boxed'
 import * as timeago from 'timeago.js'
+import { Provider } from '../../types/provider'
 import { getCookie } from '~~/functions/cookies'
 
 export default {
   name: 'ListPage',
-  data () {
+  data () : {
+    provider: Provider,
+    dockerRegistry: { url: string, username: string, password: string },
+    awsEcr: { accessKey: string, secretKey: string, region: string },
+    githubRegistry: { nickname: string, token: string },
+    dockerhub: { username: string, password: string };
+    loading: boolean;
+    hiddingRepoMode: false,
+    hiddingRepositories: Array<any>,
+    repositories: Array<any>,
+    fetchAdditionalRepositoriesLoading: boolean,
+    imageName: string,
+    } {
     return {
-      provider: undefined,
+      provider: Option.None(),
       dockerRegistry: {
         url: '',
         username: '',
         password: '',
       },
+      imageName: '',
       awsEcr: {
         accessKey: '',
         secretKey: '',
@@ -77,33 +93,29 @@ export default {
         nickname: '',
         token: '',
       },
+      dockerhub: {
+        username: '',
+        password: '',
+      },
       loading: true,
       hiddingRepoMode: false,
       hiddingRepositories: [],
       repositories: [],
+      fetchAdditionalRepositoriesLoading: false,
     }
   },
   computed: {
-    url () {
-      if (this.repositories.length > 0) {
-        if (this.provider === 'aws-ecr') {
-          return `AWS - ${this.repositories[0].url.split('.')[0]} - ${this.awsEcr.region}`
-        }
-
-        if (this.provider === 'docker-registry-v2') {
-          return this.dockerRegistry.url
-        }
-
-        if (this.provider === 'dockerhub') {
-          return `DockerHub - ${this.dockerhub.username}`
-        }
-
-        return 'Github repository'
-      }
-
-      return '-'
+    url (): string {
+      return this.provider.match({
+        Some: provider => match(provider)
+          .with('aws-ecr', () => `AWS - ${this.repositories?.[0]?.url?.split('.')?.[0]} - ${this.awsEcr.region}`)
+          .with('docker-registry-v2', () => this.dockerRegistry.url)
+          .with('dockerhub', () => `DockerHub - ${this.dockerhub.username}`)
+          .with('github-ecr', () => 'Github repository')
+          .exhaustive(),
+        None: () => ''
+      })
     },
-
     filteredRepositories () {
       if (this.hiddingRepoMode) {
         return this.repositories
@@ -141,7 +153,7 @@ export default {
       this.dockerRegistry.password = password
     }
 
-    this.provider = getCookie('fuzzy-engine-provider')
+    this.provider = Option.fromNullable(getCookie('fuzzy-engine-provider'))
 
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
     this.loading = false
@@ -151,7 +163,13 @@ export default {
       this.$router.push('/list')
     }
 
-    const { data } = await this.$axios.get(`${new URL(window.location).origin}/api/repositories/latest`, { withCredentials: true })
+    const data = await $fetch(
+      `${new URL((window as any).location).origin}/api/repositories/latest`,
+      { credentials: 'include' }
+    )
+
+    console.log(data)
+
     this.repositories = data
   },
   methods: {
