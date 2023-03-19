@@ -131,7 +131,7 @@
             class="text-xl italic mt-4 font-light"
             @click="fetchRepositories"
           >
-            {{ fetchAdditionalRepositoriesLoading ? 'Loading...' : 'List more...' }}
+            {{ fetchAdditionalRepositoriesLoading ? 'Loading...' : hasNext ? 'List more...': '' }}
           </button>
         </div>
       </div>
@@ -161,6 +161,7 @@ export default {
     hiddingRepositories: Array<any>,
     repositories: Array<any>,
     fetchAdditionalRepositoriesLoading: boolean,
+    hasNext: boolean,
     imageName: string,
     } {
     return {
@@ -189,6 +190,7 @@ export default {
       hiddingRepositories: [],
       repositories: [],
       fetchAdditionalRepositoriesLoading: false,
+      hasNext: false,
     }
   },
   computed: {
@@ -252,13 +254,14 @@ export default {
       this.$router.push('/list')
     }
 
-    const data = await $fetch(`${new URL(window.location).origin}/api/repositories?offset=0&limit=10`, { credentials: 'include' })
+    const { data, next } = await $fetch(`${new URL(window.location).origin}/api/repositories?offset=0&limit=10`, { credentials: 'include' })
 
     this.repositories = data.sort((a, b) => {
       if (a.name > b.name) { return 1 }
       if (a.name < b.name) { return -1 }
       return 1
     })
+    this.hasNext = next
   },
   methods: {
     debounce,
@@ -283,25 +286,27 @@ export default {
     async fetchRepositories () {
       this.fetchAdditionalRepositoriesLoading = true
 
-      const data = await $fetch(
+      const { data, next } = await $fetch(
         `${new URL(window.location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
         { credentials: 'include' }
       )
 
       this.repositories = [...this.repositories, ...data]
       this.fetchAdditionalRepositoriesLoading = false
+      this.hasNext = next
     },
 
     async searchImage () {
       this.fetchAdditionalRepositoriesLoading = true
 
-      const data = await $fetch(
+      const { data, next } = await $fetch(
         `${new URL(window.location).origin}/api/repositories?limit=10&name=${this.imageName}`,
         { credentials: 'include' }
       )
 
       this.repositories = [...data]
       this.fetchAdditionalRepositoriesLoading = false
+      this.hasNext = next
     }
   },
   notifications: {
