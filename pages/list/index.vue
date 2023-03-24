@@ -135,11 +135,10 @@
           </div>
 
           <button
-            v-if="filteredRepositories.length > 0"
             class="text-xl italic mt-4 font-light"
             @click="fetchRepositories"
           >
-            {{ fetchAdditionalRepositoriesLoading ? 'Loading...' : hasNext ? 'List more...': '' }}
+            {{ ctaDisplay }}
           </button>
         </div>
       </div>
@@ -154,24 +153,27 @@ import { match } from 'ts-pattern'
 import debounce from 'lodash.debounce'
 import { Provider } from '../../types/provider'
 
+import { DB } from '../../functions/db'
 import { getCookie } from '~~/functions/cookies'
+
+type State = {
+  awsEcr: { accessKey: string, secretKey: string, region: string },
+  dockerRegistry: { url: string, username: string, password: string },
+  dockerhub: { username: string, password: string };
+  fetchAdditionalRepositoriesLoading: boolean,
+  githubRegistry: { nickname: string, token: string },
+  hasNext: boolean,
+  hiddingRepoMode: false,
+  hiddingRepositories: Array<any>,
+  imageName: string,
+  loading: boolean;
+  provider: Provider,
+  repositories: Array<any>,
+}
 
 export default {
   name: 'ListPage',
-  data () : {
-    provider: Provider,
-    dockerRegistry: { url: string, username: string, password: string },
-    awsEcr: { accessKey: string, secretKey: string, region: string },
-    githubRegistry: { nickname: string, token: string },
-    dockerhub: { username: string, password: string };
-    loading: boolean;
-    hiddingRepoMode: false,
-    hiddingRepositories: Array<any>,
-    repositories: Array<any>,
-    fetchAdditionalRepositoriesLoading: boolean,
-    hasNext: boolean,
-    imageName: string,
-    } {
+  data (): State {
     return {
       provider: Option.None(),
       dockerRegistry: {
@@ -213,6 +215,15 @@ export default {
         None: () => ''
       })
     },
+    ctaDisplay () : string {
+      if (this.fetchAdditionalRepositoriesLoading) {
+        return 'Loading...'
+      } else if (this.hasNext) {
+        return 'list more...'
+      }
+
+      return 'Syncing...'
+    },
     filteredRepositories () {
       if (this.hiddingRepoMode) {
         return this.repositories
@@ -225,6 +236,15 @@ export default {
   },
   async mounted () {
     this.searchImageByNameDebounce = debounce(this.searchImage, 400)
+
+    const db = new DB()
+    this.provider = Option.Some(getCookie('fuzzy-engine-provider')) as Provider
+
+    const storedData = db.findRepositories()
+    if (storedData.isSome()) {
+      this.repositories = storedData.get()
+      this.loading = false
+    }
 
     if (getCookie('fuzzy-engine-github-ecr')) {
       const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
@@ -252,8 +272,6 @@ export default {
       this.dockerRegistry.password = password
     }
 
-    this.provider = Option.Some(getCookie('fuzzy-engine-provider')) as Provider
-
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
 
     if (this.$route.query['delete-all'] === 'success') {
@@ -261,13 +279,20 @@ export default {
       this.$router.push('/list')
     }
 
-    const { data, next } = await $fetch(`${new URL(window.location).origin}/api/repositories?offset=0&limit=10`, { credentials: 'include' })
+    const { data, next } = await $fetch(
+      `${new URL(window.location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
+      { credentials: 'include' }
+    )
 
-    this.repositories = data.sort((a, b) => {
-      if (a.name > b.name) { return 1 }
-      if (a.name < b.name) { return -1 }
-      return 1
-    })
+    const repositories = db.upsertRepositories(data)
+    if (repositories.isSome()) {
+      this.repositories = repositories.get().sort((a, b) => {
+        if (a.name > b.name) { return 1 }
+        if (a.name < b.name) { return -1 }
+        return 1
+      })
+    }
+
     this.hasNext = next
     this.loading = false
   },
@@ -284,14 +309,13 @@ export default {
         None: () => 'Non available'
       })
     },
-
     onCopy (repositoryName: string) {
       this.copiedSuccesfully()
 
       navigator.clipboard.writeText(this.downloadUrl(repositoryName))
     },
-
     async fetchRepositories () {
+      const db = new DB()
       this.fetchAdditionalRepositoriesLoading = true
 
       const { data, next } = await $fetch(
@@ -302,8 +326,8 @@ export default {
       this.repositories = [...this.repositories, ...data]
       this.fetchAdditionalRepositoriesLoading = false
       this.hasNext = next
+      db.upsertRepositories(this.repositories)
     },
-
     async searchImage () {
       this.fetchAdditionalRepositoriesLoading = true
 

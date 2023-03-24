@@ -1,11 +1,21 @@
 <template>
   <div>
-    <section id="actions" class="mt-6 ml-8">
+    <section id="actions" class="flex justify-between mt-6 ml-8">
       <NuxtLink to="/list">
         <button class="font-bold text-theme-default hover:text-theme-default">
           List of repositories
         </button>
       </NuxtLink>
+
+      <div class="mr-8">
+        <button
+          v-if="hasNullTags"
+          class="flex items-center font-bold text-theme-default hover:text-theme-default"
+          @click="toggleDoNotDisplayNullTags"
+        >
+          {{ doNotDisplayNullTags ? 'Display image with null tag' : 'Hide image with null tag' }}
+        </button>
+      </div>
     </section>
 
     <div class="flex justify-center mb-32">
@@ -19,7 +29,7 @@
         <div class="flex flex-col items-center justify-center">
           <!-- List of digests -->
           <div
-            v-for="(digest, index) of digests"
+            v-for="(digest, index) of images"
             :key="index"
             class="flex items-center justify-between w-full px-8 py-4 text-sm font-bold text-center"
             :class="{
@@ -84,13 +94,20 @@
                 </div>
               </div>
 
-              <div class="flex">
+              <div v-if="digest.tags.filter(tag => tag).length > 0" class="flex">
                 <div
-                  v-for="(tag, indexTags) of digest.tags"
+                  v-for="(tag, indexTags) of digest.tags.filter(tag => tag)"
                   :key="indexTags"
                   class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
                 >
                   {{ tag && tag.slice(0, 16) }}
+                </div>
+              </div>
+              <div v-else class="flex">
+                <div
+                  class="text-xs w-auto p-1 px-2 mx-1 whitespace-no-wrap rounded-lg"
+                >
+                  ❌
                 </div>
               </div>
 
@@ -124,23 +141,58 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import * as timeago from 'timeago.js'
 import { Option } from '@swan-io/boxed'
 import { getCookie } from '../../functions/cookies'
+import { DB } from '../../functions/db'
+
+type State = {
+  loaded: boolean;
+  provider: Option<string>;
+  name: string;
+  noTag: boolean;
+  digests: Array<any>;
+  doNotDisplayNullTags: boolean;
+}
 
 export default {
   name: 'TagsComponent',
-  data () {
+  data (): State {
     return {
       loaded: false,
       provider: Option.None(),
       name: '',
-      notag: '',
+      noTag: false,
       digests: [],
+      doNotDisplayNullTags: true,
     }
   },
+  computed: {
+    hasNullTags () {
+      return this.digests.some(digest => digest.tags.filter(tag => tag).length === 0)
+    },
+    images () {
+      if (this.doNotDisplayNullTags) {
+        return this.digests.filter(digest => digest.tags.filter(tag => tag).length > 0)
+      }
+      return this.digests
+    },
+  },
   async mounted () {
+    this.doNotDisplayNullTags = localStorage.getItem('fuzzy-engine-toggleDoNotDisplayNullTags') === 'true'
+
+    const db = new DB()
+    const repositoryName: string = this.$route.params.name as string
+
+    const storedData = db.findRepositoryImages(repositoryName)
+    if (storedData.isSome()) {
+      const data = storedData.get()
+      this.name = data.name
+      this.noTag = data.noTag
+      this.digests = data.digests
+    }
+
     this.provider = Option.Some(getCookie('fuzzy-engine-provider'))
 
     if (this.$route.query.delete === 'success') {
@@ -153,6 +205,8 @@ export default {
       credentials: 'include',
     })
 
+    db.saveRepositoryImages(repositoryName, data)
+
     this.name = data.name
     this.noTag = data.noTag
     this.digests = data.digests
@@ -160,18 +214,20 @@ export default {
   },
   methods: {
     timeago: timeago.format,
-
     formatFullDate (date) {
       const dtf = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
 
       return dtf.format(new Date(date))
     },
-
     deleteImage (digesthash) {
       if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
         window.location = `/${this.name}/${digesthash}/delete`
       }
     },
+    toggleDoNotDisplayNullTags () {
+      this.doNotDisplayNullTags = !this.doNotDisplayNullTags
+      localStorage.setItem('fuzzy-engine-toggleDoNotDisplayNullTags', this.doNotDisplayNullTags ? 'true' : 'false')
+    }
   },
   notifications: {
     deleteSuccess: {
