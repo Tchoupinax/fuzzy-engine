@@ -30,7 +30,7 @@
     <div class="flex flex-col items-center justify-center mb-40">
       <div class="w-full lg:w-8/12">
         <div class="flex flex-col items-center justify-center mb-40 text-theme-default">
-          <div class="mb-24 text-4xl text-center">
+          <div v-if="!loading" class="mb-16 mt-8 xl:mt-0 text-4xl text-center">
             <p>
               {{ url }}
             </p>
@@ -40,11 +40,19 @@
             </NuxtLink>
           </div>
 
-          <div v-if="loading" class="lds-ring">
-            <div /><div /><div /><div />
+          <div v-if="loading" class="flex flex-col items-center justify-center">
+            <div class="lds-ring">
+              <div /><div /><div /><div />
+            </div>
+
+            <div class="mt-16 text-xl">
+              <p>
+                We sent our messengers to get the list of repositories. Please be patient
+              </p>
+            </div>
           </div>
 
-          <div class="w-1/2 mb-16">
+          <div v-if="!loading" class="w-1/2 mb-16">
             <input
               v-model="imageName"
               type="text"
@@ -57,7 +65,7 @@
           <div
             v-for="(repo, index) of filteredRepositories"
             :key="index"
-            class="flex items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
+            class="flex pl-16 xl:pl-4 pr-16 xl:pr-4 items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
             :class="{ 'opacity-50': hiddingRepositories.includes(repo.name) }"
           >
             <div class="w-5/12 text-xl text-left truncate">
@@ -66,7 +74,7 @@
 
             <!-- Right -->
             <div class="flex items-center">
-              <div class="flex mr-8">
+              <div class="xl:flex mr-8 hidden">
                 <input
                   class="px-2 text-xs text-gray-700 border border-gray-700 rounded-l docker-pull"
                   type="text"
@@ -247,7 +255,6 @@ export default {
     this.provider = Option.Some(getCookie('fuzzy-engine-provider')) as Provider
 
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
-    this.loading = false
 
     if (this.$route.query['delete-all'] === 'success') {
       this.deleteAllSuccess()
@@ -262,6 +269,7 @@ export default {
       return 1
     })
     this.hasNext = next
+    this.loading = false
   },
   methods: {
     debounce,

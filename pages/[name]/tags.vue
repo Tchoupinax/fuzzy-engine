@@ -66,6 +66,7 @@
             <div class="flex items-center">
               <div class="relative flex items-center justify-center mr-4">
                 <div
+                  v-if="digest.architectures && digest.architectures.length > 0"
                   class="px-2 py-0 ml-2 border rounded-full cursor-pointer infoButton border-theme-default hover:text-theme-default"
                 >
                   architectures
@@ -74,7 +75,7 @@
                 <div class="absolute left-0 z-10 flex p-2 px-1 ml-24 bg-black rounded-lg w-28 info">
                   <div>
                     <div
-                      v-for="(architecture, indexArchitecture) of digest.architecures"
+                      v-for="(architecture, indexArchitecture) of digest.architectures"
                       :key="indexArchitecture"
                     >
                       {{ architecture }}
