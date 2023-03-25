@@ -94,7 +94,10 @@ export class GithubRepository implements RegistryApiRepository {
     }
   }
 
-  private githubRepositoryDetailsToContainerRepositoryTag (repositoryName, details): listRepositoriesTagsAnswer {
+  private githubRepositoryDetailsToContainerRepositoryTag (
+    repositoryName: string,
+    details: any
+  ): listRepositoriesTagsAnswer {
     return {
       name: repositoryName,
       noTag: false,

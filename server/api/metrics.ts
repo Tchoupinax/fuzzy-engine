@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 import { defineEventHandler, getRequestHeader } from 'h3'
 import { Option } from '@swan-io/boxed'
 import { Gauge, collectDefaultMetrics, register } from 'prom-client'
