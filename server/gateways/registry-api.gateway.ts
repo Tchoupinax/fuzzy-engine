@@ -10,7 +10,7 @@ export type ContainerRepositoryTags = {
   name: string;
   tags: any[];
   size: number;
-  created: Date;
+  created: string;
   fullDigest: string;
 }
 

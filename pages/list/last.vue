@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div
+      v-if="syncingInProgress"
+      class="text-theme-default hover:text-theme-default absolute text-2xl right-0 bottom-0 mb-20 shadow-xl mr-6 bg-gray-50 p-2 px-4 rounded-lg"
+    >
+      Sync in progress...
+    </div>
+
     <section id="actions" class="flex justify-between mt-6 ml-8">
       <NuxtLink to="/">
         <button class="font-bold text-theme-default hover:text-theme-default">
@@ -11,7 +18,7 @@
     <div class="flex flex-col items-center justify-center mb-40">
       <div class="w-full lg:w-8/12">
         <div class="flex flex-col items-center justify-center mb-40 text-theme-default">
-          <div class="mb-24 text-4xl text-center">
+          <div v-if="!loading" class="mb-16 mt-8 xl:mt-0 text-4xl text-center">
             <p>
               {{ url }}
             </p>
@@ -21,24 +28,18 @@
             </NuxtLink>
           </div>
 
-          <div v-if="loading" class="lds-ring">
-            <div /><div /><div /><div />
-          </div>
-
           <div
             v-for="(repo, index) of filteredRepositories"
-            v-else
             :key="index"
-            class="flex items-center justify-between w-full px-4 py-2 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
+            class="flex pl-16 xl:pl-4 pr-16 xl:pr-4 items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
             :class="{ 'opacity-50': hiddingRepositories.includes(repo.name) }"
           >
             <div class="w-5/12 text-xl text-left truncate">
               {{ repo.name }}
             </div>
-
             <div class="flex items-center justify-center">
               <p class="mr-4 text-xs italic text-right">
-                {{ timeago(repo.created) }}
+                {{ timeago(repo.createdAt) }}
               </p>
 
               <div class="relative flex justify-end">
@@ -59,23 +60,27 @@ import { match } from 'ts-pattern'
 import { Option } from '@swan-io/boxed'
 import * as timeago from 'timeago.js'
 import { Provider } from '../../types/provider'
+import { DB } from '../../functions/db'
 import { getCookie } from '~~/functions/cookies'
+
+type State = {
+  awsEcr: { accessKey: string, secretKey: string, region: string },
+  dockerRegistry: { url: string, username: string, password: string },
+  dockerhub: { username: string, password: string };
+  fetchAdditionalRepositoriesLoading: boolean,
+  githubRegistry: { nickname: string, token: string },
+  hiddingRepoMode: boolean,
+  hiddingRepositories: Array<any>,
+  imageName: string,
+  loading: boolean;
+  provider: Option<Provider>,
+  repositories: Array<any>,
+  syncingInProgress: boolean;
+}
 
 export default {
   name: 'ListPage',
-  data () : {
-    provider: Provider,
-    dockerRegistry: { url: string, username: string, password: string },
-    awsEcr: { accessKey: string, secretKey: string, region: string },
-    githubRegistry: { nickname: string, token: string },
-    dockerhub: { username: string, password: string };
-    loading: boolean;
-    hiddingRepoMode: false,
-    hiddingRepositories: Array<any>,
-    repositories: Array<any>,
-    fetchAdditionalRepositoriesLoading: boolean,
-    imageName: string,
-    } {
+  data (): State {
     return {
       provider: Option.None(),
       dockerRegistry: {
@@ -97,11 +102,12 @@ export default {
         username: '',
         password: '',
       },
-      loading: true,
+      fetchAdditionalRepositoriesLoading: false,
       hiddingRepoMode: false,
       hiddingRepositories: [],
       repositories: [],
-      fetchAdditionalRepositoriesLoading: false,
+      syncingInProgress: false,
+      loading: true,
     }
   },
   computed: {
@@ -127,6 +133,16 @@ export default {
     },
   },
   async mounted () {
+    const db = new DB()
+    this.provider = Option.fromNullable(getCookie('fuzzy-engine-provider') as Provider)
+
+    const storedData = db.findLatestRepositories()
+    if (storedData.isSome()) {
+      this.syncingInProgress = true
+      this.repositories = storedData.get()
+      this.loading = false
+    }
+
     if (getCookie('fuzzy-engine-github-ecr')) {
       const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
       this.githubRegistry.nickname = nickname
@@ -153,33 +169,23 @@ export default {
       this.dockerRegistry.password = password
     }
 
-    this.provider = Option.fromNullable(getCookie('fuzzy-engine-provider'))
-
-    this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
-    this.loading = false
-
-    if (this.$route.query['delete-all'] === 'success') {
-      this.deleteAllSuccess()
-      this.$router.push('/list')
-    }
-
     const data = await $fetch(
       `${new URL((window as any).location).origin}/api/repositories/latest`,
       { credentials: 'include' }
     )
 
-    console.log(data)
+    const repositories = db.saveLatestRepositories(data)
+    if (repositories.isSome()) {
+      this.repositories = repositories.get()
+    }
 
-    this.repositories = data
+    this.loading = false
+    this.syncingInProgress = false
   },
   methods: {
     timeago: timeago.format,
-    downloadUrl (repo) {
-      if (this.$store.state.provider === 'aws-ecr') {
-        return `docker pull 440562349563.dkr.ecr.${this.$store.state.awsEcr.region}.amazonaws.com/${repo}`
-      }
-
-      return `docker pull ${this.$store.state.url.data}/${repo}`
+    downloadUrl (repositoryName: string) {
+      return `docker pull ${this.$store.state.url.data}/${repositoryName}`
     },
     toggleHiddingRepoMode () {
       this.hiddingRepoMode = !this.hiddingRepoMode
@@ -190,26 +196,21 @@ export default {
     onCopy () {
       this.copiedSuccesfully()
     },
-    hideRepo (name) {
+    hideRepo (name: string) {
       this.hiddingRepositories.push(name)
     },
-    showRepo (name) {
+    showRepo (name: string) {
       this.hiddingRepositories.splice(this.hiddingRepositories.findIndex(n => n === name), 1)
     },
-    deleteAllImage (repoName) {
-      if (window.confirm(`Do you really want to delete all tags in ${repoName}`)) {
-        window.location = `/${repoName}/delete-all)`
+    deleteAllImage (repositoryName: string) {
+      if (window.confirm(`Do you really want to delete all tags in ${repositoryName}`)) {
+        window.location = `/${repositoryName}/delete-all)`
       }
     },
   },
   notifications: {
     copiedSuccesfully: {
       title: 'Copied!',
-      type: 'success',
-    },
-    deleteAllSuccess: {
-      title: 'Delete',
-      message: 'Sucessfully deleted all the image for this repo',
       type: 'success',
     },
   },

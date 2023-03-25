@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div
+      v-if="syncingInProgress"
+      class="text-theme-default hover:text-theme-default absolute text-2xl right-0 bottom-0 mb-20 shadow-xl mr-6 bg-gray-50 p-2 px-4 rounded-lg"
+    >
+      Sync in progress...
+    </div>
+
     <section id="actions" class="flex justify-between mt-6 ml-8">
       <NuxtLink to="/">
         <button class="font-bold text-theme-default hover:text-theme-default">
@@ -76,13 +83,13 @@
             <div class="flex items-center">
               <div class="xl:flex mr-8 hidden">
                 <input
-                  class="px-2 text-xs text-gray-700 border border-gray-700 rounded-l docker-pull"
+                  class="px-2 text-xs bg-gray-50 text-theme-default border border-theme-default rounded-l docker-pull"
                   type="text"
                   :value="downloadUrl(repo.name)"
                 >
 
                 <button
-                  class="p-2 px-4 bg-gray-200 border border-l-0 border-gray-700 rounded-r"
+                  class="p-2 px-4 bg-gray-100 border border-l-0 border-theme-default rounded-r"
                   type="button"
                   @click="onCopy(repo.name)"
                 >
@@ -133,13 +140,6 @@
             </div>
           <!-- END # Right -->
           </div>
-
-          <button
-            class="text-xl italic mt-4 font-light"
-            @click="fetchRepositories"
-          >
-            {{ ctaDisplay }}
-          </button>
         </div>
       </div>
     </div>
@@ -167,8 +167,9 @@ type State = {
   hiddingRepositories: Array<any>,
   imageName: string,
   loading: boolean;
-  provider: Provider,
+  provider: Option<Provider>,
   repositories: Array<any>,
+  syncingInProgress: boolean;
 }
 
 export default {
@@ -195,12 +196,13 @@ export default {
         username: '',
         password: '',
       },
-      loading: true,
-      hiddingRepoMode: false,
-      hiddingRepositories: [],
-      repositories: [],
       fetchAdditionalRepositoriesLoading: false,
       hasNext: false,
+      hiddingRepoMode: false,
+      hiddingRepositories: [],
+      loading: true,
+      repositories: [],
+      syncingInProgress: false,
     }
   },
   computed: {
@@ -214,15 +216,6 @@ export default {
           .exhaustive(),
         None: () => ''
       })
-    },
-    ctaDisplay () : string {
-      if (this.fetchAdditionalRepositoriesLoading) {
-        return 'Loading...'
-      } else if (this.hasNext) {
-        return 'list more...'
-      }
-
-      return 'Syncing...'
     },
     filteredRepositories () {
       if (this.hiddingRepoMode) {
@@ -238,10 +231,11 @@ export default {
     this.searchImageByNameDebounce = debounce(this.searchImage, 400)
 
     const db = new DB()
-    this.provider = Option.Some(getCookie('fuzzy-engine-provider')) as Provider
+    this.provider = Option.fromNullable(getCookie('fuzzy-engine-provider') as Provider)
 
     const storedData = db.findRepositories()
     if (storedData.isSome()) {
+      this.syncingInProgress = true
       this.repositories = storedData.get()
       this.loading = false
     }
@@ -280,21 +274,18 @@ export default {
     }
 
     const { data, next } = await $fetch(
-      `${new URL(window.location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
+      `${new URL((window as any).location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
       { credentials: 'include' }
     )
 
     const repositories = db.upsertRepositories(data)
     if (repositories.isSome()) {
-      this.repositories = repositories.get().sort((a, b) => {
-        if (a.name > b.name) { return 1 }
-        if (a.name < b.name) { return -1 }
-        return 1
-      })
+      this.repositories = repositories.get()
     }
 
     this.hasNext = next
     this.loading = false
+    this.syncingInProgress = false
   },
   methods: {
     debounce,

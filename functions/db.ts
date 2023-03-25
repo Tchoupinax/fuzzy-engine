@@ -53,6 +53,22 @@ export class DB {
     return Option.None()
   }
 
+  public saveLatestRepositories (repositories: Array<any>): Option<Array<any>> {
+    localStorage.setItem(this.computeKey('latest-repositories'), JSON.stringify(repositories))
+
+    return Option.Some(repositories)
+  }
+
+  public findLatestRepositories (): Option<Array<any>> {
+    const item = localStorage.getItem(this.computeKey('latest-repositories'))
+
+    if (item) {
+      return Option.Some(JSON.parse(item))
+    }
+
+    return Option.None()
+  }
+
   private computeKey (key: string): string {
     const provider = Option.fromNullable(getCookie('fuzzy-engine-provider'))
     if (provider.isSome()) {

@@ -24,13 +24,26 @@ export type DockerhubImage = {
   status: number,
   status_description: string,
 };
+export type DockerhubTagImage = {
+  architecture: string,
+  features: string,
+  variant: string,
+  digest: string,
+  os: string,
+  os_features: string,
+  os_version: string,
+  size: number,
+  status: string,
+  last_pulled: string,
+  last_pushed: string,
+}
 export type DockerhubTag = {
   content_type: string
   creator: number
   digest: string
   full_size: number
   id: number
-  images: DockerhubImage[]
+  images: DockerhubTagImage[]
   last_updated: string
   last_updater: number
   last_updater_username: string
@@ -49,10 +62,6 @@ export class DockerhubRepository implements RegistryApiRepository {
 
   constructor (private config: DockerhubRepositoryConfig) {
     this.url = 'https://hub.docker.com/v2'
-
-    setInterval(() => {
-      console.log(new Date().toISOString(), this.token === undefined)
-    }, 500)
   }
 
   async listRepositories (): Promise<Array<ContainerRepository>> {
@@ -90,7 +99,6 @@ export class DockerhubRepository implements RegistryApiRepository {
     }
 
     const tagsWithDigest = tags.map((tag) => {
-      console.log(tag)
       return {
         name: tag.name,
         digest: tag.images[0].digest.replace('sha256:', '').slice(7, 19),
@@ -132,7 +140,7 @@ export class DockerhubRepository implements RegistryApiRepository {
       digests: Array.from(finalDigests.values()).sort((a, b) => {
         if (a.created > b.created) {
           return -1
-        } else if (a.created > b.created) {
+        } else if (a.created < b.created) {
           return 1
         } else {
           return 0
@@ -174,7 +182,6 @@ export class DockerhubRepository implements RegistryApiRepository {
       }
     })
 
-    console.log(data.token)
     this.token = data.token
     return data.token
   }

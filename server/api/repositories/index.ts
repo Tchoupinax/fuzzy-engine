@@ -49,25 +49,21 @@ export default defineEventHandler((request) => {
       logger.debug('List repository for DockerHub')
 
       const { username, password } = JSON.parse(Buffer.from(dockerhubCredentials, 'base64').toString('ascii'))
-
       const dockerhubConfig: DockerhubRepositoryConfig = {
         username,
         password
       }
-
       return new ListRepositoryUseCase(new DockerhubRepository(dockerhubConfig))
     })
     .with('docker-registry-v2', () => {
       logger.debug('List repository for docker registry v2')
 
       const { url, username, password } = JSON.parse(Buffer.from(dockerCredentials, 'base64').toString('ascii'))
-
       const dockerRegistryConfig: DockerApiRepositoryConfig = {
         url,
         username,
         password,
       }
-
       return new ListRepositoryUseCase(new DockerApiRepository(dockerRegistryConfig))
     })
     .exhaustive()

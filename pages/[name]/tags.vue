@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div
+      v-if="syncingInProgress"
+      class="text-theme-default hover:text-theme-default absolute text-2xl right-0 bottom-0 mb-20 shadow-xl mr-6 bg-gray-50 p-2 px-4 rounded-lg"
+    >
+      Sync in progress...
+    </div>
+
     <section id="actions" class="flex justify-between mt-6 ml-8">
       <NuxtLink to="/list">
         <button class="font-bold text-theme-default hover:text-theme-default">
@@ -100,7 +107,16 @@
                   :key="indexTags"
                   class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
                 >
-                  {{ tag && tag.slice(0, 16) }}
+                  <div class="relative">
+                    <div
+                      class="px-0 py-0 cursor-pointer mx-1 infoButton border-theme-default hover:text-theme-default"
+                    >
+                      {{ tag && tag.slice(0, 10) }}
+                    </div>
+                    <div class="absolute right-0 z-10 p-2 px-4 mr-4 bg-black rounded-lg info">
+                      {{ tag }}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div v-else class="flex">
@@ -131,10 +147,6 @@
             <!-- END # Right -->
           </div>
           <!-- END # List of digests -->
-
-          <div v-if="loaded && digests.length === 0">
-            No tag found for this repository
-          </div>
         </div>
       </div>
     </div>
@@ -148,30 +160,28 @@ import { getCookie } from '../../functions/cookies'
 import { DB } from '../../functions/db'
 
 type State = {
-  loaded: boolean;
-  provider: Option<string>;
-  name: string;
-  noTag: boolean;
   digests: Array<any>;
   doNotDisplayNullTags: boolean;
+  name: string;
+  noTag: boolean;
+  provider: Option<string>;
+  syncingInProgress: boolean;
 }
 
 export default {
   name: 'TagsComponent',
   data (): State {
     return {
-      loaded: false,
-      provider: Option.None(),
-      name: '',
-      noTag: false,
       digests: [],
       doNotDisplayNullTags: true,
+      name: '',
+      noTag: false,
+      provider: Option.None(),
+      syncingInProgress: false,
     }
   },
   computed: {
-    hasNullTags () {
-      return this.digests.some(digest => digest.tags.filter(tag => tag).length === 0)
-    },
+    hasNullTags () { return this.digests.some(digest => digest.tags.filter(tag => tag).length === 0) },
     images () {
       if (this.doNotDisplayNullTags) {
         return this.digests.filter(digest => digest.tags.filter(tag => tag).length > 0)
@@ -180,6 +190,11 @@ export default {
     },
   },
   async mounted () {
+    if (this.$route.query.delete === 'success') {
+      this.deleteSuccess()
+      this.$router.push(`/${this.name}/tags/`)
+    }
+
     this.doNotDisplayNullTags = localStorage.getItem('fuzzy-engine-toggleDoNotDisplayNullTags') === 'true'
 
     const db = new DB()
@@ -187,6 +202,7 @@ export default {
 
     const storedData = db.findRepositoryImages(repositoryName)
     if (storedData.isSome()) {
+      this.syncingInProgress = true
       const data = storedData.get()
       this.name = data.name
       this.noTag = data.noTag
@@ -195,22 +211,17 @@ export default {
 
     this.provider = Option.Some(getCookie('fuzzy-engine-provider'))
 
-    if (this.$route.query.delete === 'success') {
-      this.deleteSuccess()
-      this.$router.push(`/${this.name}/tags/`)
-    }
-
     const data = await $fetch(`${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`, {
       method: 'GET',
       credentials: 'include',
     })
 
-    db.saveRepositoryImages(repositoryName, data)
-
     this.name = data.name
     this.noTag = data.noTag
     this.digests = data.digests
-    this.loaded = true
+    this.syncingInProgress = false
+
+    db.saveRepositoryImages(repositoryName, data)
   },
   methods: {
     timeago: timeago.format,
@@ -244,12 +255,10 @@ export default {
   font-size: 70px;
   border-bottom: 20px solid rgb(255, 183, 48);
 }
-
 .info {
   opacity: 0;
   display: none;
 }
-
 .infoButton:hover+.info {
   opacity: 1;
   display: inline;
