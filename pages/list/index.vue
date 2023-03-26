@@ -274,7 +274,7 @@ export default {
     }
 
     const { data, next } = await $fetch(
-      `${new URL((window as any).location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
+      `${new URL((window as any).location).origin}/api/repositories?offset=0&limit=10`,
       { credentials: 'include' }
     )
 

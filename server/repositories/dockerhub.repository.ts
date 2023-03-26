@@ -105,13 +105,13 @@ export class DockerhubRepository implements RegistryApiRepository {
         fullDigest: tag.images[0].digest.slice(8),
         size: prettyBytes(tag.full_size),
         created: tag.tag_last_pushed,
-        architecures: tag.images.map(image => image.architecture)
+        architectures: tag.images.map(image => image.architecture)
       }
     })
 
     const finalDigests = new Map()
     tagsWithDigest.forEach(
-      ({ name, digest, size, created, fullDigest, architecures }) => {
+      ({ name, digest, size, created, fullDigest, architectures }) => {
         if (finalDigests.has(digest)) {
           finalDigests.set(digest, {
             name: digest,
@@ -119,7 +119,7 @@ export class DockerhubRepository implements RegistryApiRepository {
             size,
             created,
             fullDigest,
-            architecures
+            architectures
           })
         } else {
           finalDigests.set(digest, {
@@ -128,7 +128,7 @@ export class DockerhubRepository implements RegistryApiRepository {
             size,
             created,
             fullDigest,
-            architecures
+            architectures
           })
         }
       }
