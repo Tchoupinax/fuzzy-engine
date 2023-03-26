@@ -3,15 +3,17 @@
 !package.json
 !package-lock.json
 
+!.babelrc
 !assets
 !functions
 !layouts
 !middlewares
+!nuxt.config.ts
 !pages
 !plugins
 !server
 !static
 !store
-!.babelrc
-!nuxt.config.ts
 !tailwind.config.js
+!tsconfig.json
+!types
