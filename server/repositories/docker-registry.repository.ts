@@ -68,6 +68,7 @@ export class DockerApiRepository implements RegistryApiRepository {
         })
 
         const architectures = await this.getArchitecture(repositoryName, tag)
+        // @ts-ignore
         const size = layers.reduce((acc, cur) => acc + cur.size, 0)
 
         // Get creation date
@@ -144,7 +145,7 @@ export class DockerApiRepository implements RegistryApiRepository {
       return [data.architecture]
     }
 
-    return data.manifests.map((m) => {
+    return data.manifests.map((m: any) => {
       return `${m.platform.os}/${m.platform.architecture}${m.platform.variant ?? ''}`
     })
   }

@@ -49,6 +49,7 @@ export class AwsRepository implements RegistryApiRepository {
     if (this.useCLI) {
       const a = await this.describeImages(repositoryName)
 
+      // @ts-ignore
       digests = a.imageDetails.map((i) => {
         return {
           name: i.imageTags,
@@ -73,6 +74,7 @@ export class AwsRepository implements RegistryApiRepository {
     }
 
     const finalDigests = new Map()
+    // @ts-ignore
     digests.forEach(({ name, digest, size, created, fullDigest }) => {
       if (finalDigests.has(digest)) {
         finalDigests.set(digest, {

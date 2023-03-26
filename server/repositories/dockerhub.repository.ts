@@ -162,7 +162,7 @@ export class DockerhubRepository implements RegistryApiRepository {
       return [data.architecture]
     }
 
-    return data.manifests.map((m) => {
+    return data.manifests.map((m: any) => {
       return `${m.platform.os}/${m.platform.architecture}${m.platform.variant ??
         ''}`
     })

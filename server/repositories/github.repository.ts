@@ -34,7 +34,7 @@ export class GithubRepository implements RegistryApiRepository {
       },
     })
 
-    const digests = data.map((i) => {
+    const digests = data.map((i: any) => {
       return {
         name: i.metadata.container.tags[0],
         digest: i.name.replace('sha256:', '').slice(0, 7),
@@ -45,7 +45,7 @@ export class GithubRepository implements RegistryApiRepository {
     })
 
     const finalDigests = new Map()
-    digests.forEach(({ name, digest, size, created, fullDigest }) => {
+    digests.forEach(({ name, digest, size, created, fullDigest }: any) => {
       if (finalDigests.has(created)) {
         finalDigests.set(created, {
           name: digest,

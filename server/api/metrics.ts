@@ -52,9 +52,9 @@ export default defineEventHandler(async (request) => {
     offset: 1
   })
 
-  countRepositories.set(repositories.length)
+  countRepositories.set(repositories.data.length)
 
-  repositories.forEach(
+  repositories.data.forEach(
     (repository) => {
       countTagByRepository.labels(repository.name).set(repository.countOfTags)
     }
