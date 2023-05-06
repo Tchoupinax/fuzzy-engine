@@ -245,20 +245,17 @@ export default {
       this.githubRegistry.nickname = nickname
       this.githubRegistry.token = token
     }
-
     if (getCookie('fuzzy-engine-aws-ecr')) {
       const { accessKey, secretKey, region } = JSON.parse(atob(getCookie('fuzzy-engine-aws-ecr')))
       this.awsEcr.accessKey = accessKey
       this.awsEcr.secretKey = secretKey
       this.awsEcr.region = region
     }
-
     if (getCookie('fuzzy-engine-dockerhub')) {
       const { username, password } = JSON.parse(atob(getCookie('fuzzy-engine-dockerhub')))
       this.dockerhub.username = username
       this.dockerhub.password = password
     }
-
     if (getCookie('fuzzy-engine-docker-v2')) {
       const { url, username, password } = JSON.parse(atob(getCookie('fuzzy-engine-docker-v2')))
       this.dockerRegistry.url = url
@@ -273,7 +270,7 @@ export default {
       this.$router.push('/list')
     }
 
-    const { data, next } = await $fetch(
+    const { data, hasNext } = await $fetch(
       `${new URL((window as any).location).origin}/api/repositories?offset=0&limit=10`,
       { credentials: 'include' }
     )
@@ -283,7 +280,7 @@ export default {
       this.repositories = repositories.get()
     }
 
-    this.hasNext = next
+    this.hasNext = hasNext
     this.loading = false
     this.syncingInProgress = false
   },
@@ -302,34 +299,33 @@ export default {
     },
     onCopy (repositoryName: string) {
       this.copiedSuccesfully()
-
       navigator.clipboard.writeText(this.downloadUrl(repositoryName))
     },
     async fetchRepositories () {
       const db = new DB()
       this.fetchAdditionalRepositoriesLoading = true
 
-      const { data, next } = await $fetch(
+      const { data, hasNext } = await $fetch(
         `${new URL(window.location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
         { credentials: 'include' }
       )
 
       this.repositories = [...this.repositories, ...data]
       this.fetchAdditionalRepositoriesLoading = false
-      this.hasNext = next
+      this.hasNext = hasNext
       db.upsertRepositories(this.repositories)
     },
     async searchImage () {
       this.fetchAdditionalRepositoriesLoading = true
 
-      const { data, next } = await $fetch(
+      const { data, hasNext } = await $fetch(
         `${new URL(window.location).origin}/api/repositories?limit=10&name=${this.imageName}`,
         { credentials: 'include' }
       )
 
       this.repositories = [...data]
       this.fetchAdditionalRepositoriesLoading = false
-      this.hasNext = next
+      this.hasNext = hasNext
     }
   },
   notifications: {

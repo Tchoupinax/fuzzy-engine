@@ -22,7 +22,7 @@ export class ListRepositoryUseCase {
     const hasNext = repositories.length > port.limit
 
     return {
-      next: hasNext,
+      hasNext,
       data: hasNext ? repositories.slice(0, -1) : repositories,
     }
   }
