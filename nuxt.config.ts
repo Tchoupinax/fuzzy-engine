@@ -4,7 +4,7 @@
 export default defineNuxtConfig({
   ssr: true,
   typescript: {
-    shim: false
+    shim: false,
   },
   app: {
     head: {

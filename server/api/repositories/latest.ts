@@ -21,12 +21,12 @@ export default defineEventHandler((request) => {
 
   const listLatest10TagsUseCase: ListLatest10TagsUseCase = match(provider as Provider)
     .with('aws-ecr', () => {
-      const { secretKey, accessKey, region, useCLI } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
+      const { secretKey, accessKey, region } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
       const awsConfig: AwsRepositoryConfig = {
         accessKey,
         secretKey,
         region,
-        useCLI,
+        sessionToken: ''
       }
       return new ListLatest10TagsUseCase(new AwsRepository(awsConfig))
     })

@@ -27,6 +27,7 @@ export default defineEventHandler(async (request) => {
   if (dockerCredentials) {
     ({ url, username, password } = JSON.parse(Buffer.from(dockerCredentials, 'base64').toString('ascii')))
   }
+
   // For the prometheus token way
   else {
     const bearerToken = getRequestHeader(request, 'authorization')

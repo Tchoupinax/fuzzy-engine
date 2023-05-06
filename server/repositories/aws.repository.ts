@@ -6,7 +6,6 @@ import {
   ListImagesCommand,
   DescribeImagesCommand,
 } from '@aws-sdk/client-ecr'
-import { execa } from 'execa'
 import {
   ContainerRepository,
   RegistryApiRepository,
@@ -17,12 +16,10 @@ export type AwsRepositoryConfig = {
   secretKey: string;
   sessionToken: string;
   region: string;
-  useCLI: boolean;
 };
 
 export class AwsRepository implements RegistryApiRepository {
   private ecrClient: ECR
-  private useCLI: boolean
 
   constructor (data: AwsRepositoryConfig) {
     this.ecrClient = new ECR({
@@ -33,8 +30,6 @@ export class AwsRepository implements RegistryApiRepository {
       },
       region: data.region,
     })
-
-    this.useCLI = data.useCLI
   }
 
   async listRepositories (
@@ -60,36 +55,19 @@ export class AwsRepository implements RegistryApiRepository {
   }
 
   async listRepositoriesTags (repositoryName: string): Promise<any> {
-    let digests
+    const { imageDetails } = await this.ecrClient.send(
+      new DescribeImagesCommand({ repositoryName })
+    )
 
-    if (this.useCLI) {
-      const a = await this.describeImages(repositoryName)
-
-      // @ts-ignore
-      digests = a.imageDetails.map((i) => {
-        return {
-          name: i.imageTags,
-          digest: i?.imageDigest?.replace('sha256:', '').slice(7, 19),
-          fullDigest: i.imageDigest,
-          created: i.imagePushedAt ?? new Date(),
-          size: prettyBytes(i?.imageSizeInBytes || 0),
-        }
-      })
-    } else {
-      const { imageDetails } = await this.ecrClient.send(
-        new DescribeImagesCommand({ repositoryName })
-      )
-
-      digests = imageDetails!.map((i) => {
-        return {
-          name: repositoryName,
-          digest: i?.imageDigest?.replace('sha256:', '').slice(7, 19),
-          fullDigest: i.imageDigest,
-          created: i.imagePushedAt,
-          size: prettyBytes(i?.imageSizeInBytes || 0),
-        }
-      })
-    }
+    const digests = imageDetails!.map((i) => {
+      return {
+        name: repositoryName,
+        digest: i?.imageDigest?.replace('sha256:', '').slice(7, 19),
+        fullDigest: i.imageDigest,
+        created: i.imagePushedAt,
+        size: prettyBytes(i?.imageSizeInBytes || 0),
+      }
+    })
 
     const finalDigests = new Map()
     // @ts-ignore
@@ -128,53 +106,19 @@ export class AwsRepository implements RegistryApiRepository {
     }
   }
 
-  private async getRepositories (
+  private getRepositories (
     limit: number,
     offset: number,
-    name: Option<string>
+    name: Option<string>,
   ): Promise<any> {
-    if (this.useCLI) {
-      const { stdout } = await execa('aws', ['ecr', 'describe-repositories'])
-      const { repositories } = JSON.parse(stdout)
+    console.log(offset, name)
 
-      return {
-        repositories: repositories
-          .sort(
-            (a: { repositoryName: string }, b: { repositoryName: string }) => {
-              if (a.repositoryName > b.repositoryName) {
-                return 1
-              } else if (a.repositoryName < b.repositoryName) {
-                return -1
-              } else {
-                return 0
-              }
-            }
-          )
-          .filter((data: any) => {
-            if (name.isSome()) {
-              return data.repositoryName.includes(name.get())
-            }
-
-            return true
-          })
-          .slice(offset, offset + limit),
-      }
-    }
-
-    return this.ecrClient.send(new DescribeRepositoriesCommand({}))
+    return this.ecrClient.send(new DescribeRepositoriesCommand({
+      maxResults: limit,
+    }))
   }
 
-  private async listImages (repositoryName: string) {
-    if (this.useCLI) {
-      const { stdout } = await execa('aws', [
-        'ecr',
-        'list-images',
-        '--repository-name',
-        repositoryName,
-      ])
-      return JSON.parse(stdout)
-    }
-
+  private listImages (repositoryName: string) {
     return this.ecrClient.send(
       new ListImagesCommand({
         repositoryName,
@@ -182,17 +126,7 @@ export class AwsRepository implements RegistryApiRepository {
     )
   }
 
-  private async describeImages (repositoryName: string) {
-    if (this.useCLI) {
-      const { stdout } = await execa('aws', [
-        'ecr',
-        'describe-images',
-        '--repository-name',
-        repositoryName,
-      ])
-      return JSON.parse(stdout)
-    }
-
+  private describeImages (repositoryName: string) {
     return this.ecrClient.send(
       new ListImagesCommand({
         repositoryName,

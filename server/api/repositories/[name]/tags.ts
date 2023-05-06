@@ -28,7 +28,7 @@ export default defineEventHandler((request) => {
         accessKey,
         secretKey,
         region,
-        useCLI: true
+        sessionToken: ''
       }
       return new ListRepositoryTagsUseCase(new AwsRepository(awsConfig))
     })

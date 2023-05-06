@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { AwsRepository, AwsRepositoryConfig } from '../repositories/aws.repository'
+import { AwsRepository } from '../repositories/aws.repository'
 import { DockerhubRepository } from '../repositories/dockerhub.repository'
 import { GithubRepository } from '../repositories/github.repository'
 import { ListRepositoryTagsUseCase } from './list-repositories-tags.use-case'
@@ -9,12 +9,14 @@ let useCase: ListRepositoryTagsUseCase
 describe('list-repositories.use-case', () => {
   describe('with an AWS repository', () => {
     beforeEach(() => {
-      useCase = new ListRepositoryTagsUseCase(new AwsRepository({
-        accessKey: process.env.AWS_ACCESS_KEY ?? '',
-        region: 'eu-west-3',
-        secretKey: process.env.AWS_SECRET_KEY ?? '',
-        useCLI: false
-      }))
+      useCase = new ListRepositoryTagsUseCase(
+        new AwsRepository({
+          accessKey: process.env.AWS_ACCESS_KEY ?? '',
+          region: 'eu-west-3',
+          secretKey: process.env.AWS_SECRET_KEY ?? '',
+          sessionToken: ''
+        })
+      )
     })
 
     it('should list the tag of the repository called test', async () => {

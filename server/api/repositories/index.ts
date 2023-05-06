@@ -26,12 +26,12 @@ export default defineEventHandler((request) => {
     .with('aws-ecr', () => {
       logger.debug('List repository for AWS ECR')
 
-      const { secretKey, accessKey, region, useCLI } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
+      const { secretKey, accessKey, region } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
       const awsConfig: AwsRepositoryConfig = {
         accessKey,
         secretKey,
         region,
-        useCLI
+        sessionToken: ''
       }
       return new ListRepositoryUseCase(new AwsRepository(awsConfig))
     })
