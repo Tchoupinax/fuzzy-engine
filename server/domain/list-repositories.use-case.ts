@@ -2,7 +2,11 @@ import { Option } from '@swan-io/boxed'
 import { RegistryApiRepository } from '../gateways/registry-api.gateway'
 import { logger } from '../tools/logger'
 
-export type ListRepositoryPort = { limit: number, offset: number, name: Option<string> }
+export type ListRepositoryPort = {
+  limit: number;
+  offset: number;
+  name: Option<string>;
+};
 export class ListRepositoryUseCase {
   constructor (private repository: RegistryApiRepository) {}
 
