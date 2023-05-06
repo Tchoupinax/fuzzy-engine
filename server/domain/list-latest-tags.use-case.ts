@@ -1,3 +1,4 @@
+import { Option } from '@swan-io/boxed'
 import { RegistryApiRepository } from '../gateways/registry-api.gateway'
 
 export type listLatest10TagsAnswer = {
@@ -11,7 +12,7 @@ export class ListLatest10TagsUseCase {
   constructor (private repository: RegistryApiRepository) {}
 
   async execute () {
-    const names = (await this.repository.listRepositories()).map(zz => zz.name)
+    const names = (await this.repository.listRepositories(10, 0, Option.None())).map(zz => zz.name)
     const aa = await Promise.all(names.map(n => this.repository.listRepositoriesTags(n)))
 
     return aa

@@ -1,5 +1,5 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
-import eslint from 'vite-plugin-eslint'
+// import eslint from 'vite-plugin-eslint'
 
 export default defineNuxtConfig({
   ssr: true,

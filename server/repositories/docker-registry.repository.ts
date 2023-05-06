@@ -1,20 +1,23 @@
 import axios from 'axios'
 import prettyBytes from 'pretty-bytes'
-import { listRepositoriesTagsAnswer, RegistryApiRepository } from '../gateways/registry-api.gateway'
+import { listRepositoriesTagsAnswer, listRepositoriesTagsAnswerWithFullData, RegistryApiRepository } from '../gateways/registry-api.gateway'
 
 export type DockerApiRepositoryConfig = { url: string, username: string, password: string };
+
+export type DockerRegistryRepositoryName = string;
 
 export class DockerApiRepository implements RegistryApiRepository {
   constructor (private config: DockerApiRepositoryConfig) { }
 
-  async listRepositories (): Promise<any[]> {
-    let repositories
+  async listRepositories (
+    limit: number,
+    offset: number,
+    name: Option<string>
+  ): Promise<any[]> {
+    let repositoryNames: Array<DockerRegistryRepositoryName>
+
     try {
-      ({
-        data: {
-          repositories,
-        },
-      } = await axios({
+      ({ data: { repositories: repositoryNames } } = await axios({
         method: 'GET',
         url: `${this.getComputedUrl()}/v2/_catalog`,
       }))
@@ -31,24 +34,27 @@ export class DockerApiRepository implements RegistryApiRepository {
       return []
     }
 
-    repositories = await Promise.all(repositories.map((repository) => {
-      return axios({
-        method: 'GET',
-        url: `${this.getComputedUrl()}/v2/${repository}/tags/list`,
+    // If we have a name to match, we filter repositories here
+    if (name && name.isSome()) {
+      repositoryNames = repositoryNames.filter(repositoryName => repositoryName.includes(name.get()))
+    }
+
+    const repositories = await Promise.all(repositoryNames.map(
+      async (repositoryName: string) => {
+        return await axios({
+          method: 'GET',
+          url: `${this.getComputedUrl()}/v2/${repositoryName}/tags/list`,
+        })
+          .then(({
+            data,
+          }) => {
+            return {
+              name: data.name,
+              countOfTags: Array.isArray(data.tags) ? data.tags.length : 0,
+            }
+          })
       })
-        .then(({
-          data,
-        }) => {
-          return {
-            name: data.name,
-            countOfTags: Array.isArray(data.tags) ? data.tags.length : 0,
-          }
-        })
-        // eslint-disable-next-line handle-callback-err
-        .catch((err) => {
-          return null
-        })
-    }))
+    )
 
     // Remove empty repository from the list
     const filteredRepositories = repositories.filter(r => r).filter(r => r.countOfTags > 0)
@@ -70,36 +76,38 @@ export class DockerApiRepository implements RegistryApiRepository {
       }
     }
 
-    const tagsWithDigest = await Promise.all(tags.map(async (tag) => {
-      const {
-        headers: { 'docker-content-digest': digest },
-        data: { layers },
-      } = await axios({
-        method: 'GET',
-        url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
-        headers: {
-          Accept: 'application/vnd.docker.distribution.manifest.v2+json',
-        },
+    const tagsWithDigest = await Promise.all(
+      tags.map(async (tag) => {
+        const {
+          headers: { 'docker-content-digest': digest },
+          data: { layers },
+        } = await axios({
+          method: 'GET',
+          url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
+          headers: {
+            Accept: 'application/vnd.docker.distribution.manifest.v2+json',
+          },
+        })
+
+        const architecures = await this.getArchitecture(repositoryName, tag)
+        const size = layers.reduce((acc, cur) => acc + cur.size, 0)
+
+        // Get creation date
+        const { data: { history: [{ v1Compatibility }] } } = await axios({
+          method: 'GET',
+          url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
+        })
+
+        return {
+          name: tag,
+          digest: digest.slice(7, 19),
+          fullDigest: digest,
+          size: prettyBytes(size),
+          created: JSON.parse(v1Compatibility).created,
+          architecures,
+        }
       })
-
-      const architecures = await this.getArchitecture(repositoryName, tag)
-      const size = layers.reduce((acc, cur) => acc + cur.size, 0)
-
-      // Get creation date
-      const { data: { history: [{ v1Compatibility }] } } = await axios({
-        method: 'GET',
-        url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
-      })
-
-      return {
-        name: tag,
-        digest: digest.slice(7, 19),
-        fullDigest: digest,
-        size: prettyBytes(size),
-        created: JSON.parse(v1Compatibility).created,
-        architecures,
-      }
-    }))
+    )
 
     const finalDigests = new Map()
     tagsWithDigest.forEach(({ name, digest, size, created, fullDigest, architecures }) => {

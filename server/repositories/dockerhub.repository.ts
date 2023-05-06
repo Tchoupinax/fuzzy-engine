@@ -1,11 +1,26 @@
 import axios from 'axios'
 import prettyBytes from 'pretty-bytes'
+import { Option } from '@swan-io/boxed'
 import {
   listRepositoriesTagsAnswer,
   RegistryApiRepository
 } from '../gateways/registry-api.gateway'
 
 export type DockerhubRepositoryConfig = { username: string; password: string };
+
+type DockerhubImage = {
+  architecture: string;
+  features: string;
+  variant: null;
+  digest: string;
+  os: string;
+  os_features: string;
+  os_version: null;
+  size: number;
+  status: string;
+  last_pulled: null;
+  last_pushed: null;
+};
 
 export type DockerhubTag = {
   creator: number;
@@ -23,20 +38,6 @@ export type DockerhubTag = {
   tag_last_pushed: Date;
 };
 
-type DockerhubImage = {
-  architecture: string;
-  features: string;
-  variant: null;
-  digest: string;
-  os: string;
-  os_features: string;
-  os_version: null;
-  size: number;
-  status: string;
-  last_pulled: null;
-  last_pushed: null;
-};
-
 export class DockerhubRepository implements RegistryApiRepository {
   private url: string
 
@@ -44,7 +45,11 @@ export class DockerhubRepository implements RegistryApiRepository {
     this.url = 'https://hub.docker.com/v2'
   }
 
-  async listRepositories (): Promise<any[]> {
+  async listRepositories (
+    limit: number,
+    offset: number,
+    name: Option<string>
+  ): Promise<any[]> {
     let repositories: Array<any>
 
     const token = await this.getToken()
@@ -64,8 +69,10 @@ export class DockerhubRepository implements RegistryApiRepository {
       return []
     }
 
+    repositories = repositories.filter(() => false)
+
     repositories = await Promise.all(
-      repositories.map(async (repository) => {
+      repositories.map((repository) => {
         return axios({
           method: 'GET',
           url: `${this.url}/repositories/${this.config.username}/${repository.name}/tags/?page_size=25&page=1&ordering=last_updated`,
@@ -85,8 +92,9 @@ export class DockerhubRepository implements RegistryApiRepository {
       })
     )
 
+    return repositories
     // Remove empty repository from the list
-    return repositories.filter(r => r).filter(r => r.countOfTags > 0)
+      .filter(r => r).filter(r => r.countOfTags > 0)
   }
 
   async listRepositoriesTags (
