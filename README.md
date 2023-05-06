@@ -4,8 +4,10 @@ Fuzzy engine a is beautiful ✨ and simple 🐹 UI for your [private Docker regi
 
 List of supporting docker registry:
 
-- [x] Self-hostable registry
+- [x] Self hostable registry
 - [x] AWS ECR
+  - [x] With API keys
+  - [x] With local authentication (CLI)
 - [x] Github Container Registry
 - [x] Dockerhub
 - [ ] Google Cloud
@@ -18,6 +20,28 @@ The best way to use and to deploy the UI is with Docker.
 
 ```
 docker run -d -p 3000:3000 tchoupinax/fuzzy-engine
+```
+
+### Authentication to ECR using AWS local authentication
+
+In a company enterprise, you are logged to your ECR with the AWS cli. Fuzzy-engine support this authentication.
+
+When you logged in, the cli exposed three environment variables to your shell
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- AWS_SESSION_TOKEN
+
+Fuzzy-engine will simply use them for talking with AWS api.
+
+If you use a Docker image, you have to share these variable by the following way
+
+```
+docker run -d \
+  -p 3000:3000 \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+  tchoupinax/fuzzy-engine
 ```
 
 ### FAQ

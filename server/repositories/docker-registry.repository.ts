@@ -1,6 +1,8 @@
 import axios from 'axios'
 import prettyBytes from 'pretty-bytes'
-import { listRepositoriesTagsAnswer, listRepositoriesTagsAnswerWithFullData, RegistryApiRepository } from '../gateways/registry-api.gateway'
+import { Option } from '@swan-io/boxed'
+import { listRepositoriesTagsAnswer, RegistryApiRepository } from '../gateways/registry-api.gateway'
+import { DockerhubTag } from './dockerhub.repository'
 
 export type DockerApiRepositoryConfig = { url: string, username: string, password: string };
 
@@ -14,26 +16,7 @@ export class DockerApiRepository implements RegistryApiRepository {
     offset: number,
     name: Option<string>
   ): Promise<any[]> {
-    let repositoryNames: Array<DockerRegistryRepositoryName>
-
-    try {
-      ({ data: { repositories: repositoryNames } } = await axios({
-        method: 'GET',
-        url: `${this.getComputedUrl()}/v2/_catalog`,
-      }))
-    } catch (err) {
-      console.log(err.message)
-      // Catch error
-      // if (err.errno) {
-      //   return redirect('/?error=ENOTFOUND');
-      // }
-      // if (err.response.status === 401) {
-      //   return redirect('/?error=401');
-      // }
-
-      return []
-    }
-
+    let repositoryNames: Array<DockerRegistryRepositoryName> = await this.internalListRepositories()
     // If we have a name to match, we filter repositories here
     if (name && name.isSome()) {
       repositoryNames = repositoryNames.filter(repositoryName => repositoryName.includes(name.get()))
@@ -41,32 +24,27 @@ export class DockerApiRepository implements RegistryApiRepository {
 
     const repositories = await Promise.all(repositoryNames.map(
       async (repositoryName: string) => {
-        return await axios({
-          method: 'GET',
-          url: `${this.getComputedUrl()}/v2/${repositoryName}/tags/list`,
-        })
-          .then(({
-            data,
-          }) => {
+        return await this.internalListRepositoryTags(repositoryName)
+          .then(({ name, tags }) => {
             return {
-              name: data.name,
-              countOfTags: Array.isArray(data.tags) ? data.tags.length : 0,
+              name,
+              countOfTags: Array.isArray(tags) ? tags.length : 0,
             }
           })
       })
     )
 
     // Remove empty repository from the list
-    const filteredRepositories = repositories.filter(r => r).filter(r => r.countOfTags > 0)
+    const filteredRepositories = repositories
+      .filter(r => r).filter(r => r.countOfTags > 0)
 
     return filteredRepositories
   }
 
-  async listRepositoriesTags (repositoryName: string): Promise<listRepositoriesTagsAnswer> {
-    const { data: { tags } } = await axios({
-      method: 'GET',
-      url: `${this.getComputedUrl()}/v2/${repositoryName}/tags/list`,
-    })
+  async listRepositoriesTags (
+    repositoryName: string
+  ): Promise<listRepositoriesTagsAnswer> {
+    const { tags } = await this.internalListRepositoryTags(repositoryName)
 
     if (tags === null) {
       return {
@@ -89,7 +67,8 @@ export class DockerApiRepository implements RegistryApiRepository {
           },
         })
 
-        const architecures = await this.getArchitecture(repositoryName, tag)
+        const architectures = await this.getArchitecture(repositoryName, tag)
+        // @ts-ignore
         const size = layers.reduce((acc, cur) => acc + cur.size, 0)
 
         // Get creation date
@@ -104,13 +83,13 @@ export class DockerApiRepository implements RegistryApiRepository {
           fullDigest: digest,
           size: prettyBytes(size),
           created: JSON.parse(v1Compatibility).created,
-          architecures,
+          architectures,
         }
       })
     )
 
     const finalDigests = new Map()
-    tagsWithDigest.forEach(({ name, digest, size, created, fullDigest, architecures }) => {
+    tagsWithDigest.forEach(({ name, digest, size, created, fullDigest, architectures }) => {
       if (finalDigests.has(digest)) {
         finalDigests.set(digest, {
           name: digest,
@@ -118,10 +97,10 @@ export class DockerApiRepository implements RegistryApiRepository {
           size,
           created,
           fullDigest,
-          architecures,
+          architectures,
         })
       } else {
-        finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest, architecures })
+        finalDigests.set(digest, { name: digest, tags: [name], size, created, fullDigest, architectures })
       }
     })
 
@@ -166,8 +145,28 @@ export class DockerApiRepository implements RegistryApiRepository {
       return [data.architecture]
     }
 
-    return data.manifests.map((m) => {
+    return data.manifests.map((m: any) => {
       return `${m.platform.os}/${m.platform.architecture}${m.platform.variant ?? ''}`
     })
+  }
+
+  private async internalListRepositories (): Promise<Array<DockerRegistryRepositoryName>> {
+    const answer = await axios({
+      method: 'GET',
+      url: `${this.getComputedUrl()}/v2/_catalog`,
+    })
+
+    return answer.data.repositories
+  }
+
+  private async internalListRepositoryTags (
+    repositoryName: string
+  ): Promise<{ name: string, tags: Array<string> }> {
+    const answer = await axios({
+      method: 'GET',
+      url: `${this.getComputedUrl()}/v2/${repositoryName}/tags/list`,
+    })
+
+    return answer.data
   }
 }

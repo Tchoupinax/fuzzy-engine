@@ -1,4 +1,3 @@
-/* eslint-disable brace-style */
 import { defineEventHandler, getRequestHeader } from 'h3'
 import { Option } from '@swan-io/boxed'
 import { Gauge, collectDefaultMetrics, register } from 'prom-client'
@@ -28,6 +27,7 @@ export default defineEventHandler(async (request) => {
   if (dockerCredentials) {
     ({ url, username, password } = JSON.parse(Buffer.from(dockerCredentials, 'base64').toString('ascii')))
   }
+
   // For the prometheus token way
   else {
     const bearerToken = getRequestHeader(request, 'authorization')
@@ -53,9 +53,9 @@ export default defineEventHandler(async (request) => {
     offset: 1
   })
 
-  countRepositories.set(repositories.length)
+  countRepositories.set(repositories.data.length)
 
-  repositories.forEach(
+  repositories.data.forEach(
     (repository) => {
       countTagByRepository.labels(repository.name).set(repository.countOfTags)
     }

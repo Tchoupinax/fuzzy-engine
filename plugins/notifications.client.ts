@@ -1,6 +1,7 @@
 import VueNotifications from 'vue-notifications'
 
 // Include mini-toaster (or any other UI-notification library)
+// @ts-ignore
 import miniToastr from 'mini-toastr'
 
 // We shall setup types of the messages. ('error' type - red and 'success' - green in mini-toastr)
@@ -26,7 +27,7 @@ miniToastr.setIcon('success', 'i', { class: 'fas fa-check-circle' })
 // This mean that in case of 'success' message we will call miniToastr.success(message, title, timeout, cb)
 // In case of 'error' we will call miniToastr.error(message, title, timeout, cb)
 // and etc.
-function toast ({ title, message, type, timeout, cb }) {
+function toast ({ title, message, type, timeout, cb }: any) {
   return miniToastr[type](message, title, timeout, cb)
 }
 

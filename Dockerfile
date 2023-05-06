@@ -21,7 +21,7 @@ WORKDIR /app
 
 COPY --from=builder /app/.output /app/.output
 
-RUN npm install --omit=dev nuxt
+RUN npm install --omit=dev nuxt pino-pretty
 
 EXPOSE 3000
 

@@ -1,13 +1,16 @@
 import { defineEventHandler, parseCookies, getQuery } from 'h3'
 import { Option } from '@swan-io/boxed'
+import { match } from 'ts-pattern'
 import { ListRepositoryUseCase } from '../../domain/list-repositories.use-case'
 import { AwsRepository, AwsRepositoryConfig } from '../../repositories/aws.repository'
 import { DockerApiRepository, DockerApiRepositoryConfig } from '../../repositories/docker-registry.repository'
 import { GithubRepository, GithubRepositoryConfig } from '../../repositories/github.repository'
+import { Provider } from '../../../types/provider'
+import { logger } from '../../tools/logger'
 import { DockerhubRepository, DockerhubRepositoryConfig } from '~~/server/repositories/dockerhub.repository'
 
 export default defineEventHandler((request) => {
-  let listRepositoryUseCase: ListRepositoryUseCase
+  logger.info('Handle /repositories')
 
   const { limit, offset, name } = getQuery(request)
 
@@ -19,46 +22,68 @@ export default defineEventHandler((request) => {
     'fuzzy-engine-dockerhub': dockerhubCredentials,
   } = parseCookies(request)
 
-  if (provider === 'aws-ecr') {
-    const { secretKey, accessKey, region, useCLI } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
+  const listRepositoryUseCase: ListRepositoryUseCase = match(provider as Provider)
+    .with('aws-ecr', () => {
+      logger.debug('List repository for AWS ECR')
 
-    const awsConfig: AwsRepositoryConfig = {
-      accessKey,
-      secretKey,
-      region,
-      useCLI
-    }
+      const {
+        secretKey: incomingSecretKey,
+        accessKey: incomingAccessKey,
+        region,
+        useLocalAuthentication
+      } = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
 
-    listRepositoryUseCase = new ListRepositoryUseCase(new AwsRepository(awsConfig))
-  } else if (provider === 'github-ecr') {
-    const { nickname, token } = JSON.parse(Buffer.from(githubCredentials, 'base64').toString('ascii'))
+      let sessionToken = ''
+      let accessKey = incomingAccessKey
+      let secretKey = incomingSecretKey
 
-    const githubConfig: GithubRepositoryConfig = {
-      nickname,
-      token,
-    }
+      if (useLocalAuthentication) {
+        sessionToken = process.env.AWS_SESSION_TOKEN ?? ''
+        accessKey = process.env.AWS_ACCESS_KEY_ID ?? ''
+        secretKey = process.env.AWS_SECRET_ACCESS_KEY ?? ''
+      }
 
-    listRepositoryUseCase = new ListRepositoryUseCase(new GithubRepository(githubConfig))
-  } else if (provider === 'dockerhub') {
-    const { username, password } = JSON.parse(Buffer.from(dockerhubCredentials, 'base64').toString('ascii'))
+      const awsConfig: AwsRepositoryConfig = {
+        accessKey,
+        secretKey,
+        region,
+        sessionToken,
+      }
 
-    const dockerhubConfig: DockerhubRepositoryConfig = {
-      username,
-      password
-    }
+      return new ListRepositoryUseCase(new AwsRepository(awsConfig))
+    })
+    .with('github-ecr', () => {
+      logger.debug('List repository for Github ECR')
 
-    listRepositoryUseCase = new ListRepositoryUseCase(new DockerhubRepository(dockerhubConfig))
-  } else {
-    const { url, username, password } = JSON.parse(Buffer.from(dockerCredentials, 'base64').toString('ascii'))
+      const { nickname, token } = JSON.parse(Buffer.from(githubCredentials, 'base64').toString('ascii'))
+      const githubConfig: GithubRepositoryConfig = {
+        nickname,
+        token,
+      }
+      return new ListRepositoryUseCase(new GithubRepository(githubConfig))
+    })
+    .with('dockerhub', () => {
+      logger.debug('List repository for DockerHub')
 
-    const dockerRegistryConfig: DockerApiRepositoryConfig = {
-      url,
-      username,
-      password,
-    }
+      const { username, password } = JSON.parse(Buffer.from(dockerhubCredentials, 'base64').toString('ascii'))
+      const dockerhubConfig: DockerhubRepositoryConfig = {
+        username,
+        password
+      }
+      return new ListRepositoryUseCase(new DockerhubRepository(dockerhubConfig))
+    })
+    .with('docker-registry-v2', () => {
+      logger.debug('List repository for docker registry v2')
 
-    listRepositoryUseCase = new ListRepositoryUseCase(new DockerApiRepository(dockerRegistryConfig))
-  }
+      const { url, username, password } = JSON.parse(Buffer.from(dockerCredentials, 'base64').toString('ascii'))
+      const dockerRegistryConfig: DockerApiRepositoryConfig = {
+        url,
+        username,
+        password,
+      }
+      return new ListRepositoryUseCase(new DockerApiRepository(dockerRegistryConfig))
+    })
+    .exhaustive()
 
   return listRepositoryUseCase.execute({
     limit: parseInt(limit as unknown as string ?? '2', 10),

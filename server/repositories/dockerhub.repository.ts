@@ -1,114 +1,94 @@
 import axios from 'axios'
 import prettyBytes from 'pretty-bytes'
-import { Option } from '@swan-io/boxed'
 import {
+  ContainerRepository,
   listRepositoriesTagsAnswer,
   RegistryApiRepository
 } from '../gateways/registry-api.gateway'
+import { logger } from '../tools/logger'
 
 export type DockerhubRepositoryConfig = { username: string; password: string };
-
-type DockerhubImage = {
-  architecture: string;
-  features: string;
-  variant: null;
-  digest: string;
-  os: string;
-  os_features: string;
-  os_version: null;
-  size: number;
-  status: string;
-  last_pulled: null;
-  last_pushed: null;
+export type DockerhubImage = {
+  affiliation: string,
+  content_types: Array<string>
+  date_registered: string,
+  description: string,
+  is_private: boolean,
+  last_updated: string,
+  media_types: Array<string>,
+  name: string,
+  namespace: string,
+  pull_count: number,
+  repository_type: string,
+  star_count: number,
+  status: number,
+  status_description: string,
 };
-
+export type DockerhubTagImage = {
+  architecture: string,
+  features: string,
+  variant: string,
+  digest: string,
+  os: string,
+  os_features: string,
+  os_version: string,
+  size: number,
+  status: string,
+  last_pulled: string,
+  last_pushed: string,
+}
 export type DockerhubTag = {
-  creator: number;
-  id: number;
-  images: DockerhubImage[];
-  last_updated: Date;
-  last_updater: number;
-  last_updater_username: string;
-  name: string;
-  repository: number;
-  full_size: number;
-  v2: boolean;
-  tag_status: string;
-  tag_last_pulled: null;
-  tag_last_pushed: Date;
+  content_type: string
+  creator: number
+  digest: string
+  full_size: number
+  id: number
+  images: DockerhubTagImage[]
+  last_updated: string
+  last_updater: number
+  last_updater_username: string
+  media_type: string
+  name: string
+  repository: number
+  tag_last_pulled: string
+  tag_last_pushed: string
+  tag_status: string
+  v2: boolean
 };
 
 export class DockerhubRepository implements RegistryApiRepository {
   private url: string
+  private token: string | undefined
 
   constructor (private config: DockerhubRepositoryConfig) {
     this.url = 'https://hub.docker.com/v2'
   }
 
-  async listRepositories (
-    limit: number,
-    offset: number,
-    name: Option<string>
-  ): Promise<any[]> {
-    let repositories: Array<any>
+  async listRepositories (): Promise<Array<ContainerRepository>> {
+    logger.info('DockerhubRepository.listRepositories')
 
-    const token = await this.getToken()
+    const repositories = await this.internalListRepositories()
 
-    try {
-      ({
-        data: { results: repositories }
-      } = await axios({
-        method: 'GET',
-        url: `${this.url}/repositories/${this.config.username}/?page_size=25&page=1&ordering=last_updated`,
-        headers: {
-          Authorization: `JWT ${token}`
-        }
-      }))
-    } catch (err) {
-      console.log(err.message)
-      return []
-    }
-
-    repositories = repositories.filter(() => false)
-
-    repositories = await Promise.all(
+    return Promise.all(
       repositories.map((repository) => {
-        return axios({
-          method: 'GET',
-          url: `${this.url}/repositories/${this.config.username}/${repository.name}/tags/?page_size=25&page=1&ordering=last_updated`,
-          headers: {
-            Authorization: `JWT ${token}`
-          }
-        })
-          .then(({ data }) => {
+        return this.internalListRepositoryTags(repository.name)
+          .then((tags) => {
             return {
               name: repository.name,
-              countOfTags: Array.isArray(data.results) ? data.results.length : 0
+              countOfTags: tags.length,
+              url: ''
             }
-          })
-          .catch((err) => {
-            return null
           })
       })
     )
-
-    return repositories
-    // Remove empty repository from the list
-      .filter(r => r).filter(r => r.countOfTags > 0)
   }
 
   async listRepositoriesTags (
     repositoryName: string
   ): Promise<listRepositoriesTagsAnswer> {
-    const { data } = await axios({
-      method: 'GET',
-      url: `${this.url}/repositories/${this.config.username}/${repositoryName}/tags/?page_size=25&page=1&ordering=last_updated`,
-      headers: {
-        Authorization: `JWT ${await this.getToken()}`
-      }
-    })
+    logger.info('DockerhubRepository.listRepositoriesTags')
 
-    const tags: DockerhubTag[] = data.results
+    const tags: DockerhubTag[] = await this.internalListRepositoryTags(repositoryName)
 
     if (tags.length === 0) {
       return {
@@ -125,13 +105,13 @@ export class DockerhubRepository implements RegistryApiRepository {
         fullDigest: tag.images[0].digest.slice(8),
         size: prettyBytes(tag.full_size),
         created: tag.tag_last_pushed,
-        architecures: tag.images.map(image => image.architecture)
+        architectures: tag.images.map(image => image.architecture)
       }
     })
 
     const finalDigests = new Map()
     tagsWithDigest.forEach(
-      ({ name, digest, size, created, fullDigest, architecures }) => {
+      ({ name, digest, size, created, fullDigest, architectures }) => {
         if (finalDigests.has(digest)) {
           finalDigests.set(digest, {
             name: digest,
@@ -139,7 +119,7 @@ export class DockerhubRepository implements RegistryApiRepository {
             size,
             created,
             fullDigest,
-            architecures
+            architectures
           })
         } else {
           finalDigests.set(digest, {
@@ -148,7 +128,7 @@ export class DockerhubRepository implements RegistryApiRepository {
             size,
             created,
             fullDigest,
-            architecures
+            architectures
           })
         }
       }
@@ -160,7 +140,7 @@ export class DockerhubRepository implements RegistryApiRepository {
       digests: Array.from(finalDigests.values()).sort((a, b) => {
         if (a.created > b.created) {
           return -1
-        } else if (a.created > b.created) {
+        } else if (a.created < b.created) {
           return 1
         } else {
           return 0
@@ -182,13 +162,17 @@ export class DockerhubRepository implements RegistryApiRepository {
       return [data.architecture]
     }
 
-    return data.manifests.map((m) => {
+    return data.manifests.map((m: any) => {
       return `${m.platform.os}/${m.platform.architecture}${m.platform.variant ??
         ''}`
     })
   }
 
   private async getToken (): Promise<string> {
+    if (this.token) {
+      return Promise.resolve(this.token)
+    }
+
     const { data } = await axios({
       method: 'POST',
       url: `${this.url}/users/login`,
@@ -198,6 +182,31 @@ export class DockerhubRepository implements RegistryApiRepository {
       }
     })
 
+    this.token = data.token
     return data.token
+  }
+
+  private async internalListRepositories (): Promise<Array<DockerhubImage>> {
+    const answer = await axios({
+      method: 'GET',
+      url: `${this.url}/repositories/${this.config.username}/?page_size=25&page=1`,
+      headers: {
+        Authorization: `JWT ${await this.getToken()}`
+      }
+    })
+
+    return answer.data.results
+  }
+
+  private async internalListRepositoryTags (repositoryName: string): Promise<Array<DockerhubTag>> {
+    const answer = await axios({
+      method: 'GET',
+      url: `${this.url}/repositories/${this.config.username}/${repositoryName}/tags/?page_size=25&page=1`,
+      headers: {
+        Authorization: `JWT ${await this.getToken()}`
+      }
+    })
+
+    return answer.data.results
   }
 }

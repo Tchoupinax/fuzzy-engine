@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.7.0 | 2023-05-06
+
+AWS CLI was dropped and now it uses the standard api with SDK. Intructions to use a local authentication with Docker are available in the readme.
+Now cache is built for every page client side to improve the experience when consulting data intensively
+#### Features
+
+- Classic usage of AWS SDK with local authentication (awscli)
+- Add cache everywhere in app, transitions are smoother
+
+#### Chores
+
+- Upgrade to the latest version of Nuxt.js (v3.4.3)
+- Upgrage packages
+
 ## 1.6.0 | 2022-11-05
 
 Nuxt.js v3 is definitively coming. The bridge has been removed and the framework has been updated to the last current version (Nuxt.js v3-rc13).

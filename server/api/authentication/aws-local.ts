@@ -1,0 +1,48 @@
+import { defineEventHandler } from 'h3'
+import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts'
+import { logger } from '../../tools/logger'
+
+export default defineEventHandler(async (request) => {
+  logger.info('Handle /authentication/aws-local')
+
+  let region: string
+  try {
+    const { 'fuzzy-engine-aws-ecr': awsCredentials } = parseCookies(request)
+    const data = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
+    region = data.region
+    logger.info(`Region ${region} detected`)
+  } catch (err) {
+    logger.error(err)
+    region = 'eu-west-1'
+  }
+
+  if (
+    process.env.AWS_SESSION_TOKEN &&
+    process.env.AWS_ACCESS_KEY_ID &&
+    process.env.AWS_SECRET_ACCESS_KEY
+  ) {
+    try {
+      const client = new STSClient({ region })
+      const command = new GetCallerIdentityCommand({ region })
+      const response = await client.send(command)
+
+      return {
+        identity: response.UserId,
+        connected: true
+      }
+    } catch (err) {
+      logger.error(err)
+      return {
+        identity: '',
+        connected: false
+      }
+    }
+  }
+
+  logger.info('No credentials detected')
+
+  return {
+    identity: '',
+    connected: false
+  }
+})

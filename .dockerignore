@@ -6,12 +6,12 @@
 !assets
 !functions
 !layouts
-!middlewares
 !pages
 !plugins
 !server
-!static
-!store
-!.babelrc
+!types
+
+!LICENSE
 !nuxt.config.ts
-!tailwind.config.js
+!tailwind.config.ts
+!tsconfig.json

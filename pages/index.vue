@@ -195,13 +195,16 @@
             v-if="provider === 'aws-ecr'"
             class="flex flex-col items-center justify-center w-full p-4"
           >
-            <label class="text-xl mb-4">
+            <label
+              v-if="awsEcr.localAuthentication.length > 0"
+              class="text-xl mb-4"
+            >
               <input
-                v-model="awsEcr.useCLI"
+                v-model="awsEcr.useLocalAuthentication"
                 type="checkbox"
                 @change="saveData"
               >
-              Use local AWS CLI for the authentication
+              Use local AWS authentication <br>({{ awsEcr.localAuthentication }})
             </label>
 
             <input
@@ -213,7 +216,7 @@
             >
 
             <input
-              v-if="!awsEcr.useCLI"
+              v-if="!awsEcr.useLocalAuthentication"
               v-model="awsEcr.accessKey"
               type="text"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
@@ -221,7 +224,7 @@
               @keyup="saveData"
             >
 
-            <div v-if="!awsEcr.useCLI" class="flex justify-center w-full">
+            <div v-if="!awsEcr.useLocalAuthentication" class="flex justify-center w-full">
               <input
                 v-model="awsEcr.secretKey"
                 class="w-full p-1 px-2 text-xl font-bold border rounded-l text-theme-default border-theme-default docker-pull placeholder-theme-lighter"
@@ -335,6 +338,7 @@
 </template>
 
 <script lang="ts">
+import { Provider } from '../types/provider'
 import { getCookie, setCookie } from '~~/functions/cookies'
 
 export default {
@@ -375,7 +379,8 @@ export default {
         accessKey: '',
         secretKey: '',
         region: '',
-        useCLI: false,
+        useLocalAuthentication: false,
+        localAuthentication: ''
       },
       githubRegistry: {
         nickname: '',
@@ -393,7 +398,7 @@ export default {
             this.awsEcr.secretKey?.length > 0
           ) || (
             this.awsEcr.region?.length > 0 &&
-            this.awsEcr.useCLI
+            this.awsEcr.useLocalAuthentication
           )
         )
       }
@@ -418,6 +423,10 @@ export default {
     },
   },
   mounted () {
+    this.checkAwsLocalAuthentication()
+
+    console.log(this.$route.query.provider)
+
     if (getCookie('fuzzy-engine-github-ecr')) {
       const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
       this.githubRegistry.nickname = nickname
@@ -442,6 +451,10 @@ export default {
       this.dockerRegistry.url = url
       this.dockerRegistry.username = username
       this.dockerRegistry.password = password
+    }
+
+    if (this.$route.query.provider) {
+      setCookie('fuzzy-engine-provider', this.$route.query.provider)
     }
 
     this.provider = getCookie('fuzzy-engine-provider')
@@ -501,16 +514,24 @@ export default {
         ),
       )
     },
-
     openList (e) {
       e.preventDefault()
       this.$router.push('/list')
     },
-
-    changeProvider (provider) {
+    changeProvider (provider: Provider) {
       this.provider = provider
       setCookie('fuzzy-engine-provider', this.provider)
     },
+    async checkAwsLocalAuthentication () {
+      const data: any = await $fetch(
+        `${new URL((window as any).location).origin}/api/authentication/aws-local`,
+      )
+
+      if (data.connected) {
+        this.awsEcr.localAuthentication = data.identity
+        this.awsEcr.useLocalAuthentication = true
+      }
+    }
   },
   notifications: {
     unauthorized: {

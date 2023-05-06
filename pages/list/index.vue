@@ -1,5 +1,12 @@
 <template>
   <div>
+    <div
+      v-if="syncingInProgress"
+      class="text-theme-default hover:text-theme-default absolute text-2xl right-0 bottom-0 mb-20 shadow-xl mr-6 bg-gray-50 p-2 px-4 rounded-lg"
+    >
+      Sync in progress...
+    </div>
+
     <section id="actions" class="flex justify-between mt-6 ml-8">
       <NuxtLink to="/">
         <button class="font-bold text-theme-default hover:text-theme-default">
@@ -76,13 +83,13 @@
             <div class="flex items-center">
               <div class="xl:flex mr-8 hidden">
                 <input
-                  class="px-2 text-xs text-gray-700 border border-gray-700 rounded-l docker-pull"
+                  class="px-2 text-xs bg-gray-50 text-theme-default border border-theme-default rounded-l docker-pull"
                   type="text"
                   :value="downloadUrl(repo.name)"
                 >
 
                 <button
-                  class="p-2 px-4 bg-gray-200 border border-l-0 border-gray-700 rounded-r"
+                  class="p-2 px-4 bg-gray-100 border border-l-0 border-theme-default rounded-r"
                   type="button"
                   @click="onCopy(repo.name)"
                 >
@@ -133,14 +140,6 @@
             </div>
           <!-- END # Right -->
           </div>
-
-          <button
-            v-if="filteredRepositories.length > 0"
-            class="text-xl italic mt-4 font-light"
-            @click="fetchRepositories"
-          >
-            {{ fetchAdditionalRepositoriesLoading ? 'Loading...' : hasNext ? 'List more...': '' }}
-          </button>
         </div>
       </div>
     </div>
@@ -154,24 +153,28 @@ import { match } from 'ts-pattern'
 import debounce from 'lodash.debounce'
 import { Provider } from '../../types/provider'
 
+import { DB } from '../../functions/db'
 import { getCookie } from '~~/functions/cookies'
+
+type State = {
+  awsEcr: { accessKey: string, secretKey: string, region: string },
+  dockerRegistry: { url: string, username: string, password: string },
+  dockerhub: { username: string, password: string };
+  fetchAdditionalRepositoriesLoading: boolean,
+  githubRegistry: { nickname: string, token: string },
+  hasNext: boolean,
+  hiddingRepoMode: false,
+  hiddingRepositories: Array<any>,
+  imageName: string,
+  loading: boolean;
+  provider: Option<Provider>,
+  repositories: Array<any>,
+  syncingInProgress: boolean;
+}
 
 export default {
   name: 'ListPage',
-  data () : {
-    provider: Provider,
-    dockerRegistry: { url: string, username: string, password: string },
-    awsEcr: { accessKey: string, secretKey: string, region: string },
-    githubRegistry: { nickname: string, token: string },
-    dockerhub: { username: string, password: string };
-    loading: boolean;
-    hiddingRepoMode: false,
-    hiddingRepositories: Array<any>,
-    repositories: Array<any>,
-    fetchAdditionalRepositoriesLoading: boolean,
-    hasNext: boolean,
-    imageName: string,
-    } {
+  data (): State {
     return {
       provider: Option.None(),
       dockerRegistry: {
@@ -193,12 +196,13 @@ export default {
         username: '',
         password: '',
       },
-      loading: true,
-      hiddingRepoMode: false,
-      hiddingRepositories: [],
-      repositories: [],
       fetchAdditionalRepositoriesLoading: false,
       hasNext: false,
+      hiddingRepoMode: false,
+      hiddingRepositories: [],
+      loading: true,
+      repositories: [],
+      syncingInProgress: false,
     }
   },
   computed: {
@@ -226,33 +230,38 @@ export default {
   async mounted () {
     this.searchImageByNameDebounce = debounce(this.searchImage, 400)
 
+    const db = new DB()
+    this.provider = Option.fromNullable(getCookie('fuzzy-engine-provider') as Provider)
+
+    const storedData = db.findRepositories()
+    if (storedData.isSome()) {
+      this.syncingInProgress = true
+      this.repositories = storedData.get()
+      this.loading = false
+    }
+
     if (getCookie('fuzzy-engine-github-ecr')) {
       const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
       this.githubRegistry.nickname = nickname
       this.githubRegistry.token = token
     }
-
     if (getCookie('fuzzy-engine-aws-ecr')) {
       const { accessKey, secretKey, region } = JSON.parse(atob(getCookie('fuzzy-engine-aws-ecr')))
       this.awsEcr.accessKey = accessKey
       this.awsEcr.secretKey = secretKey
       this.awsEcr.region = region
     }
-
     if (getCookie('fuzzy-engine-dockerhub')) {
       const { username, password } = JSON.parse(atob(getCookie('fuzzy-engine-dockerhub')))
       this.dockerhub.username = username
       this.dockerhub.password = password
     }
-
     if (getCookie('fuzzy-engine-docker-v2')) {
       const { url, username, password } = JSON.parse(atob(getCookie('fuzzy-engine-docker-v2')))
       this.dockerRegistry.url = url
       this.dockerRegistry.username = username
       this.dockerRegistry.password = password
     }
-
-    this.provider = Option.Some(getCookie('fuzzy-engine-provider')) as Provider
 
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
 
@@ -261,15 +270,19 @@ export default {
       this.$router.push('/list')
     }
 
-    const { data, next } = await $fetch(`${new URL(window.location).origin}/api/repositories?offset=0&limit=10`, { credentials: 'include' })
+    const { data, hasNext } = await $fetch(
+      `${new URL((window as any).location).origin}/api/repositories?offset=0&limit=10`,
+      { credentials: 'include' }
+    )
 
-    this.repositories = data.sort((a, b) => {
-      if (a.name > b.name) { return 1 }
-      if (a.name < b.name) { return -1 }
-      return 1
-    })
-    this.hasNext = next
+    const repositories = db.upsertRepositories(data)
+    if (repositories.isSome()) {
+      this.repositories = repositories.get()
+    }
+
+    this.hasNext = hasNext
     this.loading = false
+    this.syncingInProgress = false
   },
   methods: {
     debounce,
@@ -284,37 +297,35 @@ export default {
         None: () => 'Non available'
       })
     },
-
     onCopy (repositoryName: string) {
       this.copiedSuccesfully()
-
       navigator.clipboard.writeText(this.downloadUrl(repositoryName))
     },
-
     async fetchRepositories () {
+      const db = new DB()
       this.fetchAdditionalRepositoriesLoading = true
 
-      const { data, next } = await $fetch(
+      const { data, hasNext } = await $fetch(
         `${new URL(window.location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
         { credentials: 'include' }
       )
 
       this.repositories = [...this.repositories, ...data]
       this.fetchAdditionalRepositoriesLoading = false
-      this.hasNext = next
+      this.hasNext = hasNext
+      db.upsertRepositories(this.repositories)
     },
-
     async searchImage () {
       this.fetchAdditionalRepositoriesLoading = true
 
-      const { data, next } = await $fetch(
+      const { data, hasNext } = await $fetch(
         `${new URL(window.location).origin}/api/repositories?limit=10&name=${this.imageName}`,
         { credentials: 'include' }
       )
 
       this.repositories = [...data]
       this.fetchAdditionalRepositoriesLoading = false
-      this.hasNext = next
+      this.hasNext = hasNext
     }
   },
   notifications: {
