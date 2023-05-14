@@ -425,8 +425,6 @@ export default {
   mounted () {
     this.checkAwsLocalAuthentication()
 
-    console.log(this.$route.query.provider)
-
     if (getCookie('fuzzy-engine-github-ecr')) {
       const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
       this.githubRegistry.nickname = nickname
