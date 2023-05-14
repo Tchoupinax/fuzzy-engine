@@ -2,7 +2,6 @@ import axios from 'axios'
 import prettyBytes from 'pretty-bytes'
 import { Option } from '@swan-io/boxed'
 import { listRepositoriesTagsAnswer, RegistryApiRepository } from '../gateways/registry-api.gateway'
-import { DockerhubTag } from './dockerhub.repository'
 
 export type DockerApiRepositoryConfig = { url: string, username: string, password: string };
 
