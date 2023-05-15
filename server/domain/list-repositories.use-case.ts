@@ -19,11 +19,11 @@ export class ListRepositoryUseCase {
       port.name
     )
 
-    const hasNext = repositories.length > port.limit
+    const hasNext = repositories.length > port.limit + port.offset
 
     return {
       hasNext,
-      data: hasNext ? repositories.slice(0, -1) : repositories,
+      data: hasNext ? repositories.slice(0, port.limit) : repositories,
     }
   }
 }

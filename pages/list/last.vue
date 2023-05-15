@@ -7,7 +7,7 @@
       Sync in progress...
     </div>
 
-    <section id="actions" class="flex justify-between mt-6 ml-8">
+    <section id="actions" class="flex justify-between pt-6 ml-8">
       <NuxtLink to="/">
         <button class="font-bold text-theme-default hover:text-theme-default">
           Home

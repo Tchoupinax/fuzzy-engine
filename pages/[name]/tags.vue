@@ -7,7 +7,7 @@
       Sync in progress...
     </div>
 
-    <section id="actions" class="flex justify-between mt-6 ml-8">
+    <section id="actions" class="flex justify-between pt-6 ml-8">
       <NuxtLink to="/list">
         <button class="font-bold text-theme-default hover:text-theme-default">
           List of repositories
@@ -45,7 +45,7 @@
             }"
           >
             <div class="flex items-center justify-center">
-              <div class="w-24 mr-8">
+              <div class="w-auto mr-8">
                 {{ digest.name }}
               </div>
 
@@ -89,7 +89,7 @@
                   architectures
                 </div>
 
-                <div class="absolute left-0 z-10 flex p-2 px-1 ml-24 bg-black rounded-lg w-28 info">
+                <div class="absolute left-0 z-10 flex p-2 ml-24 bg-black rounded-lg w-auto px-4 info">
                   <div>
                     <div
                       v-for="(architecture, indexArchitecture) of digest.architectures"
@@ -225,12 +225,12 @@ export default {
   },
   methods: {
     timeago: timeago.format,
-    formatFullDate (date) {
+    formatFullDate (date: Date) {
       const dtf = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
 
       return dtf.format(new Date(date))
     },
-    deleteImage (digesthash) {
+    deleteImage (digesthash: string) {
       if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
         window.location = `/${this.name}/${digesthash}/delete`
       }

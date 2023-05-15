@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-full">
     <div
       v-if="syncingInProgress"
       class="text-theme-default hover:text-theme-default absolute text-2xl right-0 bottom-0 mb-20 shadow-xl mr-6 bg-gray-50 p-2 px-4 rounded-lg"
@@ -7,14 +7,14 @@
       Sync in progress...
     </div>
 
-    <section id="actions" class="flex justify-between mt-6 ml-8">
+    <section id="actions" class="flex justify-between pt-6 ml-8">
       <NuxtLink to="/">
         <button class="font-bold text-theme-default hover:text-theme-default">
           Home
         </button>
       </NuxtLink>
 
-      <div class="mr-8">
+      <!--<div class="mr-8">
         <button
           class="flex items-center font-bold text-theme-default hover:text-theme-default"
           @click="toggleHiddingRepoMode"
@@ -31,11 +31,11 @@
           </div>
           {{ !hiddingRepoMode ? 'Edit mode' : 'Validate' }}
         </button>
-      </div>
+      </div>-->
     </section>
 
-    <div class="flex flex-col items-center justify-center mb-40">
-      <div class="w-full lg:w-8/12">
+    <div class="flex flex-col h-full items-center justify-center mb-40">
+      <div class="w-full h-full lg:w-8/12">
         <div class="flex flex-col items-center justify-center mb-40 text-theme-default">
           <div v-if="!loading" class="mb-16 mt-8 xl:mt-0 text-4xl text-center">
             <p>
@@ -228,6 +228,7 @@ export default {
     },
   },
   async mounted () {
+    this.syncingInProgress = true
     this.searchImageByNameDebounce = debounce(this.searchImage, 400)
 
     const db = new DB()
@@ -235,33 +236,11 @@ export default {
 
     const storedData = db.findRepositories()
     if (storedData.isSome()) {
-      this.syncingInProgress = true
-      this.repositories = storedData.get()
       this.loading = false
+      this.repositories = storedData.get()
     }
 
-    if (getCookie('fuzzy-engine-github-ecr')) {
-      const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
-      this.githubRegistry.nickname = nickname
-      this.githubRegistry.token = token
-    }
-    if (getCookie('fuzzy-engine-aws-ecr')) {
-      const { accessKey, secretKey, region } = JSON.parse(atob(getCookie('fuzzy-engine-aws-ecr')))
-      this.awsEcr.accessKey = accessKey
-      this.awsEcr.secretKey = secretKey
-      this.awsEcr.region = region
-    }
-    if (getCookie('fuzzy-engine-dockerhub')) {
-      const { username, password } = JSON.parse(atob(getCookie('fuzzy-engine-dockerhub')))
-      this.dockerhub.username = username
-      this.dockerhub.password = password
-    }
-    if (getCookie('fuzzy-engine-docker-v2')) {
-      const { url, username, password } = JSON.parse(atob(getCookie('fuzzy-engine-docker-v2')))
-      this.dockerRegistry.url = url
-      this.dockerRegistry.username = username
-      this.dockerRegistry.password = password
-    }
+    this.initFromCookies()
 
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
 
@@ -270,18 +249,20 @@ export default {
       this.$router.push('/list')
     }
 
-    const { data, hasNext } = await $fetch(
-      `${new URL((window as any).location).origin}/api/repositories?offset=0&limit=10`,
-      { credentials: 'include' }
-    )
+    let repositories = []
+    let hasNext = true
+    while (hasNext) {
+      const { data, hasNext: localHasNext } = await $fetch(
+        `${new URL(window.location).origin}/api/repositories?offset=${repositories.length}&limit=10`,
+        { credentials: 'include' }
+      )
 
-    const repositories = db.upsertRepositories(data)
-    if (repositories.isSome()) {
-      this.repositories = repositories.get()
+      repositories = [...repositories, ...data]
+      hasNext = localHasNext
     }
 
-    this.hasNext = hasNext
-    this.loading = false
+    db.saveRepositoryImages(repositories)
+    this.repositories = [...repositories]
     this.syncingInProgress = false
   },
   methods: {
@@ -297,23 +278,33 @@ export default {
         None: () => 'Non available'
       })
     },
+    initFromCookies () {
+      if (getCookie('fuzzy-engine-github-ecr')) {
+        const { nickname, token } = JSON.parse(atob(getCookie('fuzzy-engine-github-ecr')))
+        this.githubRegistry.nickname = nickname
+        this.githubRegistry.token = token
+      }
+      if (getCookie('fuzzy-engine-aws-ecr')) {
+        const { accessKey, secretKey, region } = JSON.parse(atob(getCookie('fuzzy-engine-aws-ecr')))
+        this.awsEcr.accessKey = accessKey
+        this.awsEcr.secretKey = secretKey
+        this.awsEcr.region = region
+      }
+      if (getCookie('fuzzy-engine-dockerhub')) {
+        const { username, password } = JSON.parse(atob(getCookie('fuzzy-engine-dockerhub')))
+        this.dockerhub.username = username
+        this.dockerhub.password = password
+      }
+      if (getCookie('fuzzy-engine-docker-v2')) {
+        const { url, username, password } = JSON.parse(atob(getCookie('fuzzy-engine-docker-v2')))
+        this.dockerRegistry.url = url
+        this.dockerRegistry.username = username
+        this.dockerRegistry.password = password
+      }
+    },
     onCopy (repositoryName: string) {
       this.copiedSuccesfully()
       navigator.clipboard.writeText(this.downloadUrl(repositoryName))
-    },
-    async fetchRepositories () {
-      const db = new DB()
-      this.fetchAdditionalRepositoriesLoading = true
-
-      const { data, hasNext } = await $fetch(
-        `${new URL(window.location).origin}/api/repositories?offset=${this.repositories.length}&limit=10`,
-        { credentials: 'include' }
-      )
-
-      this.repositories = [...this.repositories, ...data]
-      this.fetchAdditionalRepositoriesLoading = false
-      this.hasNext = hasNext
-      db.upsertRepositories(this.repositories)
     },
     async searchImage () {
       this.fetchAdditionalRepositoriesLoading = true

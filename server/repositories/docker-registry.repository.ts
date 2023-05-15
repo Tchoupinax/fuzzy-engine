@@ -15,11 +15,11 @@ export class DockerApiRepository implements RegistryApiRepository {
     offset: number,
     name: Option<string>
   ): Promise<any[]> {
-    let repositoryNames: Array<DockerRegistryRepositoryName> = await this.internalListRepositories()
-    // If we have a name to match, we filter repositories here
-    if (name && name.isSome()) {
-      repositoryNames = repositoryNames.filter(repositoryName => repositoryName.includes(name.get()))
-    }
+    const repositoryNames: Array<DockerRegistryRepositoryName> = await this.internalListRepositories(
+      limit,
+      offset,
+      name,
+    )
 
     const repositories = await Promise.all(repositoryNames.map(
       async (repositoryName: string) => {
@@ -149,13 +149,22 @@ export class DockerApiRepository implements RegistryApiRepository {
     })
   }
 
-  private async internalListRepositories (): Promise<Array<DockerRegistryRepositoryName>> {
+  private async internalListRepositories (
+    limit: number,
+    offset: number,
+    name: Option<string>,
+  ): Promise<Array<DockerRegistryRepositoryName>> {
     const answer = await axios({
       method: 'GET',
       url: `${this.getComputedUrl()}/v2/_catalog`,
     })
 
-    return answer.data.repositories
+    // If we have a name to match, we filter repositories here
+    if (name && name.isSome()) {
+      return answer.data.repositories.filter((repositoryName: string) => repositoryName.includes(name.get()))
+    } else {
+      return answer.data.repositories.slice(offset, offset + limit)
+    }
   }
 
   private async internalListRepositoryTags (

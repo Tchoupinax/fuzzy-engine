@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { setCookie } from '~~/functions/cookies'
+import { setCookie, getCookie } from '~~/functions/cookies'
 
 export default {
   name: 'DefaultLayout',
@@ -76,10 +76,12 @@ export default {
       theme: 'one',
     }
   },
+  mounted () {
+    this.theme = getCookie('fuzzy-engine-theme') ?? 'one'
+  },
   methods: {
     changeColor (name: string) {
       this.theme = name
-
       setCookie('fuzzy-engine-theme', name)
     },
   },
