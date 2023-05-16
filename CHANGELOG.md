@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.1 | 2023-05-16
+
+#### Features
+
+- Improve auto pagination
+
+#### Chores
+
+- Upgrade dependencies
+- Remove console.log
+
 ## 1.7.0 | 2023-05-06
 
 AWS CLI was dropped and now it uses the standard api with SDK. Intructions to use a local authentication with Docker are available in the readme.
