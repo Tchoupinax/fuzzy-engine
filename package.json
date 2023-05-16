@@ -33,6 +33,7 @@
     "@nuxtjs/sitemap": "2.4.0",
     "@swan-io/boxed": "1.0.2",
     "axios": "1.4.0",
+    "build": "^0.1.4",
     "cookieparser": "0.1.0",
     "express": "4.18.2",
     "js-cookie": "3.0.5",
@@ -58,7 +59,7 @@
     "eslint": "8.40.0",
     "eslint-plugin-vue": "9.13.0",
     "nodemon": "2.0.22",
-    "nuxt": "3.5.0",
+    "nuxt": "3.4.3",
     "typescript": "5",
     "vite-plugin-eslint": "1.8.1",
     "vitest": "0.31.0"
