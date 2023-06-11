@@ -264,6 +264,7 @@ export default {
     db.saveRepositoryImages(repositories)
     this.repositories = [...repositories]
     this.syncingInProgress = false
+    this.loading = false
   },
   methods: {
     debounce,

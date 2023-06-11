@@ -1,14 +1,15 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import prettyBytes from 'pretty-bytes'
 import { Option } from '@swan-io/boxed'
 import { listRepositoriesTagsAnswer, RegistryApiRepository } from '../gateways/registry-api.gateway'
+import { logger } from '../tools/logger'
 
 export type DockerApiRepositoryConfig = { url: string, username: string, password: string };
 
 export type DockerRegistryRepositoryName = string;
 
 export class DockerApiRepository implements RegistryApiRepository {
-  constructor (private config: DockerApiRepositoryConfig) { }
+  constructor (private config: DockerApiRepositoryConfig) {}
 
   async listRepositories (
     limit: number,
@@ -154,10 +155,17 @@ export class DockerApiRepository implements RegistryApiRepository {
     offset: number,
     name: Option<string>,
   ): Promise<Array<DockerRegistryRepositoryName>> {
-    const answer = await axios({
-      method: 'GET',
-      url: `${this.getComputedUrl()}/v2/_catalog`,
-    })
+    let answer
+
+    try {
+      answer = await axios({
+        method: 'GET',
+        url: `${this.getComputedUrl()}/v2/_catalog`,
+      })
+    } catch (err) {
+      logger.error((err as AxiosError).response?.data)
+      throw err
+    }
 
     // If we have a name to match, we filter repositories here
     if (name && name.isSome()) {
