@@ -28,7 +28,7 @@
     "test": "bash -c 'source .env && vitest'"
   },
   "dependencies": {
-    "@aws-sdk/client-ecr": "3.332.0",
+    "@aws-sdk/client-ecr": "3.350.0",
     "@nuxtjs/robots": "3.0.0",
     "@nuxtjs/sitemap": "2.4.0",
     "@swan-io/boxed": "1.0.2",
