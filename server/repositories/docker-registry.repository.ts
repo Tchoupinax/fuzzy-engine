@@ -5,7 +5,6 @@ import { listRepositoriesTagsAnswer, RegistryApiRepository } from '../gateways/r
 import { logger } from '../tools/logger'
 
 export type DockerApiRepositoryConfig = { url: string, username: string, password: string };
-
 export type DockerRegistryRepositoryName = string;
 
 export class DockerApiRepository implements RegistryApiRepository {
@@ -45,6 +44,7 @@ export class DockerApiRepository implements RegistryApiRepository {
     repositoryName: string
   ): Promise<listRepositoriesTagsAnswer> {
     const { tags } = await this.internalListRepositoryTags(repositoryName)
+    logger.debug({ tags }, 'tags detected')
 
     if (tags === null) {
       return {
@@ -56,33 +56,19 @@ export class DockerApiRepository implements RegistryApiRepository {
 
     const tagsWithDigest = await Promise.all(
       tags.map(async (tag) => {
-        const {
-          headers: { 'docker-content-digest': digest },
-          data: { layers },
-        } = await axios({
-          method: 'GET',
-          url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
-          headers: {
-            Accept: 'application/vnd.docker.distribution.manifest.v2+json',
-          },
-        })
+        const { layers, digest } = await this.internalGetManifestData(repositoryName, tag)
 
-        const architectures = await this.getArchitecture(repositoryName, tag)
-        // @ts-ignore
+        const architectures = await this.getArchitectures(repositoryName, tag)
         const size = layers.reduce((acc, cur) => acc + cur.size, 0)
 
-        // Get creation date
-        const { data: { history: [{ v1Compatibility }] } } = await axios({
-          method: 'GET',
-          url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
-        })
+        const creationDate = await this.getCreationDate(repositoryName, tag)
 
         return {
           name: tag,
           digest: digest.slice(7, 19),
           fullDigest: digest,
           size: prettyBytes(size),
-          created: JSON.parse(v1Compatibility).created,
+          created: creationDate,
           architectures,
         }
       })
@@ -130,24 +116,30 @@ export class DockerApiRepository implements RegistryApiRepository {
     return `${protocol}://${this.config.username}:${this.config.password}@${this.config.url}`
   }
 
-  private async getArchitecture (name: string, tag: string) {
-    const {
-      data,
-    } = await axios({
+  private getArchitectures (
+    repositoryName: string,
+    tag: string
+  ): Promise<Array<any>> {
+    return axios({
       method: 'GET',
-      url: `${this.getComputedUrl()}/v2/${name}/manifests/${tag}`,
+      url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
       headers: {
         Accept: 'application/vnd.docker.distribution.manifest.list.v2+json', // Manifest list, aka “fat manifest”
       },
     })
+      .then((answer) => {
+        if (!answer.data.manifests) {
+          return [answer.data.architecture]
+        }
 
-    if (!data.manifests) {
-      return [data.architecture]
-    }
-
-    return data.manifests.map((m: any) => {
-      return `${m.platform.os}/${m.platform.architecture}${m.platform.variant ?? ''}`
-    })
+        return answer.data.manifests.map((m: any) => {
+          return `${m.platform.os}/${m.platform.architecture}${m.platform.variant ?? ''}`
+        })
+      })
+      .catch((err) => {
+        logger.error({ error: err.response.data, repositoryName, tag }, 'getArchitectures')
+        return []
+      })
   }
 
   private async internalListRepositories (
@@ -184,5 +176,52 @@ export class DockerApiRepository implements RegistryApiRepository {
     })
 
     return answer.data
+  }
+
+  private internalGetManifestData (
+    repositoryName: string,
+    tag: string,
+  ): Promise<{
+    layers: Array<{ mediaType: string, digest: string, size: number }>;
+    digest: string
+  }> {
+    return axios({
+      method: 'GET',
+      url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
+      headers: {
+        Accept: 'application/vnd.docker.distribution.manifest.v2+json',
+      },
+    })
+      .then((answer) => {
+        return {
+          layers: answer.data.layers,
+          digest: answer.headers['docker-content-digest']
+        }
+      })
+      .catch((err) => {
+        logger.error({ error: err.response.data, repositoryName, tag }, 'internalGetManifestData')
+        return {
+          layers: [],
+          digest: 'N/A'
+        }
+      })
+  }
+
+  private getCreationDate (
+    repositoryName: string,
+    tag: string,
+  ): Promise<Date> {
+    return axios({
+      method: 'GET',
+      url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
+    })
+      .then((answer) => {
+        const obj = answer.data.history[0].v1Compatibility
+        return new Date(JSON.parse(obj).created)
+      })
+      .catch((err) => {
+        logger.error({ error: err.response.data, repositoryName, tag }, 'getCreationDate')
+        return new Date(0)
+      })
   }
 }
