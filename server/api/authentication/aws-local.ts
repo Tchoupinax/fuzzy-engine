@@ -5,15 +5,16 @@ import { logger } from '../../tools/logger'
 export default defineEventHandler(async (request) => {
   logger.info('Handle /authentication/aws-local')
 
-  let region: string
+  let region = 'eu-west-1'
   try {
     const { 'fuzzy-engine-aws-ecr': awsCredentials } = parseCookies(request)
-    const data = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
-    region = data.region
-    logger.info(`Region ${region} detected`)
+    if (awsCredentials) {
+      const data = JSON.parse(Buffer.from(awsCredentials, 'base64').toString('ascii'))
+      region = data.region
+      logger.info(`Region ${region} detected`)
+    }
   } catch (err) {
     logger.error(err)
-    region = 'eu-west-1'
   }
 
   if (

@@ -111,7 +111,7 @@
                     <div
                       class="px-0 py-0 cursor-pointer mx-1 infoButton border-theme-default hover:text-theme-default"
                     >
-                      {{ tag && tag.slice(0, 10) }}
+                      {{ digest.tags.length < 10 ? tag : tag.slice(0, 10) }}
                     </div>
                     <div class="absolute right-0 z-10 p-2 px-4 mr-4 bg-black rounded-lg info">
                       {{ tag }}
@@ -158,9 +158,10 @@ import * as timeago from 'timeago.js'
 import { Option } from '@swan-io/boxed'
 import { getCookie } from '../../functions/cookies'
 import { DB } from '../../functions/db'
+import { ContainerRepositoryTags, listRepositoriesTagsAnswer } from '../../server/gateways/registry-api.gateway'
 
 type State = {
-  digests: Array<any>;
+  digests: Array<ContainerRepositoryTags>;
   doNotDisplayNullTags: boolean;
   name: string;
   noTag: boolean;
@@ -211,14 +212,14 @@ export default {
 
     this.provider = Option.Some(getCookie('fuzzy-engine-provider'))
 
-    const data = await $fetch(`${new URL(window.location).origin}/api/repositories/${this.$route.params.name}/tags`, {
+    const data = await $fetch(`${window.location.origin}/api/repositories/${this.$route.params.name}/tags`, {
       method: 'GET',
       credentials: 'include',
     })
 
     this.name = data.name
     this.noTag = data.noTag
-    this.digests = data.digests
+    this.digests = data.digests as unknown as listRepositoriesTagsAnswer['digests']
     this.syncingInProgress = false
 
     db.saveRepositoryImages(repositoryName, data)

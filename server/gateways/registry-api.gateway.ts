@@ -7,17 +7,18 @@ export type ContainerRepository = {
 }
 
 export type ContainerRepositoryTags = {
-  name: string;
-  tags: any[];
-  size: number;
-  created: string;
+  architectures: Array<string>;
+  created: Date;
   fullDigest: string;
+  name: string;
+  size: number;
+  tags: any[];
 }
 
 export type listRepositoriesTagsAnswer = {
+  digests: Array<ContainerRepositoryTags>;
   name: string;
   noTag: boolean;
-  digests: ContainerRepositoryTags[];
 }
 
 export abstract class RegistryApiRepository {

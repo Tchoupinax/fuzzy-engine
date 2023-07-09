@@ -5,7 +5,7 @@ export type listLatest10TagsResult = {
   name: string;
   tag: string;
   size: number;
-  createdAt: string;
+  createdAt: Date;
 };
 
 export class ListLatest10TagsUseCase {
