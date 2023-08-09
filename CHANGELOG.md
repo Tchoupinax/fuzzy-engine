@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.2 | 2023-08-08
+
+#### Features
+
+- Fix password manager autocompletion for Docker Registry
+
 ## 1.7.1 | 2023-05-16
 
 #### Features
