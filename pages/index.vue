@@ -51,7 +51,7 @@
           >
             <input
               v-model="dockerRegistry.url"
-              type="text"
+              type="url"
               class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
               placeholder="registry.mydomain.com"
               @keyup="saveData"
