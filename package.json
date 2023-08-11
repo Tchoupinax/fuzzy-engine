@@ -1,6 +1,6 @@
 {
   "name": "fuzzy-engine",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "Docker registry UI made with love",
   "author": "Tchoupinax <corentinfiloche@hotmail.fr> (https://corentinfiloche.xyz)",
   "licence": "MIT",
@@ -28,7 +28,7 @@
     "test": "bash -c 'source .env && vitest'"
   },
   "dependencies": {
-    "@aws-sdk/client-ecr": "3.386.0",
+    "@aws-sdk/client-ecr": "3.388.0",
     "@nuxtjs/robots": "3.0.0",
     "@nuxtjs/sitemap": "2.4.0",
     "@swan-io/boxed": "1.1.0",
@@ -56,8 +56,8 @@
     "autoprefixer": "10.4.14",
     "babel-eslint": "10.1.0",
     "defu": "6.1.2",
-    "eslint": "8.46.0",
-    "eslint-plugin-vue": "9.16.1",
+    "eslint": "8.47.0",
+    "eslint-plugin-vue": "9.17.0",
     "nodemon": "3.0.1",
     "nuxt": "3.6.5",
     "typescript": "5",

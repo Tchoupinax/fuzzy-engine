@@ -47,7 +47,11 @@
         </div>
       </div>
 
-      <div>
+      <div class="flex">
+        <div class="text-black text-xl mr-6 font-medium">
+          v{{ version }}
+        </div>
+
         <a target="_blank" href="https://github.com/Tchoupinax/fuzzy-engine">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -74,16 +78,23 @@ export default {
   data () {
     return {
       theme: 'one',
+      version: ''
     }
   },
   mounted () {
     this.theme = getCookie('fuzzy-engine-theme') ?? 'one'
+    this.fetchVersion()
   },
   methods: {
     changeColor (name: string) {
       this.theme = name
       setCookie('fuzzy-engine-theme', name)
     },
+    fetchVersion () {
+      $fetch('/api/version').then((payload) => {
+        this.version = payload.version
+      })
+    }
   },
 }
 </script>

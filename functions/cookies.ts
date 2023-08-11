@@ -10,7 +10,7 @@ export function setCookie<T> (name: string, value: T, days?: number) {
   document.cookie = `${name}=${value || ''}${expires}; path=/`
 }
 
-export function getCookie (cname: string) {
+export function getCookie (cname: string): string | null {
   const name = `${cname}=`
   const decodedCookie = decodeURIComponent(document.cookie)
   const ca = decodedCookie.split(';')
@@ -24,5 +24,5 @@ export function getCookie (cname: string) {
     }
   }
 
-  return ''
+  return null
 }

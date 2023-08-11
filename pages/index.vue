@@ -31,6 +31,7 @@
 
       <div class="flex justify-center w-full mt-16">
         <button
+          v-if="provider"
           class="px-4 py-2 font-bold text-white rounded bg-theme-lighter"
           :class="{
             'hover:bg-theme-default': connected,
@@ -288,7 +289,7 @@
                 v-model="githubRegistry.token"
                 class="w-full p-1 px-2 text-xl font-bold border rounded-l text-theme-default border-theme-default docker-pull placeholder-theme-lighter"
                 :type="revealed ? 'text' : 'password'"
-                placeholder="Token"
+                placeholder="token"
                 @keyup="saveData"
               >
               <button
