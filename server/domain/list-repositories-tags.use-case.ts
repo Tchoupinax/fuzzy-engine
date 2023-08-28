@@ -4,6 +4,7 @@ export class ListRepositoryTagsUseCase {
   constructor (private repository: RegistryApiRepository) {}
 
   execute (repositoryName: string): Promise<listRepositoriesTagsAnswer> {
-    return this.repository.listRepositoriesTags(repositoryName)
+    const name = repositoryName.replace('--slash--', '/')
+    return this.repository.listRepositoriesTags(name)
   }
 }
