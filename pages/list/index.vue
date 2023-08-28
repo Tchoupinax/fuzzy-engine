@@ -102,7 +102,7 @@
               </div>
 
               <div class="flex items-center justify-end text-right w-40">
-                <NuxtLink :to="`/${repo.name.replace(/\//g, '-')}/tags`">
+                <NuxtLink :to="`/${repo.name.replace(/\//g, '--slash--')}/tags`">
                   Show tags ({{ repo.countOfTags }})
                 </NuxtLink>
               </div>
