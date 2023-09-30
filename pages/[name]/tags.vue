@@ -111,7 +111,7 @@
                     <div
                       class="px-0 py-0 cursor-pointer mx-1 infoButton border-theme-default hover:text-theme-default"
                     >
-                      {{ digest.tags.length < 10 ? tag : tag.slice(0, 10) }}
+                      {{ tag.slice(0, 8) }}
                     </div>
                     <div class="absolute right-0 z-10 p-2 px-4 mr-4 bg-black rounded-lg info">
                       {{ tag }}

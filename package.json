@@ -1,6 +1,6 @@
 {
   "name": "fuzzy-engine",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "description": "Docker registry UI made with love",
   "author": "Tchoupinax <corentinfiloche@hotmail.fr> (https://corentinfiloche.xyz)",
   "licence": "MIT",
@@ -28,18 +28,18 @@
     "test": "bash -c 'source .env && vitest'"
   },
   "dependencies": {
-    "@aws-sdk/client-ecr": "3.398.0",
+    "@aws-sdk/client-ecr": "3.421.0",
     "@nuxtjs/robots": "3.0.0",
     "@nuxtjs/sitemap": "2.4.0",
-    "@swan-io/boxed": "1.1.0",
-    "axios": "1.5.0",
+    "@swan-io/boxed": "1.2.0",
+    "axios": "1.5.1",
     "build": "^0.1.4",
     "cookieparser": "0.1.0",
     "express": "4.18.2",
     "js-cookie": "3.0.5",
     "lodash.debounce": "4.0.8",
     "mini-toastr": "0.8.1",
-    "pino": "8.15.0",
+    "pino": "8.15.1",
     "pino-pretty": "10.2.0",
     "pretty-bytes": "6.1.1",
     "prom-client": "14.2.0",
@@ -48,20 +48,20 @@
     "vue-notifications": "1.0.2"
   },
   "devDependencies": {
-    "@nuxtjs/eslint-config-typescript": "12.0.0",
+    "@nuxtjs/eslint-config-typescript": "12.1.0",
     "@nuxtjs/tailwindcss": "6.8.0",
-    "@typescript-eslint/eslint-plugin": "6.5.0",
-    "@typescript-eslint/parser": "6.5.0",
+    "@typescript-eslint/eslint-plugin": "6.7.3",
+    "@typescript-eslint/parser": "6.7.3",
     "@vue/test-utils": "2.4.1",
-    "autoprefixer": "10.4.15",
+    "autoprefixer": "10.4.16",
     "babel-eslint": "10.1.0",
     "defu": "6.1.2",
-    "eslint": "8.48.0",
+    "eslint": "8.50.0",
     "eslint-plugin-vue": "9.17.0",
     "nodemon": "3.0.1",
-    "nuxt": "3.7.0",
+    "nuxt": "3.7.4",
     "typescript": "5",
     "vite-plugin-eslint": "1.8.1",
-    "vitest": "0.34.3"
+    "vitest": "0.34.6"
   }
 }

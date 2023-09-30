@@ -456,7 +456,7 @@ export default {
       setCookie('fuzzy-engine-provider', this.$route.query.provider)
     }
 
-    this.provider = getCookie('fuzzy-engine-provider')
+    this.provider = getCookie('fuzzy-engine-provider') ?? 'docker-registry-v2'
   },
   methods: {
     saveData () {
