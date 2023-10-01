@@ -22,8 +22,8 @@ export class DockerApiRepository implements RegistryApiRepository {
     )
 
     const repositories = await Promise.all(repositoryNames.map(
-      async (repositoryName: string) => {
-        return await this.internalListRepositoryTags(repositoryName)
+      (repositoryName: string) => {
+        return this.internalListRepositoryTags(repositoryName)
           .then(({ name, tags }) => {
             return {
               name,
@@ -170,12 +170,16 @@ export class DockerApiRepository implements RegistryApiRepository {
   private async internalListRepositoryTags (
     repositoryName: string
   ): Promise<{ name: string, tags: Array<string> }> {
-    const answer = await axios({
-      method: 'GET',
-      url: `${this.getComputedUrl()}/v2/${repositoryName}/tags/list`,
-    })
-
-    return answer.data
+    try {
+      const answer = await axios({
+        method: 'GET',
+        url: `${this.getComputedUrl()}/v2/${repositoryName}/tags/list`,
+      })
+      return answer.data
+    } catch (err) {
+      logger.error((err as AxiosError).response?.data)
+      return { name: repositoryName, tags: [] }
+    }
   }
 
   private internalGetManifestData (
