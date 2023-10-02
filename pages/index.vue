@@ -339,12 +339,40 @@
 </template>
 
 <script lang="ts">
+import { match } from 'ts-pattern'
 import { Provider } from '../types/provider'
 import { getCookie, setCookie } from '~~/functions/cookies'
 
+type Store = {
+  provider: Provider;
+  providers: Array<{ name: Provider, image: string }>;
+  revealed: boolean;
+  dockerRegistry: {
+    url: string;
+    username: string;
+    password: string;
+    passwordless: boolean;
+  };
+  dockerhub: {
+    username: string;
+    password: string;
+  };
+  awsEcr: {
+    accessKey: string;
+    localAuthentication: string;
+    region: string;
+    secretKey: string;
+    useLocalAuthentication: boolean;
+  };
+  githubRegistry: {
+    nickname: string;
+    token: string;
+  };
+}
+
 export default {
   name: 'IndexPage',
-  data () {
+  data (): Store {
     return {
       provider: 'docker-registry-v2',
       providers: [
@@ -391,8 +419,8 @@ export default {
   },
   computed: {
     connected () {
-      if (this.provider === 'aws-ecr') {
-        return (
+      return match(this.provider)
+        .with('aws-ecr', () => (
           (
             this.awsEcr.region?.length > 0 &&
             this.awsEcr.accessKey?.length > 0 &&
@@ -401,26 +429,17 @@ export default {
             this.awsEcr.region?.length > 0 &&
             this.awsEcr.useLocalAuthentication
           )
-        )
-      }
-
-      if (this.provider === 'github-ecr') {
-        return this.githubRegistry.token.length > 0 &&
-          this.githubRegistry.nickname.length > 0
-      }
-
-      if (this.provider === 'dockerhub') {
-        return this.dockerhub.username.length > 0 &&
-          this.dockerhub.password.length > 0
-      }
-
-      return (
-        this.dockerRegistry.url?.length > 0 &&
+        ))
+        .with('github-ecr', () => this.githubRegistry.token.length > 0 && this.githubRegistry.nickname.length > 0)
+        .with('dockerhub', () => this.dockerhub.username.length > 0 && this.dockerhub.password.length > 0)
+        .with('docker-registry-v2', () => (
+          this.dockerRegistry.url?.length > 0 &&
           (this.dockerRegistry.passwordless || (
             this.dockerRegistry.username?.length > 0 &&
             this.dockerRegistry.password?.length > 0)
           )
-      )
+        ))
+        .exhaustive()
     },
   },
   mounted () {
@@ -456,62 +475,14 @@ export default {
       setCookie('fuzzy-engine-provider', this.$route.query.provider)
     }
 
-    this.provider = getCookie('fuzzy-engine-provider') ?? 'docker-registry-v2'
+    this.provider = (getCookie('fuzzy-engine-provider') ?? 'docker-registry-v2') as Provider
   },
   methods: {
     saveData () {
-      setCookie(
-        'fuzzy-engine-ids',
-        btoa(
-          JSON.stringify({
-            url: {
-              data: this.urlData,
-            },
-            username: {
-              data: this.usernameData,
-            },
-            password: {
-              data: this.passwordData,
-            },
-          }),
-        ),
-      )
-
-      setCookie(
-        'fuzzy-engine-aws-ecr',
-        btoa(
-          JSON.stringify({
-            ...this.awsEcr,
-          }),
-        ),
-      )
-
-      setCookie(
-        'fuzzy-engine-github-ecr',
-        btoa(
-          JSON.stringify({
-            ...this.githubRegistry,
-          }),
-        ),
-      )
-
-      setCookie(
-        'fuzzy-engine-dockerhub',
-        btoa(
-          JSON.stringify({
-            ...this.dockerhub,
-          }),
-        ),
-      )
-
-      setCookie(
-        'fuzzy-engine-docker-v2',
-        btoa(
-          JSON.stringify({
-            ...this.dockerRegistry,
-          }),
-        ),
-      )
+      setCookie('fuzzy-engine-aws-ecr', btoa(JSON.stringify(this.awsEcr)))
+      setCookie('fuzzy-engine-docker-v2', btoa(JSON.stringify(this.dockerRegistry)))
+      setCookie('fuzzy-engine-dockerhub', btoa(JSON.stringify(this.dockerhub)))
+      setCookie('fuzzy-engine-github-ecr', btoa(JSON.stringify(this.githubRegistry)))
     },
     openList (e) {
       e.preventDefault()

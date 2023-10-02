@@ -154,7 +154,7 @@ import debounce from 'lodash.debounce'
 import { Provider } from '../../types/provider'
 
 import { DB } from '../../functions/db'
-import { getCookie } from '~~/functions/cookies'
+import { getCookie, setCookie } from '~~/functions/cookies'
 
 type State = {
   awsEcr: { accessKey: string, secretKey: string, region: string },
@@ -228,6 +228,10 @@ export default {
     },
   },
   async mounted () {
+    if (!getCookie('fuzzy-engine-provider')) {
+      setCookie('fuzzy-engine-provider', 'docker-registry-v2')
+    }
+
     this.syncingInProgress = true
     this.searchImageByNameDebounce = debounce(this.searchImage, 400)
 
@@ -241,7 +245,6 @@ export default {
     }
 
     this.initFromCookies()
-
     this.hiddingRepositories = JSON.parse(localStorage.getItem('hiddingRepositories') || '[]')
 
     if (this.$route.query['delete-all'] === 'success') {
