@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.0 | 2023-10-02
+
+#### Chores
+
+- Upgrade to Node.js 20
+
 ## 1.7.2 | 2023-08-08
 
 #### Features
