@@ -45,8 +45,16 @@
             }"
           >
             <div class="flex items-center justify-center">
-              <div class="w-auto mr-8">
-                {{ digest.name }}
+              <div class="w-auto mr-8 relative">
+                <div
+                  class="px-0 py-0 cursor-pointer mx-1 infoButton border-theme-default hover:text-theme-default"
+                  @dblclick="deleteImage(digest.tags.at(0))"
+                >
+                  {{ digest.name }}
+                </div>
+                <div class="absolute right-0 z-10 p-2 px-4 mr-24 mb-16 bg-black rounded-lg info">
+                  Double click to delete
+                </div>
               </div>
 
               <div
@@ -231,9 +239,15 @@ export default {
 
       return dtf.format(new Date(date))
     },
-    deleteImage (digesthash: string) {
-      if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
-        window.location = `/${this.name}/${digesthash}/delete`
+    async deleteImage (tag: string) {
+      if (window.confirm(`Do you really want to delete ${this.name}:${tag} ?`)) {
+        await $fetch(`${window.location.origin}/api/repositories/${this.$route.params.name}/tags`, {
+          method: 'DELETE',
+          credentials: 'include',
+          body: JSON.stringify({
+            tag,
+          })
+        })
       }
     },
     toggleDoNotDisplayNullTags () {

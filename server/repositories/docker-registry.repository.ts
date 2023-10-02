@@ -228,4 +228,25 @@ export class DockerApiRepository implements RegistryApiRepository {
         return new Date(0)
       })
   }
+
+  async deleteImageDigest (repositoryName: string, tag: string): Promise<boolean> {
+    try {
+      const { headers } = await axios({
+        method: 'HEAD',
+        url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${tag}`,
+        headers: {
+          Accept: 'application/vnd.docker.distribution.manifest.v2+json',
+        },
+      })
+
+      const answer = await axios({
+        method: 'DELETE',
+        url: `${this.getComputedUrl()}/v2/${repositoryName}/manifests/${headers['docker-content-digest']}`,
+      })
+      return answer.data
+    } catch (err) {
+      logger.error((err as AxiosError).response?.data)
+      return false
+    }
+  }
 }

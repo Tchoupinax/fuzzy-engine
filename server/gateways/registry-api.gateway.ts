@@ -29,4 +29,5 @@ export abstract class RegistryApiRepository {
   ): Promise<ContainerRepository[]>;
 
   abstract listRepositoriesTags(repositoryName: string): Promise<listRepositoriesTagsAnswer>;
+  abstract deleteImageDigest(repositoryName: string, tag: string): Promise<boolean>;
 }
