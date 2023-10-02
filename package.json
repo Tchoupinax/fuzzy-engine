@@ -1,6 +1,6 @@
 {
   "name": "fuzzy-engine",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "description": "Docker registry UI made with love",
   "author": "Tchoupinax <corentinfiloche@hotmail.fr> (https://corentinfiloche.xyz)",
   "licence": "MIT",
@@ -39,7 +39,7 @@
     "js-cookie": "3.0.5",
     "lodash.debounce": "4.0.8",
     "mini-toastr": "0.8.1",
-    "pino": "8.15.1",
+    "pino": "8.15.3",
     "pino-pretty": "10.2.0",
     "pretty-bytes": "6.1.1",
     "prom-client": "14.2.0",
