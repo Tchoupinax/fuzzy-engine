@@ -3,7 +3,7 @@ name: build-image-tag
 on:
   push:
     tags:
-    - v*
+      - v*
 
 jobs:
   docker:

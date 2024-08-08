@@ -1,6 +1,6 @@
-import { Option } from '@swan-io/boxed'
-import { RegistryApiRepository } from '../gateways/registry-api.gateway'
-import { logger } from '../tools/logger'
+import { Option } from "@swan-io/boxed";
+import { RegistryApiRepository } from "../gateways/registry-api.gateway";
+import { logger } from "../tools/logger";
 
 export type ListRepositoryPort = {
   limit: number;
@@ -8,22 +8,35 @@ export type ListRepositoryPort = {
   name: Option<string>;
 };
 export class ListRepositoryUseCase {
-  constructor (private repository: RegistryApiRepository) {}
+  constructor(private repository: RegistryApiRepository) {}
 
-  async execute (port: ListRepositoryPort) {
-    logger.info(port, 'ListRepositoryUseCase')
+  async execute(port: ListRepositoryPort) {
+    logger.info(port, "ListRepositoryUseCase");
+
+    let limit = port.limit +1;
+    if (port.name.isSome()) {
+      limit = 100;
+    }
 
     const repositories = await this.repository.listRepositories(
-      port.limit + 1,
+      limit,
       port.offset,
-      port.name
-    )
+      port.name,
+    ).then(respositories => respositories.filter(
+      r => {
+        if (port.name.isSome()) {
+          return r.name.match(port.name.value);
+        }
 
-    const hasNext = repositories.length > port.limit + port.offset
+        return true;
+      }
+    ));
+
+    const hasNext = repositories.length > port.limit + port.offset;
 
     return {
       hasNext,
       data: hasNext ? repositories.slice(0, port.limit) : repositories,
-    }
+    };
   }
 }

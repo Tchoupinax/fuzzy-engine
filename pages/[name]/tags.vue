@@ -20,7 +20,11 @@
           class="flex items-center font-bold text-theme-default hover:text-theme-default"
           @click="toggleDoNotDisplayNullTags"
         >
-          {{ doNotDisplayNullTags ? 'Display image with null tag' : 'Hide image with null tag' }}
+          {{
+            doNotDisplayNullTags
+              ? "Display image with null tag"
+              : "Hide image with null tag"
+          }}
         </button>
       </div>
     </section>
@@ -28,7 +32,9 @@
     <div class="flex justify-center mb-32">
       <div class="w-full lg:w-8/12 text-theme-default">
         <div class="flex justify-center w-full">
-          <p class="inline-block w-auto mt-16 mb-16 text-4xl text-center border-blue-400 border-b-10 title">
+          <p
+            class="inline-block w-auto mt-16 mb-16 text-4xl text-center border-blue-400 border-b-10 title"
+          >
             {{ name }}
           </p>
         </div>
@@ -60,8 +66,11 @@
                 >
                   i
                 </div>
-                <div class="absolute left-0 z-10 w-48 p-2 px-1 ml-24 bg-black rounded-lg info">
-                  This size is calculated by summing the image's layers, of which are compressed.
+                <div
+                  class="absolute left-0 z-10 w-48 p-2 px-1 ml-24 bg-black rounded-lg info"
+                >
+                  This size is calculated by summing the image's layers, of
+                  which are compressed.
                 </div>
               </div>
 
@@ -74,7 +83,9 @@
                   i
                 </div>
 
-                <div class="absolute left-0 z-10 w-48 p-2 px-1 ml-32 bg-black rounded-lg info">
+                <div
+                  class="absolute left-0 z-10 w-48 p-2 px-1 ml-32 bg-black rounded-lg info"
+                >
                   {{ formatFullDate(digest.created) }}
                 </div>
               </div>
@@ -89,10 +100,14 @@
                   architectures
                 </div>
 
-                <div class="absolute left-0 z-10 flex p-2 ml-24 bg-black rounded-lg w-auto px-4 info">
+                <div
+                  class="absolute left-0 z-10 flex p-2 ml-24 bg-black rounded-lg w-auto px-4 info"
+                >
                   <div>
                     <div
-                      v-for="(architecture, indexArchitecture) of digest.architectures"
+                      v-for="(
+                        architecture, indexArchitecture
+                      ) of digest.architectures"
                       :key="indexArchitecture"
                     >
                       {{ architecture }}
@@ -101,9 +116,12 @@
                 </div>
               </div>
 
-              <div v-if="digest.tags.filter(tag => tag).length > 0" class="flex">
+              <div
+                v-if="digest.tags.filter((tag) => tag).length > 0"
+                class="flex"
+              >
                 <div
-                  v-for="(tag, indexTags) of digest.tags.filter(tag => tag)"
+                  v-for="(tag, indexTags) of digest.tags.filter((tag) => tag)"
                   :key="indexTags"
                   class="w-auto p-1 px-2 mx-1 whitespace-no-wrap bg-gray-200 rounded-lg"
                 >
@@ -113,7 +131,9 @@
                     >
                       {{ tag.slice(0, 8) }}
                     </div>
-                    <div class="absolute right-0 z-10 p-2 px-4 mr-4 bg-black rounded-lg info">
+                    <div
+                      class="absolute right-0 z-10 p-2 px-4 mr-4 bg-black rounded-lg info"
+                    >
                       {{ tag }}
                     </div>
                   </div>
@@ -133,7 +153,12 @@
                 @click="deleteImage(digest.fullDigest)"
               >
                 <div class="w-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -154,11 +179,14 @@
 </template>
 
 <script lang="ts">
-import * as timeago from 'timeago.js'
-import { Option } from '@swan-io/boxed'
-import { getCookie } from '../../functions/cookies'
-import { DB } from '../../functions/db'
-import { ContainerRepositoryTags, listRepositoriesTagsAnswer } from '../../server/gateways/registry-api.gateway'
+import * as timeago from "timeago.js";
+import { Option } from "@swan-io/boxed";
+import { getCookie } from "../../functions/cookies";
+import { DB } from "../../functions/db";
+import {
+  type ContainerRepositoryTags,
+  type listRepositoriesTagsAnswer,
+} from "../../server/gateways/registry-api.gateway";
 
 type State = {
   digests: Array<ContainerRepositoryTags>;
@@ -167,88 +195,115 @@ type State = {
   noTag: boolean;
   provider: Option<string>;
   syncingInProgress: boolean;
-}
+};
 
 export default {
-  name: 'TagsComponent',
-  data (): State {
+  name: "TagsComponent",
+  data(): State {
     return {
       digests: [],
       doNotDisplayNullTags: true,
-      name: '',
+      name: "",
       noTag: false,
       provider: Option.None(),
       syncingInProgress: false,
-    }
+    };
   },
   computed: {
-    hasNullTags () { return this.digests.some(digest => digest.tags.filter(tag => tag).length === 0) },
-    images () {
+    hasNullTags() {
+      return this.digests.some(
+        (digest) => digest.tags.filter((tag) => tag).length === 0,
+      );
+    },
+    images() {
       if (this.doNotDisplayNullTags) {
-        return this.digests.filter(digest => digest.tags.filter(tag => tag).length > 0)
+        return this.digests.filter(
+          (digest) => digest.tags.filter((tag) => tag).length > 0,
+        );
       }
-      return this.digests
+      return this.digests;
     },
   },
-  async mounted () {
-    if (this.$route.query.delete === 'success') {
-      this.deleteSuccess()
-      this.$router.push(`/${this.name}/tags/`)
+  async mounted() {
+    if (this.$route.query.delete === "success") {
+      this.deleteSuccess();
+      this.$router.push(`/${this.name}/tags/`);
     }
 
-    this.doNotDisplayNullTags = localStorage.getItem('fuzzy-engine-toggleDoNotDisplayNullTags') === 'true'
+    this.doNotDisplayNullTags =
+      localStorage.getItem("fuzzy-engine-toggleDoNotDisplayNullTags") ===
+      "true";
 
-    const db = new DB()
-    const repositoryName: string = this.$route.params.name as string
+    const db = new DB();
+    const repositoryName: string = this.$route.params.name as string;
 
-    const storedData = db.findRepositoryImages(repositoryName)
+    const storedData = db.findRepositoryImages(repositoryName);
     if (storedData.isSome()) {
-      this.syncingInProgress = true
-      const data = storedData.get()
-      this.name = data.name
-      this.noTag = data.noTag
-      this.digests = data.digests
+      this.syncingInProgress = true;
+      const data = storedData.get();
+      this.name = data.name;
+      this.noTag = data.noTag;
+      this.digests = data.digests;
     }
 
-    this.provider = Option.Some(getCookie('fuzzy-engine-provider'))
+    this.provider = Option.Some(getCookie("fuzzy-engine-provider"));
 
-    const data = await $fetch(`${window.location.origin}/api/repositories/${this.$route.params.name}/tags`, {
-      method: 'GET',
-      credentials: 'include',
-    })
+    const data = await $fetch(
+      `${window.location.origin}/api/repositories/${this.$route.params.name}/tags`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
 
-    this.name = data.name
-    this.noTag = data.noTag
-    this.digests = data.digests as unknown as listRepositoriesTagsAnswer['digests']
-    this.syncingInProgress = false
+    this.name = data.name;
+    this.noTag = data.noTag;
+    this.digests =
+      data.digests as unknown as listRepositoriesTagsAnswer["digests"];
+    this.syncingInProgress = false;
 
-    db.saveRepositoryImages(repositoryName, data)
+    db.saveRepositoryImages(repositoryName, data);
   },
   methods: {
     timeago: timeago.format,
-    formatFullDate (date: Date) {
-      const dtf = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false })
+    formatFullDate(date: Date) {
+      const dtf = new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: false,
+      });
 
-      return dtf.format(new Date(date))
+      return dtf.format(new Date(date));
     },
-    deleteImage (digesthash: string) {
-      if (window.confirm(`Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`)) {
-        window.location = `/${this.name}/${digesthash}/delete`
+    deleteImage(digesthash: string) {
+      if (
+        window.confirm(
+          `Do you really want to delete ${this.$store.state.url.data}/${this.name}:${digesthash} ?`,
+        )
+      ) {
+        window.location = `/${this.name}/${digesthash}/delete`;
       }
     },
-    toggleDoNotDisplayNullTags () {
-      this.doNotDisplayNullTags = !this.doNotDisplayNullTags
-      localStorage.setItem('fuzzy-engine-toggleDoNotDisplayNullTags', this.doNotDisplayNullTags ? 'true' : 'false')
-    }
+    toggleDoNotDisplayNullTags() {
+      this.doNotDisplayNullTags = !this.doNotDisplayNullTags;
+      localStorage.setItem(
+        "fuzzy-engine-toggleDoNotDisplayNullTags",
+        this.doNotDisplayNullTags ? "true" : "false",
+      );
+    },
   },
   notifications: {
     deleteSuccess: {
-      title: 'Delete',
-      message: 'Sucessfully deleted the digest!',
-      type: 'success',
+      title: "Delete",
+      message: "Sucessfully deleted the digest!",
+      type: "success",
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -260,7 +315,7 @@ export default {
   opacity: 0;
   display: none;
 }
-.infoButton:hover+.info {
+.infoButton:hover + .info {
   opacity: 1;
   display: inline;
 }

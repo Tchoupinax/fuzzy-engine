@@ -17,8 +17,8 @@ export default {
   //   url: store.state.url,
   // };
   // },
-  mounted () {
-    window.location = `/${this.name}/tags?delete=success`
+  mounted() {
+    window.location = `/${this.name}/tags?delete=success`;
   },
-}
+};
 </script>

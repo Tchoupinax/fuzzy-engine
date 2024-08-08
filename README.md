@@ -27,6 +27,7 @@ docker run -d -p 3000:3000 tchoupinax/fuzzy-engine
 In a company enterprise, you are logged to your ECR with the AWS cli. Fuzzy-engine support this authentication.
 
 When you logged in, the cli exposed three environment variables to your shell
+
 - AWS_ACCESS_KEY_ID
 - AWS_SECRET_ACCESS_KEY
 - AWS_SESSION_TOKEN
@@ -70,8 +71,8 @@ List of the digests (with tags) for one repository
 
 #### Built with
 
-* [Nuxt.js 3](https://nuxtjs.org/) - Vue.js framework
-* [Tailwindcss](https://tailwindcss.com/) - Utility-first CSS framework
+- [Nuxt.js 3](https://nuxtjs.org/) - Vue.js framework
+- [Tailwindcss](https://tailwindcss.com/) - Utility-first CSS framework
 
 ## Docker informations
 
