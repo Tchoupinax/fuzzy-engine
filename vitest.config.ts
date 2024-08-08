@@ -1,10 +1,10 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     deps: {
-      inline: ['loglevel'],
+      inline: ["loglevel"],
     },
-    reporters: 'verbose',
+    reporters: "verbose",
   },
-})
+});

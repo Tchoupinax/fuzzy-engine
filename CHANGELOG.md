@@ -27,6 +27,7 @@
 
 AWS CLI was dropped and now it uses the standard api with SDK. Intructions to use a local authentication with Docker are available in the readme.
 Now cache is built for every page client side to improve the experience when consulting data intensively
+
 #### Features
 
 - Classic usage of AWS SDK with local authentication (awscli)
@@ -89,12 +90,12 @@ Welcome to [Github Container registry!](https://docs.github.com/en/packages/work
 - Skeleton of API tests with vitest
 - Improve client navigation and speed
 
-
 ## 1.3.1 | 2022-04-02
 
 #### Style
 
 - Improve style of title of a repository
+
 #### Chores:
 
 - Upgrade to Node.js v16

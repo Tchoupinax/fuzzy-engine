@@ -3,33 +3,34 @@
 
 export default defineNuxtConfig({
   ssr: true,
+
   typescript: {
     shim: false,
   },
+
   app: {
     head: {
-      title: 'Docker registry UI',
+      title: "Docker registry UI",
       meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
-          hid: 'description',
-          name: 'description',
-          content: process.env.npm_package_description || ''
-        }
+          hid: "description",
+          name: "description",
+          content: process.env.npm_package_description || "",
+        },
       ],
-      link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
-      ]
+      link: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
     },
   },
-  modules: [
-    '@nuxtjs/tailwindcss',
-    '@nuxtjs/robots',
-  ],
+
+  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/robots", "@nuxt/eslint"],
+
   vite: {
     plugins: [
       // eslint()
-    ]
-  }
-})
+    ],
+  },
+
+  compatibilityDate: "2024-08-08",
+});

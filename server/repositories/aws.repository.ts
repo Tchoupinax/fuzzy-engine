@@ -1,15 +1,15 @@
-import { Option } from '@swan-io/boxed'
-import prettyBytes from 'pretty-bytes'
+import { Option } from "@swan-io/boxed";
+import prettyBytes from "pretty-bytes";
 import {
   ECR,
   DescribeRepositoriesCommand,
   ListImagesCommand,
   DescribeImagesCommand,
-} from '@aws-sdk/client-ecr'
+} from "@aws-sdk/client-ecr";
 import {
   ContainerRepository,
   RegistryApiRepository,
-} from '../gateways/registry-api.gateway'
+} from "../gateways/registry-api.gateway";
 
 export type AwsRepositoryConfig = {
   accessKey: string;
@@ -19,9 +19,9 @@ export type AwsRepositoryConfig = {
 };
 
 export class AwsRepository implements RegistryApiRepository {
-  private ecrClient: ECR
+  private ecrClient: ECR;
 
-  constructor (data: AwsRepositoryConfig) {
+  constructor(data: AwsRepositoryConfig) {
     this.ecrClient = new ECR({
       credentials: {
         accessKeyId: data.accessKey,
@@ -29,47 +29,47 @@ export class AwsRepository implements RegistryApiRepository {
         sessionToken: data.sessionToken,
       },
       region: data.region,
-    })
+    });
   }
 
-  async listRepositories (
+  async listRepositories(
     limit: number,
     offset: number,
-    name: Option<string>
+    name: Option<string>,
   ): Promise<ContainerRepository[]> {
-    const { repositories } = await this.getRepositories(limit, offset, name)
+    const { repositories } = await this.getRepositories(limit, offset, name);
 
     const arrayImageIds = await Promise.all(
       repositories.map(async (repository: any) => {
-        return (await this.listImages(repository.repositoryName)).imageIds
-      })
-    )
+        return (await this.listImages(repository.repositoryName)).imageIds;
+      }),
+    );
 
     return repositories.map(
       ({ repositoryName, repositoryUri }: any, index: number) => ({
-        name: repositoryName ?? '',
+        name: repositoryName ?? "",
         countOfTags: arrayImageIds[index]?.length ?? 0,
-        url: repositoryUri ?? '',
-      })
-    )
+        url: repositoryUri ?? "",
+      }),
+    );
   }
 
-  async listRepositoriesTags (repositoryName: string): Promise<any> {
+  async listRepositoriesTags(repositoryName: string): Promise<any> {
     const { imageDetails } = await this.ecrClient.send(
-      new DescribeImagesCommand({ repositoryName })
-    )
+      new DescribeImagesCommand({ repositoryName }),
+    );
 
     const digests = imageDetails!.map((i) => {
       return {
         name: repositoryName,
-        digest: i?.imageDigest?.replace('sha256:', '').slice(7, 19),
+        digest: i?.imageDigest?.replace("sha256:", "").slice(7, 19),
         fullDigest: i.imageDigest,
         created: i.imagePushedAt,
         size: prettyBytes(i?.imageSizeInBytes || 0),
-      }
-    })
+      };
+    });
 
-    const finalDigests = new Map()
+    const finalDigests = new Map();
     // @ts-ignore
     digests.forEach(({ name, digest, size, created, fullDigest }) => {
       if (finalDigests.has(digest)) {
@@ -79,58 +79,60 @@ export class AwsRepository implements RegistryApiRepository {
           size,
           created,
           fullDigest,
-        })
+        });
       } else {
         finalDigests.set(digest, {
           name: digest,
           tags: [name].flat(),
           size,
           created,
-          fullDigest
-        })
+          fullDigest,
+        });
       }
-    })
+    });
 
     return {
       noTag: false,
       name: repositoryName,
       digests: Array.from(finalDigests.values()).sort((a, b) => {
         if (a.created > b.created) {
-          return -1
+          return -1;
         } else if (a.created < b.created) {
-          return 1
+          return 1;
         } else {
-          return 0
+          return 0;
         }
       }),
-    }
+    };
   }
 
-  private getRepositories (
+  private getRepositories(
     limit: number,
     offset: number,
     name: Option<string>,
   ): Promise<any> {
-    console.log(offset, name)
+    console.log(offset, name);
 
-    return this.ecrClient.send(new DescribeRepositoriesCommand({
-      maxResults: limit,
-    }))
+    return this.ecrClient.send(
+      new DescribeRepositoriesCommand({
+        maxResults: limit,
+      }),
+    );
   }
 
-  private listImages (repositoryName: string) {
+  private listImages(repositoryName: string) {
     return this.ecrClient.send(
       new ListImagesCommand({
         repositoryName,
-      })
-    )
+      }),
+    );
   }
 
-  private describeImages (repositoryName: string) {
+  private describeImages(repositoryName: string) {
     return this.ecrClient.send(
       new ListImagesCommand({
         repositoryName,
-      })
-    )
+      }),
+    );
   }
 }
