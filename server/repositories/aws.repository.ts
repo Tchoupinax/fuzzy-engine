@@ -1,12 +1,14 @@
-import { Option } from "@swan-io/boxed";
-import prettyBytes from "pretty-bytes";
+import type { Option } from "@swan-io/boxed";
+
 import {
   ECR,
   DescribeRepositoriesCommand,
   ListImagesCommand,
   DescribeImagesCommand,
 } from "@aws-sdk/client-ecr";
-import {
+import prettyBytes from "pretty-bytes";
+
+import type {
   ContainerRepository,
   RegistryApiRepository,
 } from "../gateways/registry-api.gateway";

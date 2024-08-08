@@ -1,10 +1,14 @@
-import axios, { AxiosError } from "axios";
+import type { Option } from "@swan-io/boxed";
+import type { AxiosError } from "axios";
+
+import axios from "axios";
 import prettyBytes from "pretty-bytes";
-import { Option } from "@swan-io/boxed";
-import {
+
+import type {
   listRepositoriesTagsAnswer,
   RegistryApiRepository,
 } from "../gateways/registry-api.gateway";
+
 import { logger } from "../tools/logger";
 
 export type DockerApiRepositoryConfig = {

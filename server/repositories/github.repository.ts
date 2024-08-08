@@ -1,6 +1,7 @@
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
-import {
+
+import type {
   ContainerRepository,
   listRepositoriesTagsAnswer,
   RegistryApiRepository,

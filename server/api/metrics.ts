@@ -1,11 +1,11 @@
-import { defineEventHandler, getRequestHeader } from "h3";
 import { Option } from "@swan-io/boxed";
+import { defineEventHandler, getRequestHeader } from "h3";
 import { Gauge, collectDefaultMetrics, register } from "prom-client";
+
+import type { DockerApiRepositoryConfig } from "../repositories/docker-registry.repository";
+
 import { ListRepositoryUseCase } from "../domain/list-repositories.use-case";
-import {
-  DockerApiRepositoryConfig,
-  DockerApiRepository,
-} from "../repositories/docker-registry.repository";
+import { DockerApiRepository } from "../repositories/docker-registry.repository";
 
 collectDefaultMetrics();
 
