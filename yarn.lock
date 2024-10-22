@@ -2424,10 +2424,10 @@
     "@stylistic/eslint-plugin-ts" "2.6.1"
     "@types/eslint" "^9.6.0"
 
-"@swan-io/boxed@2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@swan-io/boxed/-/boxed-2.3.0.tgz#aafa19432a3fa2c00d472be7832632619c4ed5ff"
-  integrity sha512-ubonCw2GLblwsA9rodcDnhLvCY+0d9g0KyMFyzKZa+vPumWQ8IZ6HFjdQT3Nm5yC+/RnSmJ20RMPwOn/06M8Vw==
+"@swan-io/boxed@3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@swan-io/boxed/-/boxed-3.1.1.tgz#dbcb39509034766e26010b7d3b3d431b87590c71"
+  integrity sha512-brWJrD0SZiRknQSPBQmiTKp1308uTMZXwvA3oRJ4qpUFOkx3RLocmjV5SEM5gH6OoFW32JPQySvaV4EpSedPZg==
 
 "@trysound/sax@0.2.0":
   version "0.2.0"
