@@ -44,7 +44,7 @@
     "lodash.debounce": "4.0.8",
     "mini-toastr": "0.8.1",
     "pino": "9.3.2",
-    "pino-pretty": "11.2.2",
+    "pino-pretty": "12.1.0",
     "pretty-bytes": "6.1.1",
     "prom-client": "15.1.3",
     "timeago.js": "4.0.2",
