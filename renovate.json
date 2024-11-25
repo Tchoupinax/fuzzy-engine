@@ -8,7 +8,9 @@
     "enabled": true,
     "automerge": true
   },
-  "labels": ["renovate"],
+  "labels": [
+    "renovate"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": [
