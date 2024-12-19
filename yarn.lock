@@ -2507,10 +2507,10 @@
     estraverse "^5.3.0"
     picomatch "^4.0.2"
 
-"@swan-io/boxed@2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@swan-io/boxed/-/boxed-2.3.0.tgz#aafa19432a3fa2c00d472be7832632619c4ed5ff"
-  integrity sha512-ubonCw2GLblwsA9rodcDnhLvCY+0d9g0KyMFyzKZa+vPumWQ8IZ6HFjdQT3Nm5yC+/RnSmJ20RMPwOn/06M8Vw==
+"@swan-io/boxed@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@swan-io/boxed/-/boxed-3.2.0.tgz#d1c66d49eb158c36bf3092c93fd918818ff1809b"
+  integrity sha512-wk6gSWjZ7nj619ifwyLFZN+B0mjpsXyfroT97ByFqvi5Ywx9nLWz7cEvStTNGIh1oAxKxGtGQLbs9dFGmtypNA==
 
 "@trysound/sax@0.2.0":
   version "0.2.0"
