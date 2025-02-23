@@ -1,10 +1,13 @@
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
-import {
-  type ContainerRepository,
-  type listRepositoriesTagsAnswer,
+
+import type { Provider } from "../../types/provider";
+import type {
   RegistryApiRepository,
+  ContainerRepository,
+  listRepositoriesTagsAnswer,
 } from "../gateways/registry-api.gateway";
+
 import { logger } from "../tools/logger";
 
 export type DockerhubRepositoryConfig = { username: string; password: string };
@@ -59,6 +62,7 @@ export type DockerhubTag = {
 export class DockerhubRepository implements RegistryApiRepository {
   private url: string;
   private token: string | undefined;
+  public name: Provider | undefined;
 
   constructor(private config: DockerhubRepositoryConfig) {
     this.url = "https://hub.docker.com/v2";
@@ -100,12 +104,12 @@ export class DockerhubRepository implements RegistryApiRepository {
 
     const tagsWithDigest = tags.map((tag) => {
       return {
-        name: tag.name,
+        architectures: tag.images.map((image) => image.architecture),
+        created: tag.tag_last_pushed,
         digest: tag.images[0].digest.replace("sha256:", "").slice(7, 19),
         fullDigest: tag.images[0].digest.slice(8),
+        name: tag.name,
         size: prettyBytes(tag.full_size),
-        created: tag.tag_last_pushed,
-        architectures: tag.images.map((image) => image.architecture),
       };
     });
 

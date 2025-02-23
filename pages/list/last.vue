@@ -125,6 +125,7 @@ export default {
             .with("docker-registry-v2", () => this.dockerRegistry.url)
             .with("dockerhub", () => `DockerHub - ${this.dockerhub.username}`)
             .with("github-ecr", () => "Github repository")
+            .with("scaleway-registry", () => "Scaleway repository")
             .exhaustive(),
         None: () => "",
       });

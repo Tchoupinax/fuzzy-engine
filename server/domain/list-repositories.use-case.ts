@@ -1,5 +1,7 @@
-import { Option } from "@swan-io/boxed";
-import { RegistryApiRepository } from "../gateways/registry-api.gateway";
+import type { Option } from "@swan-io/boxed";
+
+import type { RegistryApiRepository } from "../gateways/registry-api.gateway";
+
 import { logger } from "../tools/logger";
 
 export type ListRepositoryPort = {
@@ -13,26 +15,27 @@ export class ListRepositoryUseCase {
   async execute(port: ListRepositoryPort) {
     logger.info(port, "ListRepositoryUseCase");
 
-    let limit = port.limit +1;
-    if (port.name.isSome()) {
+    let limit = port.limit + 1;
+    if (port.name.isSome() || this.repository.name === "scaleway-registry") {
       limit = 100;
     }
 
-    const repositories = await this.repository.listRepositories(
-      limit,
-      port.offset,
-      port.name,
-    ).then(respositories => respositories.filter(
-      r => {
-        if (port.name.isSome()) {
-          return r.name.match(port.name.value);
-        }
+    const repositories = await this.repository
+      .listRepositories(limit, port.offset, port.name)
+      .then((respositories) =>
+        respositories.filter((r) => {
+          if (port.name.isSome()) {
+            return r.name.match(port.name.value);
+          }
 
-        return true;
-      }
-    ));
+          return true;
+        }),
+      );
 
-    const hasNext = repositories.length > port.limit + port.offset;
+    let hasNext = repositories.length > port.limit + port.offset;
+    if (this.repository.name === "scaleway-registry") {
+      hasNext = false;
+    }
 
     return {
       hasNext,

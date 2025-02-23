@@ -8,6 +8,7 @@ import {
 } from "@aws-sdk/client-ecr";
 import prettyBytes from "pretty-bytes";
 
+import type { Provider } from "../../types/provider";
 import type {
   ContainerRepository,
   RegistryApiRepository,
@@ -22,14 +23,10 @@ export type AwsRepositoryConfig = {
 
 export class AwsRepository implements RegistryApiRepository {
   private ecrClient: ECR;
+  public name: Provider | undefined;
 
   constructor(data: AwsRepositoryConfig) {
     this.ecrClient = new ECR({
-      credentials: {
-        accessKeyId: data.accessKey,
-        secretAccessKey: data.secretKey,
-        sessionToken: data.sessionToken,
-      },
       region: data.region,
     });
   }

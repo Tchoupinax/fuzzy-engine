@@ -1,6 +1,7 @@
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
 
+import type { Provider } from "../../types/provider";
 import type {
   ContainerRepository,
   listRepositoriesTagsAnswer,
@@ -10,6 +11,8 @@ import type {
 export type GithubRepositoryConfig = { nickname: string; token: string };
 
 export class GithubRepository implements RegistryApiRepository {
+  public name: Provider | undefined;
+
   constructor(private config: GithubRepositoryConfig) {}
 
   async listRepositories(): Promise<ContainerRepository[]> {
@@ -42,7 +45,7 @@ export class GithubRepository implements RegistryApiRepository {
     const digests = data.map((i: any) => {
       return {
         name: i.metadata.container.tags[0],
-        digest: i.name.replace("sha256:", "").slice(0, 7),
+        digest: i?.name?.replace("sha256:", "")?.slice(0, 7),
         fullDigest: i.name,
         created: i.created_at,
         size: prettyBytes(0),

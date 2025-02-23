@@ -4,6 +4,7 @@ import type { AxiosError } from "axios";
 import axios from "axios";
 import prettyBytes from "pretty-bytes";
 
+import type { Provider } from "../../types/provider";
 import type {
   listRepositoriesTagsAnswer,
   RegistryApiRepository,
@@ -19,6 +20,7 @@ export type DockerApiRepositoryConfig = {
 export type DockerRegistryRepositoryName = string;
 
 export class DockerApiRepository implements RegistryApiRepository {
+  public name: Provider | undefined;
   constructor(private config: DockerApiRepositoryConfig) {}
 
   async listRepositories(

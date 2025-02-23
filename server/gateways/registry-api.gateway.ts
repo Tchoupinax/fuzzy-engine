@@ -1,4 +1,5 @@
-import { Option } from "@swan-io/boxed";
+import type { Option } from "@swan-io/boxed";
+import type { Provider } from "../../types/provider";
 
 export type ContainerRepository = {
   name: string;
@@ -11,8 +12,8 @@ export type ContainerRepositoryTags = {
   created: Date;
   fullDigest: string;
   name: string;
-  size: number;
-  tags: any[];
+  size: string;
+  tags: Array<string>;
 };
 
 export type listRepositoriesTagsAnswer = {
@@ -22,6 +23,8 @@ export type listRepositoriesTagsAnswer = {
 };
 
 export abstract class RegistryApiRepository {
+  public name: Provider | undefined;
+
   abstract listRepositories(
     limit: number,
     offset: number,
