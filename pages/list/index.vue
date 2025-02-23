@@ -110,6 +110,7 @@
               <div class="flex items-center justify-end text-right w-40">
                 <!-- https://github.com/nuxt/nuxt/discussions/15995#discussioncomment-3199782 -->
                 <NuxtLink
+                  v-if="repo?.name"
                   :external="true"
                   :to="`/${repo.name?.replace(/\//g, '--slash--')}/tags`"
                 >
@@ -185,13 +186,13 @@
 
 <script lang="ts">
 import { Option } from "@swan-io/boxed";
+import { getCookie, setCookie } from "~~/functions/cookies";
+import debounce from "lodash.debounce";
 import { match } from "ts-pattern";
 
-import debounce from "lodash.debounce";
 import type { Provider } from "../../types/provider";
 
 import { DB } from "../../functions/db";
-import { getCookie, setCookie } from "~~/functions/cookies";
 
 type State = {
   awsEcr: { accessKey: string; secretKey: string; region: string };
@@ -199,6 +200,7 @@ type State = {
   dockerhub: { username: string; password: string };
   fetchAdditionalRepositoriesLoading: boolean;
   githubRegistry: { nickname: string; token: string };
+  scalewayRegistry: { url: string; token: string };
   hasNext: boolean;
   hiddingRepoMode: false;
   hiddingRepositories: Array<any>;
@@ -233,6 +235,10 @@ export default {
         username: "",
         password: "",
       },
+      scalewayRegistry: {
+        token: "",
+        url: "",
+      },
       fetchAdditionalRepositoriesLoading: false,
       hasNext: false,
       hiddingRepoMode: false,
@@ -255,6 +261,7 @@ export default {
             .with("docker-registry-v2", () => this.dockerRegistry.url)
             .with("dockerhub", () => `DockerHub - ${this.dockerhub.username}`)
             .with("github-ecr", () => "Github repository")
+            .with("scaleway-registry", () => "Scaleway Registry")
             .exhaustive(),
         None: () => "",
       });
@@ -338,6 +345,7 @@ export default {
               "github-ecr",
               () => `ghcr.io/${this.githubRegistry.nickname}/${repositoryName}`,
             )
+            .with("scaleway-registry", () => `${this.scalewayRegistry.url}/${repositoryName}`)
             .exhaustive(),
         None: () => "Non available",
       });
@@ -372,6 +380,13 @@ export default {
         this.dockerRegistry.url = url;
         this.dockerRegistry.username = username;
         this.dockerRegistry.password = password;
+      }
+      if (getCookie("fuzzy-engine-scaleway-registry")) {
+        const { url, token } = JSON.parse(
+          atob(getCookie("fuzzy-engine-scaleway-registry")),
+        );
+        this.scalewayRegistry.url = url;
+        this.scalewayRegistry.token = token;
       }
     },
     onCopy(repositoryName: string) {

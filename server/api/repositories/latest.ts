@@ -1,6 +1,8 @@
 import { defineEventHandler, parseCookies } from "h3";
 import { match } from "ts-pattern";
+
 import type { Provider } from "../../../types/provider";
+
 import { ListLatest10TagsUseCase } from "../../domain/list-latest-tags.use-case";
 import {
   AwsRepository,
@@ -18,6 +20,10 @@ import {
   GithubRepository,
   type GithubRepositoryConfig,
 } from "../../repositories/github.repository";
+import {
+  type ScalewayRegistryRepositoryConfig,
+  ScalewayRegistryRepository,
+} from "../../repositories/scaleway-registry.repository";
 import { logger } from "../../tools/logger";
 
 export default defineEventHandler((request) => {
@@ -29,6 +35,7 @@ export default defineEventHandler((request) => {
     "fuzzy-engine-github-ecr": githubCredentials,
     "fuzzy-engine-docker-v2": dockerCredentials,
     "fuzzy-engine-dockerhub": dockerhubCredentials,
+    "fuzzy-engine-scaleway-registry": scalewayCredentials,
   } = parseCookies(request);
 
   const listLatest10TagsUseCase: ListLatest10TagsUseCase = match(
@@ -93,6 +100,18 @@ export default defineEventHandler((request) => {
       };
       return new ListLatest10TagsUseCase(
         new DockerhubRepository(dockerhubConfig),
+      );
+    })
+    .with("scaleway-registry", () => {
+      const { url, token } = JSON.parse(
+        Buffer.from(scalewayCredentials, "base64").toString("ascii"),
+      );
+      const config: ScalewayRegistryRepositoryConfig = {
+        url,
+        token,
+      };
+      return new ListLatest10TagsUseCase(
+        new ScalewayRegistryRepository(config),
       );
     })
     .exhaustive();

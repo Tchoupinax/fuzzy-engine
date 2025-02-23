@@ -1,5 +1,16 @@
+import {
+  DockerhubRepository,
+  type DockerhubRepositoryConfig,
+} from "~~/server/repositories/dockerhub.repository";
 import { defineEventHandler, parseCookies } from "h3";
 import { match } from "ts-pattern";
+
+import type { Provider } from "../../../../types/provider";
+import {
+  ScalewayRegistryRepository,
+  type ScalewayRegistryRepositoryConfig,
+} from "../../../repositories/scaleway-registry.repository";
+
 import { ListRepositoryTagsUseCase } from "../../../domain/list-repositories-tags.use-case";
 import {
   AwsRepository,
@@ -14,11 +25,6 @@ import {
   type GithubRepositoryConfig,
 } from "../../../repositories/github.repository";
 import { logger } from "../../../tools/logger";
-import type { Provider } from "../../../../types/provider";
-import {
-  DockerhubRepository,
-  type DockerhubRepositoryConfig,
-} from "~~/server/repositories/dockerhub.repository";
 
 export default defineEventHandler((request) => {
   logger.info(`Handle /${request.context.params?.name}/tags`);
@@ -29,6 +35,7 @@ export default defineEventHandler((request) => {
     "fuzzy-engine-github-ecr": githubCredentials,
     "fuzzy-engine-docker-v2": dockerCredentials,
     "fuzzy-engine-dockerhub": dockerhubCredentials,
+    "fuzzy-engine-scaleway-registry": scalewayCredentials,
   } = parseCookies(request);
 
   const listRepositoryTagsUseCase: ListRepositoryTagsUseCase = match(
@@ -37,18 +44,20 @@ export default defineEventHandler((request) => {
     .with("aws-ecr", () => {
       logger.debug("List repository tags for AWS ECR");
 
-      const {
-        secretKey: incomingSecretKey,
-        accessKey: incomingAccessKey,
-        region,
-        useLocalAuthentication,
-      } = JSON.parse(Buffer.from(awsCredentials, "base64").toString("ascii"));
-
+      console.log(awsCredentials);
       let sessionToken = "";
-      let accessKey = incomingAccessKey;
-      let secretKey = incomingSecretKey;
+      let accessKey = "";
+      let secretKey = "";
+      const region = "eu-west-1";
 
-      if (useLocalAuthentication) {
+      try {
+        const { secretKey: incomingSecretKey, accessKey: incomingAccessKey } =
+          JSON.parse(Buffer.from(awsCredentials, "base64").toString("ascii"));
+
+        sessionToken = "";
+        accessKey = incomingAccessKey;
+        secretKey = incomingSecretKey;
+      } catch {
         sessionToken = process.env.AWS_SESSION_TOKEN ?? "";
         accessKey = process.env.AWS_ACCESS_KEY_ID ?? "";
         secretKey = process.env.AWS_SECRET_ACCESS_KEY ?? "";
@@ -101,6 +110,18 @@ export default defineEventHandler((request) => {
       };
       return new ListRepositoryTagsUseCase(
         new DockerApiRepository(dockerRegistryConfig),
+      );
+    })
+    .with("scaleway-registry", () => {
+      const { url, token } = JSON.parse(
+        Buffer.from(scalewayCredentials, "base64").toString("ascii"),
+      );
+      const config: ScalewayRegistryRepositoryConfig = {
+        url,
+        token,
+      };
+      return new ListRepositoryTagsUseCase(
+        new ScalewayRegistryRepository(config),
       );
     })
     .exhaustive();

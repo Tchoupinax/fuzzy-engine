@@ -51,7 +51,7 @@
             }"
           >
             <div class="flex items-center justify-center">
-              <div class="w-auto mr-8">
+              <div class="w-24 mr-8">
                 {{ digest.name }}
               </div>
 

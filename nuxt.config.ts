@@ -3,6 +3,8 @@
 
 export default defineNuxtConfig({
   ssr: true,
+  devtools: { enabled: true },
+  sourcemap: true,
 
   typescript: {
     shim: false,

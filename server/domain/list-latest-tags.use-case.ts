@@ -1,10 +1,11 @@
 import { Option } from "@swan-io/boxed";
-import { RegistryApiRepository } from "../gateways/registry-api.gateway";
+
+import type { RegistryApiRepository } from "../gateways/registry-api.gateway";
 
 export type listLatest10TagsResult = {
   name: string;
   tag: string;
-  size: number;
+  size: string;
   createdAt: Date;
 };
 
@@ -36,7 +37,7 @@ export class ListLatest10TagsUseCase {
       .map((item) => ({
         createdAt: item.created,
         name: item.name,
-        tag: item.tags.at(0),
+        tag: item.tags.at(0) ?? "",
         size: item.size,
       }))
       .sort((a, b) => {
