@@ -1,4 +1,4 @@
-FROM node:24-alpine as builder
+FROM node:24-alpine AS builder
 
 RUN  apk add --no-cache --virtual .gyp git
 
@@ -6,7 +6,7 @@ WORKDIR /app
 
 COPY package*.json /app/
 
-RUN npm install --no-progress
+RUN yarn
 
 COPY . .
 
@@ -21,7 +21,7 @@ WORKDIR /app
 
 COPY --from=builder /app/.output /app/.output
 
-RUN npm install --omit=dev nuxt pino-pretty
+RUN yarn --production && yarn add nuxt pino-pretty
 
 EXPOSE 3000
 
