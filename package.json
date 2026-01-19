@@ -43,7 +43,7 @@
     "js-cookie": "3.0.5",
     "lodash.debounce": "4.0.8",
     "mini-toastr": "0.8.2",
-    "pino": "9.14.0",
+    "pino": "10.2.1",
     "pino-pretty": "11.3.0",
     "pretty-bytes": "6.1.1",
     "prom-client": "15.1.3",
