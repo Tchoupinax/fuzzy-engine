@@ -3010,10 +3010,10 @@
     estraverse "^5.3.0"
     picomatch "^4.0.3"
 
-"@swan-io/boxed@2.3.2":
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/@swan-io/boxed/-/boxed-2.3.2.tgz#2a5e8807193fa91ec85b46989340b0b26d1da5dd"
-  integrity sha512-VvJUs3SUq7ke+/bqJptFImTbtQPkdLpa1Tb6X3IpbKgcTIFISEdB7X96pWtiFbMw+25qp40z9h701SNs5fuaRg==
+"@swan-io/boxed@3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@swan-io/boxed/-/boxed-3.2.1.tgz#f45f9bc4ea3311ccecf4d58d5eebc25b1c4f6d76"
+  integrity sha512-MQqSpe09PdjDjTR4HCPpUxO9XsacNguCkce1C2wm1eIb6ycWXQoV+biYvLEuI/LiMqB31KySdgY2YFwrVucLCw==
 
 "@tybys/wasm-util@^0.10.0", "@tybys/wasm-util@^0.10.1":
   version "0.10.1"
