@@ -6,10 +6,6 @@ import { defineEventHandler, parseCookies } from "h3";
 import { match } from "ts-pattern";
 
 import type { Provider } from "../../../../types/provider";
-import {
-  ScalewayRegistryRepository,
-  type ScalewayRegistryRepositoryConfig,
-} from "../../../repositories/scaleway-registry.repository";
 
 import { ListRepositoryTagsUseCase } from "../../../domain/list-repositories-tags.use-case";
 import {
@@ -24,6 +20,10 @@ import {
   GithubRepository,
   type GithubRepositoryConfig,
 } from "../../../repositories/github.repository";
+import {
+  ScalewayRegistryRepository,
+  type ScalewayRegistryRepositoryConfig,
+} from "../../../repositories/scaleway-registry.repository";
 import { logger } from "../../../tools/logger";
 
 export default defineEventHandler((request) => {
@@ -44,7 +44,10 @@ export default defineEventHandler((request) => {
     .with("aws-ecr", () => {
       logger.debug("List repository tags for AWS ECR");
 
-      console.log(awsCredentials);
+      if (!awsCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       let sessionToken = "";
       let accessKey = "";
       let secretKey = "";
@@ -74,6 +77,10 @@ export default defineEventHandler((request) => {
     .with("github-ecr", () => {
       logger.debug("List repository tags for Github ECR");
 
+      if (!githubCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { nickname, token } = JSON.parse(
         Buffer.from(githubCredentials, "base64").toString("ascii"),
       );
@@ -85,6 +92,10 @@ export default defineEventHandler((request) => {
     })
     .with("dockerhub", () => {
       logger.debug("List repository tags for DockerHub");
+
+      if (!dockerhubCredentials) {
+        throw new Error("Config must be defined");
+      }
 
       const { username, password } = JSON.parse(
         Buffer.from(dockerhubCredentials, "base64").toString("ascii"),
@@ -100,6 +111,10 @@ export default defineEventHandler((request) => {
     .with("docker-registry-v2", () => {
       logger.debug("List repository tags for docker registry v2");
 
+      if (!dockerCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { url, username, password } = JSON.parse(
         Buffer.from(dockerCredentials, "base64").toString("ascii"),
       );
@@ -113,6 +128,10 @@ export default defineEventHandler((request) => {
       );
     })
     .with("scaleway-registry", () => {
+      if (!scalewayCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { url, token } = JSON.parse(
         Buffer.from(scalewayCredentials, "base64").toString("ascii"),
       );
@@ -126,5 +145,9 @@ export default defineEventHandler((request) => {
     })
     .exhaustive();
 
-  return listRepositoryTagsUseCase.execute(request.context.params?.name!);
+  if (!request?.context?.params?.name) {
+    throw new Error("Param name is mandatory");
+  }
+
+  return listRepositoryTagsUseCase.execute(request.context.params.name);
 });

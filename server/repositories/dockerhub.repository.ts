@@ -106,8 +106,8 @@ export class DockerhubRepository implements RegistryApiRepository {
       return {
         architectures: tag.images.map((image) => image.architecture),
         created: tag.tag_last_pushed,
-        digest: tag.images[0].digest.replace("sha256:", "").slice(7, 19),
-        fullDigest: tag.images[0].digest.slice(8),
+        digest: tag?.images[0]?.digest.replace("sha256:", "").slice(7, 19),
+        fullDigest: tag?.images[0]?.digest.slice(8),
         name: tag.name,
         size: prettyBytes(tag.full_size),
       };
@@ -166,6 +166,7 @@ export class DockerhubRepository implements RegistryApiRepository {
       return [data.architecture];
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return data.manifests.map((m: any) => {
       return `${m.platform.os}/${m.platform.architecture}${
         m.platform.variant ?? ""

@@ -1,5 +1,6 @@
-import { defineEventHandler } from "h3";
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
+import { defineEventHandler } from "h3";
+
 import { logger } from "../../tools/logger";
 
 export default defineEventHandler(async (request) => {

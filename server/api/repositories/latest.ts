@@ -42,6 +42,10 @@ export default defineEventHandler((request) => {
     provider as Provider,
   )
     .with("aws-ecr", () => {
+      if (!awsCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const {
         secretKey: incomingSecretKey,
         accessKey: incomingAccessKey,
@@ -68,6 +72,10 @@ export default defineEventHandler((request) => {
       return new ListLatest10TagsUseCase(new AwsRepository(awsConfig));
     })
     .with("github-ecr", () => {
+      if (!githubCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { nickname, token } = JSON.parse(
         Buffer.from(githubCredentials, "base64").toString("ascii"),
       );
@@ -78,6 +86,10 @@ export default defineEventHandler((request) => {
       return new ListLatest10TagsUseCase(new GithubRepository(githubConfig));
     })
     .with("docker-registry-v2", () => {
+      if (!dockerCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { url, username, password } = JSON.parse(
         Buffer.from(dockerCredentials, "base64").toString("ascii"),
       );
@@ -91,6 +103,10 @@ export default defineEventHandler((request) => {
       );
     })
     .with("dockerhub", () => {
+      if (!dockerhubCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { username, password } = JSON.parse(
         Buffer.from(dockerhubCredentials, "base64").toString("ascii"),
       );
@@ -103,6 +119,10 @@ export default defineEventHandler((request) => {
       );
     })
     .with("scaleway-registry", () => {
+      if (!scalewayCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { url, token } = JSON.parse(
         Buffer.from(scalewayCredentials, "base64").toString("ascii"),
       );

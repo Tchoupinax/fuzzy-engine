@@ -21,11 +21,11 @@ import {
   GithubRepository,
   type GithubRepositoryConfig,
 } from "../../repositories/github.repository";
-import { logger } from "../../tools/logger";
 import {
   ScalewayRegistryRepository,
   type ScalewayRegistryRepositoryConfig,
 } from "../../repositories/scaleway-registry.repository";
+import { logger } from "../../tools/logger";
 
 export default defineEventHandler((request) => {
   logger.info("Handle /repositories");
@@ -45,6 +45,10 @@ export default defineEventHandler((request) => {
     provider as Provider,
   )
     .with("aws-ecr", () => {
+      if (!awsCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       logger.debug("List repository for AWS ECR");
 
       console.log(awsCredentials);
@@ -76,6 +80,10 @@ export default defineEventHandler((request) => {
       return new ListRepositoryUseCase(new AwsRepository(awsConfig));
     })
     .with("github-ecr", () => {
+      if (!githubCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       logger.debug("List repository for Github ECR");
 
       const { nickname, token } = JSON.parse(
@@ -88,6 +96,10 @@ export default defineEventHandler((request) => {
       return new ListRepositoryUseCase(new GithubRepository(githubConfig));
     })
     .with("dockerhub", () => {
+      if (!dockerhubCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       logger.debug("List repository for DockerHub");
 
       const { username, password } = JSON.parse(
@@ -102,6 +114,10 @@ export default defineEventHandler((request) => {
       );
     })
     .with("docker-registry-v2", () => {
+      if (!dockerCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       logger.debug("List repository for docker registry v2");
 
       const { url, username, password } = JSON.parse(
@@ -117,6 +133,10 @@ export default defineEventHandler((request) => {
       );
     })
     .with("scaleway-registry", () => {
+      if (!scalewayCredentials) {
+        throw new Error("Config must be defined");
+      }
+
       const { url, token } = JSON.parse(
         Buffer.from(scalewayCredentials, "base64").toString("ascii"),
       );
