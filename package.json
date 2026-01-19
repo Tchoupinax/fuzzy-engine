@@ -39,7 +39,7 @@
     "@swan-io/boxed": "3.2.1",
     "axios": "1.13.2",
     "cookieparser": "0.1.0",
-    "express": "4.22.1",
+    "express": "5.2.1",
     "js-cookie": "3.0.5",
     "lodash.debounce": "4.0.8",
     "mini-toastr": "0.8.2",
