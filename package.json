@@ -52,7 +52,7 @@
     "vue-notifications": "1.0.3"
   },
   "devDependencies": {
-    "@nuxt/eslint": "0.7.6",
+    "@nuxt/eslint": "1.12.1",
     "@nuxtjs/tailwindcss": "6.14.0",
     "@types/lodash.debounce": "^4.0.9",
     "@vue/test-utils": "2.4.6",
