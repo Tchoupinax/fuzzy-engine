@@ -69,6 +69,6 @@
     "typescript": "5",
     "vite-plugin-eslint": "1.8.1",
     "vitest": "4.0.18",
-    "vue-tsc": "3.2.3"
+    "vue-tsc": "3.2.4"
   }
 }
