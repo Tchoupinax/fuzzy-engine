@@ -33,8 +33,8 @@
     "watch": "bash -c 'source .env && nuxi dev'"
   },
   "dependencies": {
-    "@aws-sdk/client-ecr": "3.978.0",
-    "@aws-sdk/client-sts": "3.978.0",
+    "@aws-sdk/client-ecr": "3.980.0",
+    "@aws-sdk/client-sts": "3.980.0",
     "@nuxtjs/robots": "5.7.0",
     "@nuxtjs/sitemap": "7.6.0",
     "@swan-io/boxed": "3.2.1",
@@ -57,7 +57,7 @@
     "@types/lodash.debounce": "4.0.9",
     "@types/node": "25.1.0",
     "@vue/test-utils": "2.4.6",
-    "autoprefixer": "10.4.23",
+    "autoprefixer": "10.4.24",
     "babel-eslint": "10.1.0",
     "defu": "6.1.4",
     "eslint": "9.39.2",
