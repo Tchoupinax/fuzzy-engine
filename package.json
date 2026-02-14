@@ -60,7 +60,7 @@
     "autoprefixer": "10.4.24",
     "babel-eslint": "10.1.0",
     "defu": "6.1.4",
-    "eslint": "9.39.2",
+    "eslint": "10.0.0",
     "eslint-plugin-perfectionist": "5.4.0",
     "eslint-plugin-vue": "10.7.0",
     "nodemon": "3.1.11",
