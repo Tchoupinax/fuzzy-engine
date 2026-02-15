@@ -1,12 +1,13 @@
-name: build-image-tag
+name: Release 🔥
 
 on:
   push:
     tags:
-      - v*
+      - "*"
 
 jobs:
   docker:
+    name: Build offcial container 🐳
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
@@ -28,14 +29,11 @@ jobs:
           images: tchoupinax/fuzzy-engine
           flavor: latest=true
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
+            type=semver,pattern={{raw}}
 
-      - name: Build and push
+      - name: Build intermediate container 🐳
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: v${{ steps.meta.outputs.labels }}

@@ -1,0 +1,33 @@
+name: Pull request checks 🔎
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    name: Check code quality 🫆
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check code quality 🫆
+        uses: tchoupinax/repo-config/shared-actions/steps/node/lint@v0
+        with:
+          nodeVersion: 24
+
+  build:
+    name: Check build success 🦫
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build success 🦫
+        uses: tchoupinax/repo-config/shared-actions/steps/node/build@v0
+        with:
+          nodeVersion: 24
+
+  labels:
+    name: Autodetect labels 🔍
+    runs-on: ubuntu-latest
+    steps:
+      - name: Autodetect labels 🔍
+        uses: tchoupinax/repo-config/shared-actions/steps/dx/automatically-apply-labels@v0
+        with:
+          appId: ${{ secrets.DEPLOY_APP_ID }}
+          privateKey: ${{ secrets.DEPLOY_APP_KEY }}
