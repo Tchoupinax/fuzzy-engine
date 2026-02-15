@@ -1,0 +1,36 @@
+name-template: "Version $RESOLVED_VERSION 🎉"
+tag-template: "v$RESOLVED_VERSION"
+change-template: "- (#$NUMBER) $TITLE — by @$AUTHOR 🫶"
+change-title-escapes: '\<*_&'
+
+categories:
+  - title: "🚀 Features"
+    labels:
+      - "semver:minor"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "semver:patch"
+  - title: "🧰 Maintenance"
+    labels:
+      - "maintenance"
+  - title: "👷 Build System"
+    labels:
+      - "CI/CD"
+  - title: "📝 Documentation Changes"
+    labels:
+      - "docs"
+
+version-resolver:
+  major:
+    labels:
+      - "semver:major"
+  minor:
+    labels:
+      - "semver:minor"
+  patch:
+    labels:
+      - "semver:patch"
+  default: "patch"
+
+template: |
+  $CHANGES
