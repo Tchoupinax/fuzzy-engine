@@ -55,7 +55,7 @@
     "@nuxt/eslint": "1.15.1",
     "@nuxtjs/tailwindcss": "6.14.0",
     "@types/lodash.debounce": "4.0.9",
-    "@types/node": "25.2.3",
+    "@types/node": "25.3.0",
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "10.4.24",
     "babel-eslint": "10.1.0",
