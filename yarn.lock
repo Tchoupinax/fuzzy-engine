@@ -60,10 +60,10 @@
     "@smithy/util-utf8" "^2.0.0"
     tslib "^2.6.2"
 
-"@aws-sdk/client-ecr@3.994.0":
-  version "3.994.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-ecr/-/client-ecr-3.994.0.tgz#658e5f217a46f7f1fa0e6124d9faf993eb3e8573"
-  integrity sha512-KV/wH+Tmv3U5mqtBzjoT7EKeLZFxn86JqQBre6BL63w6bct6IMeVpIepSNEqqHoaWRnUmMNjblY2tVhjwKRRZw==
+"@aws-sdk/client-ecr@3.995.0":
+  version "3.995.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-ecr/-/client-ecr-3.995.0.tgz#586d177508bc16a7911e55622263064ae7e101a0"
+  integrity sha512-mg3C+HlADnrJg6iqbSTmHPlmr5v5ycIQvYyYvxnZEVEzkbcvmlm38GaBjson2ZprTaCoqhlaVpFStvV9tSCz+w==
   dependencies:
     "@aws-crypto/sha256-browser" "5.2.0"
     "@aws-crypto/sha256-js" "5.2.0"
@@ -75,9 +75,9 @@
     "@aws-sdk/middleware-user-agent" "^3.972.11"
     "@aws-sdk/region-config-resolver" "^3.972.3"
     "@aws-sdk/types" "^3.973.1"
-    "@aws-sdk/util-endpoints" "3.994.0"
+    "@aws-sdk/util-endpoints" "3.995.0"
     "@aws-sdk/util-user-agent-browser" "^3.972.3"
-    "@aws-sdk/util-user-agent-node" "^3.972.9"
+    "@aws-sdk/util-user-agent-node" "^3.972.10"
     "@smithy/config-resolver" "^4.4.6"
     "@smithy/core" "^3.23.2"
     "@smithy/fetch-http-handler" "^5.3.9"
@@ -150,10 +150,10 @@
     "@smithy/util-utf8" "^4.2.0"
     tslib "^2.6.2"
 
-"@aws-sdk/client-sts@3.994.0":
-  version "3.994.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-sts/-/client-sts-3.994.0.tgz#0453e98db1598081a605ea78853e1ce82b45d9db"
-  integrity sha512-DfeoakPQULCJihLtp9+zRXFgb/T78murNSy7rJRuZM9tm1EgxF1yar07+jsdjx29jPxq4W00MRfhYW30f9pwYQ==
+"@aws-sdk/client-sts@3.995.0":
+  version "3.995.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-sts/-/client-sts-3.995.0.tgz#344b6261cf3e662805369dd6edc2211706798873"
+  integrity sha512-irF0VzMvPetJCIVgJ7lyiTyT1ERukNZLYzk+rwlOapWEODFSxqMcw/lAebPZSWxN/t7uec6cYGDyt/hlVoVpdQ==
   dependencies:
     "@aws-crypto/sha256-browser" "5.2.0"
     "@aws-crypto/sha256-js" "5.2.0"
@@ -165,9 +165,9 @@
     "@aws-sdk/middleware-user-agent" "^3.972.11"
     "@aws-sdk/region-config-resolver" "^3.972.3"
     "@aws-sdk/types" "^3.973.1"
-    "@aws-sdk/util-endpoints" "3.994.0"
+    "@aws-sdk/util-endpoints" "3.995.0"
     "@aws-sdk/util-user-agent-browser" "^3.972.3"
-    "@aws-sdk/util-user-agent-node" "^3.972.9"
+    "@aws-sdk/util-user-agent-node" "^3.972.10"
     "@smithy/config-resolver" "^4.4.6"
     "@smithy/core" "^3.23.2"
     "@smithy/fetch-http-handler" "^5.3.9"
@@ -462,10 +462,10 @@
     "@smithy/util-endpoints" "^3.2.8"
     tslib "^2.6.2"
 
-"@aws-sdk/util-endpoints@3.994.0":
-  version "3.994.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/util-endpoints/-/util-endpoints-3.994.0.tgz#ba66054d8aef3202aaac656425ccdb68adb5117d"
-  integrity sha512-L2obUBw4ACMMd1F/SG5LdfPyZ0xJNs9Maifwr3w0uWO+4YvHmk9FfRskfSfE/SLZ9S387oSZ+1xiP7BfVCP/Og==
+"@aws-sdk/util-endpoints@3.995.0":
+  version "3.995.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-endpoints/-/util-endpoints-3.995.0.tgz#9815ef48b79e56e05130928885126385835a120c"
+  integrity sha512-aym/pjB8SLbo9w2nmkrDdAAVKVlf7CM71B9mKhjDbJTzwpSFBPHqJIMdDyj0mLumKC0aIVDr1H6U+59m9GvMFw==
   dependencies:
     "@aws-sdk/types" "^3.973.1"
     "@smithy/types" "^4.12.0"
@@ -488,6 +488,17 @@
     "@aws-sdk/types" "^3.973.1"
     "@smithy/types" "^4.12.0"
     bowser "^2.11.0"
+    tslib "^2.6.2"
+
+"@aws-sdk/util-user-agent-node@^3.972.10":
+  version "3.972.10"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-user-agent-node/-/util-user-agent-node-3.972.10.tgz#a449af988dba13db55ac37ab1844d942f522ab68"
+  integrity sha512-LVXzICPlsheET+sE6tkcS47Q5HkSTrANIlqL1iFxGAY/wRQ236DX/PCAK56qMh9QJoXAfXfoRW0B0Og4R+X7Nw==
+  dependencies:
+    "@aws-sdk/middleware-user-agent" "^3.972.11"
+    "@aws-sdk/types" "^3.973.1"
+    "@smithy/node-config-provider" "^4.3.8"
+    "@smithy/types" "^4.12.0"
     tslib "^2.6.2"
 
 "@aws-sdk/util-user-agent-node@^3.972.9":
@@ -6311,10 +6322,10 @@ node-releases@^2.0.27:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.27.tgz#eedca519205cf20f650f61d56b070db111231e4e"
   integrity sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==
 
-nodemon@3.1.13:
-  version "3.1.13"
-  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-3.1.13.tgz#06e4861d8f8a8033c9f607ae3645d3c02ca1c061"
-  integrity sha512-nPN6L7A9cTA3BnJ3zZIibH5FiDh3GbmibeS17bl5YEU1IRO2mcfvR0ZJXH3ndoeKItjUcaX81FSKc/Kq/IiG6g==
+nodemon@3.1.14:
+  version "3.1.14"
+  resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-3.1.14.tgz#8487ca379c515301d221ec007f27f24ecafa2b51"
+  integrity sha512-jakjZi93UtB3jHMWsXL68FXSAosbLfY0In5gtKq3niLSkrWznrVBzXFNOEMJUfc9+Ke7SHWoAZsiMkNP3vq6Jw==
   dependencies:
     chokidar "^3.5.2"
     debug "^4"
