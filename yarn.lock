@@ -60,10 +60,10 @@
     "@smithy/util-utf8" "^2.0.0"
     tslib "^2.6.2"
 
-"@aws-sdk/client-ecr@3.999.0":
-  version "3.999.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-ecr/-/client-ecr-3.999.0.tgz#aeffb2e5ded6620f2b4f632aa818c11308a8d8f7"
-  integrity sha512-fJaKHbgt9DUDRMWr9dMk56NbK7cZ/fMSImX2BpJMEbRj0sK8tF3YZ97FsLnfowVNxH9W6Sj0P8egm6L7MokxEg==
+"@aws-sdk/client-ecr@3.1000.0":
+  version "3.1000.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-ecr/-/client-ecr-3.1000.0.tgz#d7f6b4ab8ebcfae7feff822b0614217ba3234c4e"
+  integrity sha512-wQLFW+oEyzU1eUapgT1bv8m3Fh00Z7ssdq13EYYbBI7EF1gfSaxyaUDI5Rcka72BSvQae+/6OMqvSE5/UF0rvw==
   dependencies:
     "@aws-crypto/sha256-browser" "5.2.0"
     "@aws-crypto/sha256-js" "5.2.0"
@@ -106,10 +106,10 @@
     "@smithy/util-waiter" "^4.2.10"
     tslib "^2.6.2"
 
-"@aws-sdk/client-sts@3.999.0":
-  version "3.999.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-sts/-/client-sts-3.999.0.tgz#4b3fdf37020f10de16c94a8dea83775cf9b0e473"
-  integrity sha512-t8gm6Ak9LjD5X7pmFlVDQ+Jod+bcVKlQbdFZ0x9b4kvpAa1WyPdRsSbnFRp+CfHF7MLUIgkoMy5a4/VdqLS/BA==
+"@aws-sdk/client-sts@3.1000.0":
+  version "3.1000.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-sts/-/client-sts-3.1000.0.tgz#ba64493c93188322940454ce635e128898b28eb9"
+  integrity sha512-PMUloaoajk/YxLWh4OFC5H8wauISkeG5/OS/I0ZeptMVq36hKQmJgYFhOqcCWAm6u/88JX9XztmKCTX8CyFPVg==
   dependencies:
     "@aws-crypto/sha256-browser" "5.2.0"
     "@aws-crypto/sha256-js" "5.2.0"
@@ -3472,10 +3472,10 @@ autoprefixer@^10.4.20, autoprefixer@^10.4.24:
     picocolors "^1.1.1"
     postcss-value-parser "^4.2.0"
 
-axios@1.13.5:
-  version "1.13.5"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.13.5.tgz#5e464688fa127e11a660a2c49441c009f6567a43"
-  integrity sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==
+axios@1.13.6:
+  version "1.13.6"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.13.6.tgz#c3f92da917dc209a15dd29936d20d5089b6b6c98"
+  integrity sha512-ChTCHMouEe2kn713WHbQGcuYrr6fXTBiu460OTwWrWob16g1bXn4vtz07Ope7ewMozJAnEquLk5lWQWtBig9DQ==
   dependencies:
     follow-redirects "^1.15.11"
     form-data "^4.0.5"
