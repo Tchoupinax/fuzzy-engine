@@ -33,12 +33,12 @@
     "watch": "bash -c 'source .env && nuxi dev'"
   },
   "dependencies": {
-    "@aws-sdk/client-ecr": "3.999.0",
-    "@aws-sdk/client-sts": "3.999.0",
+    "@aws-sdk/client-ecr": "3.1000.0",
+    "@aws-sdk/client-sts": "3.1000.0",
     "@nuxtjs/robots": "5.7.0",
     "@nuxtjs/sitemap": "7.6.0",
     "@swan-io/boxed": "3.2.1",
-    "axios": "1.13.5",
+    "axios": "1.13.6",
     "cookieparser": "0.1.0",
     "js-cookie": "3.0.5",
     "lodash.debounce": "4.0.8",
