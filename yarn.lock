@@ -1184,7 +1184,7 @@
   resolved "https://registry.yarnpkg.com/@nuxt/devalue/-/devalue-2.0.2.tgz#5749f04df13bda4c863338d8dabaf370f45ef7c7"
   integrity sha512-GBzP8zOc7CGWyFQS6dv1lQz8VVpz5C2yRszbXufwG/9zhStTIH50EtD87NmWbTMwXDvZLNg8GIpb1UFdH93JCA==
 
-"@nuxt/devtools-kit@3.2.2", "@nuxt/devtools-kit@^3.1.1", "@nuxt/devtools-kit@^3.2.1":
+"@nuxt/devtools-kit@3.2.2", "@nuxt/devtools-kit@^3.1.1", "@nuxt/devtools-kit@^3.2.1", "@nuxt/devtools-kit@^3.2.2":
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/@nuxt/devtools-kit/-/devtools-kit-3.2.2.tgz#7967ceb9b0df921117782540209c59d9f647690c"
   integrity sha512-07E1phqoVPNlexlkrYuOMPhTzLIRjcl9iEqyc/vZLH2zWeH/T1X3v+RLTVW5Oio40f/XBp9yQuyihmX34ddjgQ==
@@ -1441,18 +1441,18 @@
     vite-plugin-checker "^0.12.0"
     vue-bundle-renderer "^2.2.0"
 
-"@nuxtjs/robots@5.7.0":
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/@nuxtjs/robots/-/robots-5.7.0.tgz#0df46d308d6a2b2d25d2990509be01c76e270351"
-  integrity sha512-pkGtOP88rzIalvYE3rTCkJ+f0TDHfB/sbSCcA7inVemFa17JVu8AFlO4e+y4zthj+Jh98Tkf7yCuaDU5w3C1vQ==
+"@nuxtjs/robots@5.7.1":
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/@nuxtjs/robots/-/robots-5.7.1.tgz#add57cabe1311b13f74488bace574dbda0497964"
+  integrity sha512-1y1pW8Dh2gqJGFpXwkTin1KokBofYAG91C1gqxR4XbI7Xkl7DAXQ+BropHF2AeCV/uCxs6qz28ONp0+60TSw1Q==
   dependencies:
     "@fingerprintjs/botd" "^2.0.0"
-    "@nuxt/devtools-kit" "^3.1.1"
-    "@nuxt/kit" "^4.3.0"
+    "@nuxt/devtools-kit" "^3.2.2"
+    "@nuxt/kit" "^4.3.1"
     consola "^3.4.2"
     defu "^6.1.4"
     h3 "^1.15.5"
-    nuxt-site-config "^3.2.18"
+    nuxt-site-config "^3.2.21"
     pathe "^2.0.3"
     pkg-types "^2.3.0"
     sirv "^3.0.2"
@@ -6219,7 +6219,7 @@ nuxt-site-config-kit@3.2.21:
     std-env "^3.10.0"
     ufo "^1.6.3"
 
-nuxt-site-config@^3.2.18:
+nuxt-site-config@^3.2.18, nuxt-site-config@^3.2.21:
   version "3.2.21"
   resolved "https://registry.yarnpkg.com/nuxt-site-config/-/nuxt-site-config-3.2.21.tgz#f3befbd4a630b23d289d9e190d25be6c0726dca3"
   integrity sha512-WCqo4cirBc+GLPBZOU1ye5+f4xjC7Sf7qbKt/zpeCtEUqJLHDR0MoKICfsGt/8EdkSDYUo+m5BNZ1oxai0isgQ==
