@@ -9,10 +9,14 @@
     "enabled": true,
     "automerge": true
   },
+
+  "schedule": ["after 6am and before 8am on monday"],
   "mode": "full",
   "prConcurrentLimit": 20,
   "prHourlyLimit": 10,
+  
   "labels": ["renovate"],
+
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch"],
