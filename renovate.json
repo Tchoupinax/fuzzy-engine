@@ -10,7 +10,7 @@
     "automerge": true
   },
 
-  "schedule": ["after 6am and before 8am on monday"],
+  "schedule": ["after 6am and before 10am on saturday"],
   "mode": "full",
   "prConcurrentLimit": 20,
   "prHourlyLimit": 10,
