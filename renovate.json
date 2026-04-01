@@ -12,6 +12,7 @@
 
   "schedule": ["after 6am and before 10am on saturday"],
   "mode": "full",
+  "minimumReleaseAge": "3 days",
   "prConcurrentLimit": 20,
   "prHourlyLimit": 10,
   
