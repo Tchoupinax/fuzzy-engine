@@ -36,7 +36,7 @@
     "@aws-sdk/client-ecr": "3.1026.0",
     "@aws-sdk/client-sts": "3.1026.0",
     "@nuxtjs/robots": "6.0.7",
-    "@nuxtjs/sitemap": "7.6.0",
+    "@nuxtjs/sitemap": "8.0.12",
     "@swan-io/boxed": "3.2.1",
     "axios": "1.14.0",
     "cookieparser": "0.1.0",
