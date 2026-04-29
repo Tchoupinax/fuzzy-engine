@@ -66,7 +66,7 @@
     "nodemon": "3.1.14",
     "nuxt": "4.4.2",
     "prettier": "3.8.3",
-    "typescript": "5",
+    "typescript": "6",
     "vite-plugin-eslint": "1.8.1",
     "vitest": "4.1.5",
     "vue-tsc": "3.2.7"
