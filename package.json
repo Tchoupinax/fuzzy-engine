@@ -33,12 +33,12 @@
     "watch": "bash -c 'source .env && nuxi dev'"
   },
   "dependencies": {
-    "@aws-sdk/client-ecr": "3.1060.0",
-    "@aws-sdk/client-sts": "3.1060.0",
-    "@nuxtjs/robots": "6.0.9",
-    "@nuxtjs/sitemap": "8.0.15",
+    "@aws-sdk/client-ecr": "3.1071.0",
+    "@aws-sdk/client-sts": "3.1071.0",
+    "@nuxtjs/robots": "6.1.1",
+    "@nuxtjs/sitemap": "8.2.1",
     "@swan-io/boxed": "3.2.1",
-    "axios": "1.17.0",
+    "axios": "1.18.0",
     "cookieparser": "0.1.0",
     "js-cookie": "3.0.8",
     "lodash.debounce": "4.0.8",
@@ -52,23 +52,23 @@
     "vue-notifications": "1.0.3"
   },
   "devDependencies": {
-    "@nuxt/eslint": "1.15.2",
+    "@nuxt/eslint": "1.16.0",
     "@nuxtjs/tailwindcss": "6.14.0",
     "@types/lodash.debounce": "4.0.9",
-    "@types/node": "25.9.1",
-    "@vue/test-utils": "2.4.10",
+    "@types/node": "25.9.3",
+    "@vue/test-utils": "2.4.11",
     "autoprefixer": "10.5.0",
     "babel-eslint": "10.1.0",
     "defu": "6.1.7",
-    "eslint": "10.4.1",
-    "eslint-plugin-perfectionist": "5.9.0",
-    "eslint-plugin-vue": "10.9.1",
+    "eslint": "10.5.0",
+    "eslint-plugin-perfectionist": "5.9.1",
+    "eslint-plugin-vue": "10.9.2",
     "nodemon": "3.1.14",
-    "nuxt": "4.4.7",
-    "prettier": "3.8.3",
+    "nuxt": "4.4.8",
+    "prettier": "3.8.4",
     "typescript": "6",
     "vite-plugin-eslint": "1.8.1",
-    "vitest": "4.1.8",
-    "vue-tsc": "3.3.3"
+    "vitest": "4.1.9",
+    "vue-tsc": "3.3.5"
   }
 }
