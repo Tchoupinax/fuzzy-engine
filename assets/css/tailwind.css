@@ -35,6 +35,8 @@
   --color-theme-fifth-lighter: #b779e6;
   --color-theme-sixth: #37e6ce;
   --color-theme-sixth-lighter: #72e6d7;
+  --color-theme: var(--color-theme-one);
+  --color-theme-lighter: var(--color-theme-one-lighter);
 }
 
 .one {

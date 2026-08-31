@@ -564,12 +564,21 @@ export default {
     }
 
     if (getCookie("fuzzy-engine-docker-v2")) {
-      const { url, username, password } = JSON.parse(
+      const { url, username, password, passwordless } = JSON.parse(
         atob(getCookie("fuzzy-engine-docker-v2")),
       );
       this.dockerRegistry.url = url;
       this.dockerRegistry.username = username;
       this.dockerRegistry.password = password;
+      this.dockerRegistry.passwordless = passwordless ?? false;
+    }
+
+    if (getCookie("fuzzy-engine-scaleway-registry")) {
+      const { url, token } = JSON.parse(
+        atob(getCookie("fuzzy-engine-scaleway-registry")),
+      );
+      this.scalewayRegistry.url = url;
+      this.scalewayRegistry.token = token;
     }
 
     if (this.$route.query.provider) {

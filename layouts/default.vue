@@ -1,14 +1,5 @@
 <template>
-  <div
-    :class="{
-      one: theme === 'one',
-      two: theme === 'two',
-      three: theme === 'three',
-      fourth: theme === 'fourth',
-      fifth: theme === 'fifth',
-      sixth: theme === 'sixth',
-    }"
-  >
+  <div>
     <slot />
 
     <footer
@@ -57,36 +48,43 @@
 </template>
 
 <script lang="ts">
-import { setCookie, getCookie } from "~~/functions/cookies";
-
 const THEME_COLORS = ["one", "two", "three", "fourth", "fifth", "sixth"] as const;
 type ThemeColor = (typeof THEME_COLORS)[number];
 
+function isThemeColor(value: string): value is ThemeColor {
+  return (THEME_COLORS as readonly string[]).includes(value);
+}
+
 export default {
   name: "DefaultLayout",
+  setup() {
+    const theme = useCookie<ThemeColor>("fuzzy-engine-theme", {
+      default: () => "one",
+    });
+
+    if (!isThemeColor(theme.value)) {
+      theme.value = "one";
+    }
+
+    useHead({
+      htmlAttrs: {
+        class: theme,
+      },
+    });
+
+    return { theme, themeColors: THEME_COLORS };
+  },
   data() {
     return {
-      theme: "one" as ThemeColor,
-      themeColors: THEME_COLORS,
       version: "",
     };
   },
   mounted() {
-    const savedTheme = getCookie("fuzzy-engine-theme");
-    this.theme = THEME_COLORS.includes(savedTheme as ThemeColor)
-      ? (savedTheme as ThemeColor)
-      : "one";
-
-    if (!savedTheme) {
-      setCookie("fuzzy-engine-theme", this.theme);
-    }
-
     this.fetchVersion();
   },
   methods: {
     changeColor(name: ThemeColor) {
       this.theme = name;
-      setCookie("fuzzy-engine-theme", name);
     },
     fetchVersion() {
       $fetch("/api/version").then((payload) => {

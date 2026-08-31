@@ -34,22 +34,34 @@
       </div>-->
     </section>
 
-    <div class="flex flex-col h-full items-center justify-center mb-40">
+    <div class="flex flex-col h-full items-center mb-40 pt-4">
       <div class="w-full h-full lg:w-8/12">
-        <div
-          class="flex flex-col items-center justify-center mb-40 text-theme-default"
-        >
-          <div v-if="!loading" class="mb-16 mt-8 xl:mt-0 text-4xl text-center">
-            <p>
-              {{ url }}
-            </p>
+        <div class="flex flex-col items-center mb-40 text-theme-default">
+          <div v-if="!loading" class="mb-8 mt-4 xl:mt-0 text-4xl text-center">
+            <p>{{ url }}</p>
 
             <NuxtLink to="/list/last" class="text-sm underline">
               View last pushed images
             </NuxtLink>
           </div>
 
-          <div v-if="loading" class="flex flex-col items-center justify-center">
+          <div
+            v-if="!loading && filteredRepositories.length > 0"
+            class="grid w-full grid-cols-2 gap-4 px-4 mb-10 lg:grid-cols-4"
+          >
+            <div
+              v-for="stat in statistics"
+              :key="stat.label"
+              class="flex flex-col items-center p-4 border-2 border-theme-default rounded-lg"
+            >
+              <span class="text-3xl font-bold">{{ stat.value }}</span>
+              <span class="mt-1 text-sm font-medium text-theme-lighter">
+                {{ stat.label }}
+              </span>
+            </div>
+          </div>
+
+          <div v-if="loading" class="flex flex-col items-center justify-center py-16">
             <div class="lds-ring">
               <div />
               <div />
@@ -65,7 +77,7 @@
             </div>
           </div>
 
-          <div v-if="!loading" class="w-1/2 mb-16">
+          <div v-if="!loading" class="w-1/2 mb-10">
             <input
               v-model="imageName"
               type="text"
@@ -81,30 +93,44 @@
             class="flex pl-16 xl:pl-4 pr-16 xl:pr-4 items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
             :class="{ 'opacity-50': hiddingRepositories.includes(repo.name) }"
           >
-            <div class="w-5/12 text-xl text-left truncate">
-              {{ repo.name }}
+            <div class="w-5/12 text-xl text-left truncate flex items-center gap-3">
+              <span class="truncate">{{ repo.name }}</span>
+              <span
+                v-if="repo.size"
+                class="xl:hidden text-sm font-medium text-theme-lighter whitespace-nowrap"
+              >
+                {{ repo.size }}
+              </span>
             </div>
 
             <!-- Right -->
             <div class="flex items-center">
-              <div class="xl:flex mr-8 hidden">
-                <input
-                  class="px-2 text-xs bg-gray-50 text-theme-default border border-theme-default rounded-l docker-pull"
-                  type="text"
-                  :value="downloadUrl(repo.name)"
-                />
-
-                <button
-                  class="p-2 px-4 bg-gray-100 border border-l-0 border-theme-default rounded-r"
-                  type="button"
-                  @click="onCopy(repo.name)"
+              <div class="xl:flex mr-8 hidden items-center">
+                <span
+                  v-if="repo.size"
+                  class="w-20 shrink-0 text-right text-sm font-medium text-theme-lighter mr-3"
                 >
-                  <img
-                    class="w-4"
-                    src="https://clipboardjs.com/assets/images/clippy.svg"
-                    alt=""
+                  {{ repo.size }}
+                </span>
+                <div class="flex">
+                  <input
+                    class="px-2 text-xs bg-gray-50 text-theme-default border border-theme-default rounded-l docker-pull"
+                    type="text"
+                    :value="downloadUrl(repo.name)"
                   />
-                </button>
+
+                  <button
+                    class="p-2 px-4 bg-gray-100 border border-l-0 border-theme-default rounded-r"
+                    type="button"
+                    @click="onCopy(repo.name)"
+                  >
+                    <img
+                      class="w-4"
+                      src="https://clipboardjs.com/assets/images/clippy.svg"
+                      alt=""
+                    />
+                  </button>
+                </div>
               </div>
 
               <div class="flex items-center justify-end text-right w-40">
@@ -275,6 +301,24 @@ export default {
         return !this.hiddingRepositories.includes(n.name);
       });
     },
+    statistics() {
+      const repos = this.filteredRepositories;
+      const totalTags = repos.reduce(
+        (sum, repo) => sum + (repo.countOfTags ?? 0),
+        0,
+      );
+      const withTags = repos.filter((repo) => repo.countOfTags > 0).length;
+      const avgTags = repos.length
+        ? (totalTags / repos.length).toFixed(1)
+        : "0";
+
+      return [
+        { label: "Repositories", value: repos.length },
+        { label: "Total tags", value: totalTags },
+        { label: "With tags", value: withTags },
+        { label: "Avg tags / repo", value: avgTags },
+      ];
+    },
   },
   async mounted() {
     if (!getCookie("fuzzy-engine-provider")) {
@@ -306,15 +350,25 @@ export default {
     }
 
     let repositories = [];
-    let hasNext = true;
-    while (hasNext) {
-      const { data, hasNext: localHasNext } = await $fetch(
-        `${new URL(window.location.toString()).origin}/api/repositories?offset=${repositories.length}&limit=10`,
+    const provider = getCookie("fuzzy-engine-provider");
+
+    if (provider === "scaleway-registry") {
+      const { data } = await $fetch(
+        `${new URL(window.location.toString()).origin}/api/repositories?offset=0&limit=10`,
         { credentials: "include" },
       );
+      repositories = data;
+    } else {
+      let hasNext = true;
+      while (hasNext) {
+        const { data, hasNext: localHasNext } = await $fetch(
+          `${new URL(window.location.toString()).origin}/api/repositories?offset=${repositories.length}&limit=10`,
+          { credentials: "include" },
+        );
 
-      repositories = [...repositories, ...data];
-      hasNext = localHasNext;
+        repositories = [...repositories, ...data];
+        hasNext = localHasNext;
+      }
     }
 
     db.saveRepositoryImages(repositories);
