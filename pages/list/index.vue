@@ -14,6 +14,15 @@
         </button>
       </NuxtLink>
 
+      <button
+        v-if="isScaleway && !loading"
+        type="button"
+        class="mr-8 font-bold text-theme-default hover:text-theme-default"
+        @click="showCleanupModal = true"
+      >
+        Tag cleanup
+      </button>
+
       <!--<div class="mr-8">
         <button
           class="flex items-center font-bold text-theme-default hover:text-theme-default"
@@ -207,6 +216,79 @@
         </div>
       </div>
     </div>
+
+    <div
+      v-if="showCleanupModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
+      <div
+        class="absolute inset-0 z-0 bg-black/50"
+        @click="showCleanupModal = false"
+      />
+
+      <div
+        class="relative z-10 w-full max-w-lg p-6 bg-white rounded-lg border-2 border-theme-default text-theme-default shadow-xl"
+        role="dialog"
+        aria-labelledby="cleanup-modal-title"
+        aria-modal="true"
+      >
+        <button
+          type="button"
+          class="absolute top-4 right-4 text-2xl leading-none text-theme-lighter hover:text-theme-default"
+          aria-label="Close"
+          @click="showCleanupModal = false"
+        >
+          ×
+        </button>
+
+        <h2 id="cleanup-modal-title" class="text-xl font-bold pr-8">
+          Tag cleanup
+        </h2>
+        <p class="mt-2 text-sm font-medium text-theme-lighter">
+          Remove non-semver tags older than the selected duration across all
+          repositories.
+        </p>
+
+        <div class="mt-6">
+          <label class="block mb-2 text-sm font-bold">Older than</label>
+          <div class="flex">
+            <input
+              v-model.number="cleanupDurationValue"
+              type="number"
+              min="1"
+              class="w-24 p-2 px-3 text-sm font-bold bg-gray-50 border rounded-l text-theme-default border-theme-default"
+            />
+            <select
+              v-model="cleanupDurationUnit"
+              class="flex-1 p-2 px-3 text-sm font-bold bg-gray-50 border-y border-r text-theme-default border-theme-default"
+            >
+              <option value="days">days</option>
+              <option value="weeks">weeks</option>
+              <option value="months">months</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-8">
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-bold border rounded border-theme-default text-theme-default hover:bg-gray-50"
+            :disabled="cleanupInProgress"
+            @click="showCleanupModal = false"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-bold text-white rounded border border-theme-default bg-theme-default hover:opacity-90 disabled:opacity-50"
+            :disabled="cleanupInProgress"
+            @click="cleanupNonSemverTags"
+          >
+            {{ cleanupInProgress ? "Cleaning…" : "Run cleanup" }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -224,6 +306,10 @@ type State = {
   awsEcr: { accessKey: string; secretKey: string; region: string };
   dockerRegistry: { url: string; username: string; password: string };
   dockerhub: { username: string; password: string };
+  cleanupDurationUnit: "days" | "months" | "weeks";
+  cleanupDurationValue: number;
+  cleanupInProgress: boolean;
+  showCleanupModal: boolean;
   fetchAdditionalRepositoriesLoading: boolean;
   githubRegistry: { nickname: string; token: string };
   scalewayRegistry: { url: string; token: string };
@@ -265,6 +351,10 @@ export default {
         token: "",
         url: "",
       },
+      cleanupDurationUnit: "days",
+      cleanupDurationValue: 30,
+      cleanupInProgress: false,
+      showCleanupModal: false,
       fetchAdditionalRepositoriesLoading: false,
       hasNext: false,
       hiddingRepoMode: false,
@@ -300,6 +390,9 @@ export default {
       return this.repositories.filter((n) => {
         return !this.hiddingRepositories.includes(n.name);
       });
+    },
+    isScaleway(): boolean {
+      return this.provider.getWithDefault("_") === "scaleway-registry";
     },
     statistics() {
       const repos = this.filteredRepositories;
@@ -349,35 +442,77 @@ export default {
       this.$router.push("/list");
     }
 
-    let repositories = [];
-    const provider = getCookie("fuzzy-engine-provider");
-
-    if (provider === "scaleway-registry") {
-      const { data } = await $fetch(
-        `${new URL(window.location.toString()).origin}/api/repositories?offset=0&limit=10`,
-        { credentials: "include" },
-      );
-      repositories = data;
-    } else {
-      let hasNext = true;
-      while (hasNext) {
-        const { data, hasNext: localHasNext } = await $fetch(
-          `${new URL(window.location.toString()).origin}/api/repositories?offset=${repositories.length}&limit=10`,
-          { credentials: "include" },
-        );
-
-        repositories = [...repositories, ...data];
-        hasNext = localHasNext;
-      }
-    }
-
-    db.saveRepositoryImages(repositories);
-    this.repositories = [...repositories];
-    this.syncingInProgress = false;
-    this.loading = false;
+    await this.loadRepositories();
   },
   methods: {
     debounce,
+    async loadRepositories() {
+      this.syncingInProgress = true;
+
+      const db = new DB();
+      let repositories = [];
+      const provider = getCookie("fuzzy-engine-provider");
+
+      if (provider === "scaleway-registry") {
+        const { data } = await $fetch(
+          `${new URL(window.location.toString()).origin}/api/repositories?offset=0&limit=10`,
+          { credentials: "include" },
+        );
+        repositories = data;
+      } else {
+        let hasNext = true;
+        while (hasNext) {
+          const { data, hasNext: localHasNext } = await $fetch(
+            `${new URL(window.location.toString()).origin}/api/repositories?offset=${repositories.length}&limit=10`,
+            { credentials: "include" },
+          );
+
+          repositories = [...repositories, ...data];
+          hasNext = localHasNext;
+        }
+      }
+
+      db.saveRepositoryImages(repositories);
+      this.repositories = [...repositories];
+      this.syncingInProgress = false;
+      this.loading = false;
+    },
+    async cleanupNonSemverTags() {
+      if (
+        !window.confirm(
+          `Delete all non-semver tags older than ${this.cleanupDurationValue} ${this.cleanupDurationUnit}?`,
+        )
+      ) {
+        return;
+      }
+
+      this.cleanupInProgress = true;
+
+      try {
+        const result = await $fetch(
+          `${new URL(window.location.toString()).origin}/api/repositories/cleanup-non-semver`,
+          {
+            body: {
+              durationUnit: this.cleanupDurationUnit,
+              durationValue: this.cleanupDurationValue,
+            },
+            credentials: "include",
+            method: "POST",
+          },
+        );
+
+        const failedCount = result.failed?.length ?? 0;
+        this.cleanupSuccess({
+          message: `Deleted ${result.deleted} tag(s) out of ${result.scanned} scanned${failedCount > 0 ? ` (${failedCount} failed)` : ""}`,
+        });
+        this.showCleanupModal = false;
+        await this.loadRepositories();
+      } catch {
+        this.cleanupFailed();
+      } finally {
+        this.cleanupInProgress = false;
+      }
+    },
     downloadUrl(repositoryName: string): string {
       return this.provider.match({
         Some: (provider) =>
@@ -469,6 +604,16 @@ export default {
       title: "Delete",
       message: "Sucessfully deleted all the image for this repo",
       type: "success",
+    },
+    cleanupSuccess: {
+      title: "Cleanup complete",
+      message: "Cleanup finished",
+      type: "success",
+    },
+    cleanupFailed: {
+      title: "Cleanup failed",
+      message: "Could not delete non-semver tags",
+      type: "error",
     },
   },
 };
