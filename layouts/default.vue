@@ -17,34 +17,16 @@
       <div class="flex items-center justify-center">
         <div class="flex">
           <div
-            style="background-color: var(--color-theme-one)"
-            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
-            @click="changeColor('one')"
-          />
-          <div
-            style="background-color: var(--color-theme-two)"
-            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
-            @click="changeColor('two')"
-          />
-          <div
-            style="background-color: var(--color-theme-three)"
-            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
-            @click="changeColor('three')"
-          />
-          <div
-            style="background-color: var(--color-theme-fourth)"
-            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
-            @click="changeColor('fourth')"
-          />
-          <div
-            style="background-color: var(--color-theme-fifth)"
-            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
-            @click="changeColor('fifth')"
-          />
-          <div
-            style="background-color: var(--color-theme-sixth)"
-            class="w-8 h-8 mr-2 border-2 border-black rounded-full cursor-pointer"
-            @click="changeColor('sixth')"
+            v-for="color in themeColors"
+            :key="color"
+            :style="{ backgroundColor: `var(--color-theme-${color})` }"
+            class="w-8 h-8 mr-2 border-2 rounded-full cursor-pointer"
+            :class="
+              theme === color
+                ? 'border-white ring-2 ring-black scale-110'
+                : 'border-black'
+            "
+            @click="changeColor(color)"
           />
         </div>
       </div>
@@ -77,20 +59,32 @@
 <script lang="ts">
 import { setCookie, getCookie } from "~~/functions/cookies";
 
+const THEME_COLORS = ["one", "two", "three", "fourth", "fifth", "sixth"] as const;
+type ThemeColor = (typeof THEME_COLORS)[number];
+
 export default {
   name: "DefaultLayout",
   data() {
     return {
-      theme: "one",
+      theme: "one" as ThemeColor,
+      themeColors: THEME_COLORS,
       version: "",
     };
   },
   mounted() {
-    this.theme = getCookie("fuzzy-engine-theme") ?? "one";
+    const savedTheme = getCookie("fuzzy-engine-theme");
+    this.theme = THEME_COLORS.includes(savedTheme as ThemeColor)
+      ? (savedTheme as ThemeColor)
+      : "one";
+
+    if (!savedTheme) {
+      setCookie("fuzzy-engine-theme", this.theme);
+    }
+
     this.fetchVersion();
   },
   methods: {
-    changeColor(name: string) {
+    changeColor(name: ThemeColor) {
       this.theme = name;
       setCookie("fuzzy-engine-theme", name);
     },
