@@ -187,14 +187,20 @@ export default {
       this.dockerRegistry.password = password;
     }
 
-    const data = await $fetch(
-      `${new URL((window as any).location).origin}/api/repositories/latest`,
-      { credentials: "include" },
-    );
+    try {
+      const data = await $fetch(
+        `${new URL((window as any).location).origin}/api/repositories/latest`,
+        { credentials: "include" },
+      );
 
-    const repositories = db.saveLatestRepositories(data);
-    if (repositories.isSome()) {
-      this.repositories = repositories.get();
+      const repositories = db.saveLatestRepositories(data);
+      if (repositories.isSome()) {
+        this.repositories = repositories.get();
+      }
+    } catch {
+      if (!this.repositories.length && storedData.isNone()) {
+        this.repositories = [];
+      }
     }
 
     this.loading = false;

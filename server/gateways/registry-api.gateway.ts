@@ -5,6 +5,7 @@ export type ContainerRepository = {
   name: string;
   countOfTags: number;
   url: string;
+  size?: string;
 };
 
 export type ContainerRepositoryTags = {

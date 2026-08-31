@@ -26,7 +26,8 @@ import {
 } from "../../repositories/scaleway-registry.repository";
 import { logger } from "../../tools/logger";
 
-export default defineEventHandler((request) => {
+export default defineEventHandler(async (request) => {
+  const startedAt = Date.now();
   logger.info("Handle /repositories/latest");
 
   const {
@@ -136,5 +137,18 @@ export default defineEventHandler((request) => {
     })
     .exhaustive();
 
-  return listLatest10TagsUseCase.execute();
+  logger.info({ provider }, "/repositories/latest: provider resolved");
+
+  const result = await listLatest10TagsUseCase.execute();
+
+  logger.info(
+    {
+      provider,
+      durationMs: Date.now() - startedAt,
+      resultCount: result.length,
+    },
+    "/repositories/latest: completed",
+  );
+
+  return result;
 });
