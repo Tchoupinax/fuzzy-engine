@@ -64,6 +64,7 @@ import * as timeago from "timeago.js";
 import type { Provider } from "../../types/provider";
 import { DB } from "../../functions/db";
 import { getCookie } from "~~/functions/cookies";
+import { syncServerConfig } from "~~/functions/server-config";
 
 type State = {
   awsEcr: { accessKey: string; secretKey: string; region: string };
@@ -141,6 +142,8 @@ export default {
     },
   },
   async mounted() {
+    await syncServerConfig();
+
     const db = new DB();
     this.provider = Option.fromNullable(
       getCookie("fuzzy-engine-provider") as Provider,

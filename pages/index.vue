@@ -399,6 +399,7 @@
 
 <script lang="ts">
 import { getCookie, setCookie } from "~~/functions/cookies";
+import { syncServerConfig } from "~~/functions/server-config";
 import { match } from "ts-pattern";
 
 import type { Provider } from "../types/provider";
@@ -433,6 +434,7 @@ type Store = {
     url: string;
     token: string;
   };
+  serverConfigured: boolean;
 };
 
 export default {
@@ -493,10 +495,15 @@ export default {
         url: "",
         token: "",
       },
+      serverConfigured: false,
     };
   },
   computed: {
     connected() {
+      if (this.serverConfigured) {
+        return true;
+      }
+
       return match(this.provider)
         .with(
           "aws-ecr",
@@ -535,7 +542,14 @@ export default {
         .exhaustive();
     },
   },
-  mounted() {
+  async mounted() {
+    const serverConfig = await syncServerConfig();
+    this.serverConfigured = serverConfig.configured;
+
+    if (serverConfig.configured && serverConfig.provider) {
+      this.provider = serverConfig.provider;
+    }
+
     this.checkAwsLocalAuthentication();
 
     if (getCookie("fuzzy-engine-github-ecr")) {

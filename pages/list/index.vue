@@ -295,6 +295,7 @@
 <script lang="ts">
 import { Option } from "@swan-io/boxed";
 import { getCookie, setCookie } from "~~/functions/cookies";
+import { syncServerConfig } from "~~/functions/server-config";
 import debounce from "lodash.debounce";
 import { match } from "ts-pattern";
 
@@ -414,6 +415,8 @@ export default {
     },
   },
   async mounted() {
+    await syncServerConfig();
+
     if (!getCookie("fuzzy-engine-provider")) {
       setCookie("fuzzy-engine-provider", "docker-registry-v2");
     }

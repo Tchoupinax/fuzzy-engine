@@ -1,10 +1,9 @@
 import { Option } from "@swan-io/boxed";
-import { defineEventHandler, getRequestHeader } from "h3";
+import { createError, defineEventHandler, getRequestHeader } from "h3";
 import { Gauge, collectDefaultMetrics, register } from "prom-client";
 
-import type { DockerApiRepositoryConfig } from "../repositories/docker-registry.repository";
-
 import { ListRepositoryUseCase } from "../domain/list-repositories.use-case";
+import { parseRegistryCookies, resolveDockerRegistryConfig } from "../config/registry-config";
 import { DockerApiRepository } from "../repositories/docker-registry.repository";
 
 collectDefaultMetrics();
@@ -24,17 +23,12 @@ export default defineEventHandler(async (request) => {
   let username: string;
   let password: string;
 
-  const { "fuzzy-engine-docker-v2": dockerCredentials } = parseCookies(request);
+  const cookies = parseRegistryCookies(request);
+  const dockerRegistryConfig = resolveDockerRegistryConfig(cookies);
 
-  // For the cookie way
-  if (dockerCredentials) {
-    ({ url, username, password } = JSON.parse(
-      Buffer.from(dockerCredentials, "base64").toString("ascii"),
-    ));
-  }
-
-  // For the prometheus token way
-  else {
+  if (dockerRegistryConfig) {
+    ({ url, username, password } = dockerRegistryConfig);
+  } else {
     const bearerToken = getRequestHeader(request, "authorization");
     if (bearerToken) {
       const token = bearerToken.split(" ").at(1)!;
@@ -45,14 +39,8 @@ export default defineEventHandler(async (request) => {
     }
   }
 
-  const dockerRegistryConfig: DockerApiRepositoryConfig = {
-    url,
-    username,
-    password,
-  };
-
   const listRepositoryUseCase = new ListRepositoryUseCase(
-    new DockerApiRepository(dockerRegistryConfig),
+    new DockerApiRepository({ password, url, username }),
   );
   const repositories = await listRepositoryUseCase.execute({
     name: Option.None(),
