@@ -1,10 +1,11 @@
-import { createError, defineEventHandler, parseCookies, readBody } from "h3";
+import { createError, defineEventHandler, readBody } from "h3";
 
 import { CleanupNonSemverTagsUseCase } from "../../domain/cleanup-non-semver-tags.use-case";
+import { parseRegistryCookies } from "../../config/registry-config";
 import {
-  ScalewayRegistryRepository,
-  type ScalewayRegistryRepositoryConfig,
-} from "../../repositories/scaleway-registry.repository";
+  createScalewayRegistryRepository,
+  resolveConfiguredProvider,
+} from "../../tools/registry-repository.factory";
 import { logger } from "../../tools/logger";
 
 type CleanupBody = {
@@ -29,22 +30,13 @@ function durationToMs(value: number, unit: CleanupBody["durationUnit"]): number 
 export default defineEventHandler(async (event) => {
   logger.info("Handle POST /repositories/cleanup-non-semver");
 
-  const {
-    "fuzzy-engine-provider": provider,
-    "fuzzy-engine-scaleway-registry": scalewayCredentials,
-  } = parseCookies(event);
+  const cookies = parseRegistryCookies(event);
+  const provider = resolveConfiguredProvider(cookies);
 
   if (provider !== "scaleway-registry") {
     throw createError({
       message: "Tag cleanup is only supported for Scaleway registry",
       statusCode: 501,
-    });
-  }
-
-  if (!scalewayCredentials) {
-    throw createError({
-      message: "Scaleway credentials are missing",
-      statusCode: 401,
     });
   }
 
@@ -66,12 +58,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { url, token } = JSON.parse(
-    Buffer.from(scalewayCredentials, "base64").toString("ascii"),
-  ) as ScalewayRegistryRepositoryConfig;
-
   const useCase = new CleanupNonSemverTagsUseCase(
-    new ScalewayRegistryRepository({ token, url }),
+    createScalewayRegistryRepository(cookies),
   );
 
   return useCase.execute(durationToMs(durationValue, durationUnit));

@@ -19,8 +19,25 @@ List of supporting docker registry:
 The best way to use and to deploy the UI is with Docker.
 
 ```
-docker run -d -p 3000:3000 tchoupinax/fuzzy-engine
+docker run -d -p 3000:3000   tchoupinax/fuzzy-engine
 ```
+
+### Server-side configuration with environment variables
+
+Instead of using the login form, you can configure fuzzy-engine directly with environment variables. This is the recommended way for production deployments.
+
+Set `FUZZY_ENGINE_PROVIDER` to one of: `docker-registry-v2`, `dockerhub`, `aws-ecr`, `github-ecr`, `scaleway-registry`, then provide the matching credentials:
+
+```
+docker run -d \
+  -p 3000:3000 \
+  -e FUZZY_ENGINE_PROVIDER=scaleway-registry \
+  -e SCALEWAY_REGISTRY_URL=rg.fr-par.scw.cloud/your-namespace \
+  -e SCALEWAY_REGISTRY_TOKEN=your-secret-key \
+  tchoupinax/fuzzy-engine
+```
+
+See `.env.example` for the full list of supported variables.
 
 ### Authentication to ECR using AWS local authentication
 
@@ -50,6 +67,8 @@ docker run -d \
 #### How it works ?
 
 You set your credentials with the form on the home page. Then, they are kept in a cookie. **Not elsewhere**. These credentials are used to request your registry.
+
+Alternatively, configure credentials with environment variables (see above). In that case, secrets stay on the server and are never sent to the browser.
 
 #### Why this is not an SPA ?
 
