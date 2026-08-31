@@ -7,12 +7,14 @@ import prettyBytes from "pretty-bytes";
 import type { Provider } from "../../types/provider";
 import type { listLatest10TagsResult } from "../domain/list-latest-tags.use-case";
 import type {
+  CleanupNonSemverTagsResult,
   ContainerRepository,
   ContainerRepositoryTags,
   listRepositoriesTagsAnswer,
   RegistryApiRepository,
 } from "../gateways/registry-api.gateway";
 
+import { isSemverTag } from "../tools/is-semver-tag";
 import { logger } from "../tools/logger";
 
 export type ScalewayRegistryRepositoryConfig = {
@@ -40,9 +42,46 @@ type ScalewayImageTag = {
   image_id: string;
   status: "ready" | "pending" | "failed";
   digest: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 };
+
+const REGISTRY_V2_MANIFEST_ACCEPT =
+  "application/vnd.docker.distribution.manifest.v2+json, application/vnd.docker.distribution.manifest.list.v2+json";
+
+const registryBearerTokenCache = new Map<
+  string,
+  { expiresAt: number; value: string }
+>();
+
+type RegistryBearerChallenge = {
+  realm: string;
+  service: string;
+  scope?: string;
+};
+
+function parseRegistryBearerChallenge(
+  wwwAuthenticate: string | undefined,
+): RegistryBearerChallenge | null {
+  if (!wwwAuthenticate?.toLowerCase().startsWith("bearer ")) {
+    return null;
+  }
+
+  const params: Record<string, string> = {};
+  for (const match of wwwAuthenticate.slice(7).matchAll(/(\w+)="([^"]*)"/g)) {
+    params[match[1]!] = match[2]!;
+  }
+
+  if (!params.realm || !params.service) {
+    return null;
+  }
+
+  return {
+    realm: params.realm,
+    scope: params.scope,
+    service: params.service,
+  };
+}
 
 const SCALEWAY_REQUEST_DELAY_MS = 250;
 const SCALEWAY_MAX_RETRIES = 4;
@@ -293,7 +332,7 @@ export class ScalewayRegistryRepository implements RegistryApiRepository {
     >();
 
     for (const tag of tags) {
-      const created = new Date(tag.updated_at);
+      const created = new Date(tag.created_at ?? tag.updated_at);
       const existing = digestGroups.get(tag.digest);
 
       if (existing) {
@@ -311,14 +350,26 @@ export class ScalewayRegistryRepository implements RegistryApiRepository {
       });
     }
 
-    const digests = Array.from(digestGroups.values()).map((group) => ({
-      architectures: [],
-      created: group.created,
-      fullDigest: group.digest.replace("sha256:", ""),
-      name: group.digest.slice(7, 19),
-      size: prettyBytes(repo.size),
-      tags: group.tags,
-    } satisfies ContainerRepositoryTags));
+    const digests = await mapWithConcurrency(
+      Array.from(digestGroups.values()),
+      SCALEWAY_MAX_CONCURRENT_REQUESTS,
+      async (group) => {
+        const sizeBytes = await this.getManifestSizeBytes(
+          repositoryName,
+          group.digest,
+          group.tags[0],
+        );
+
+        return {
+          architectures: [],
+          created: group.created,
+          fullDigest: group.digest.replace("sha256:", ""),
+          name: group.digest.slice(7, 19),
+          size: prettyBytes(sizeBytes > 0 ? sizeBytes : repo.size),
+          tags: group.tags,
+        } satisfies ContainerRepositoryTags;
+      },
+    );
 
     return {
       name: repositoryName,
@@ -333,6 +384,62 @@ export class ScalewayRegistryRepository implements RegistryApiRepository {
         return 0;
       }),
     };
+  }
+
+  async cleanupNonSemverTagsOlderThan(
+    olderThanMs: number,
+  ): Promise<CleanupNonSemverTagsResult> {
+    const cutoff = Date.now() - olderThanMs;
+    const images = await this.listAllImages();
+    let scanned = 0;
+    let deleted = 0;
+    const failed: CleanupNonSemverTagsResult["failed"] = [];
+
+    for (const image of images) {
+      const tags = await this.listAllTagsForImage(image.id);
+
+      for (const tag of tags) {
+        scanned++;
+
+        if (isSemverTag(tag.name)) {
+          continue;
+        }
+
+        const createdAt = new Date(tag.created_at ?? tag.updated_at).getTime();
+        if (!Number.isFinite(createdAt) || createdAt > cutoff) {
+          continue;
+        }
+
+        try {
+          await this.deleteTag(tag.id);
+          deleted++;
+          logger.info(
+            { image: image.name, tag: tag.name },
+            "Scaleway: deleted non-semver tag",
+          );
+        } catch (err) {
+          const axiosError = err as AxiosError;
+          const reason =
+            typeof axiosError.response?.data === "object"
+              ? JSON.stringify(axiosError.response.data)
+              : String(axiosError.response?.data ?? axiosError.message);
+
+          failed.push({
+            image: image.name,
+            reason,
+            tag: tag.name,
+          });
+          logger.warn(
+            { error: axiosError.response?.data, image: image.name, tag: tag.name },
+            "Scaleway: failed to delete tag",
+          );
+        }
+
+        await sleep(SCALEWAY_REQUEST_DELAY_MS);
+      }
+    }
+
+    return { deleted, failed, scanned };
   }
 
   private getCacheKey(): string {
@@ -357,6 +464,183 @@ export class ScalewayRegistryRepository implements RegistryApiRepository {
 
   private getComputedUrl() {
     return `https://api.scaleway.com/registry/v1/regions/fr-par`;
+  }
+
+  private getRegistryV2ManifestUrl(
+    repositoryName: string,
+    reference: string,
+  ): string {
+    const normalized = this.config.url
+      .replace(/^https?:\/\//, "")
+      .replace(/\/$/, "");
+    const slashIndex = normalized.indexOf("/");
+
+    const host =
+      slashIndex === -1 ? normalized : normalized.slice(0, slashIndex);
+    const namespace =
+      slashIndex === -1 ? "" : normalized.slice(slashIndex + 1);
+
+    const fullRepositoryName = namespace
+      ? `${namespace}/${repositoryName}`
+      : repositoryName;
+
+    return `https://${host}/v2/${fullRepositoryName}/manifests/${reference}`;
+  }
+
+  private async getRegistryV2BearerToken(
+    challenge: RegistryBearerChallenge,
+  ): Promise<string> {
+    const cacheKey = `${this.config.url}:${challenge.service}:${challenge.scope ?? ""}`;
+    const cached = registryBearerTokenCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.value;
+    }
+
+    const { data } = await axios.get<{
+      access_token?: string;
+      expires_in?: number;
+      token?: string;
+    }>(challenge.realm, {
+      auth: {
+        password: this.config.token,
+        username: "nologin",
+      },
+      params: {
+        service: challenge.service,
+        ...(challenge.scope ? { scope: challenge.scope } : {}),
+      },
+    });
+
+    const token = data.token ?? data.access_token;
+    if (!token) {
+      throw new Error("Scaleway registry token response missing token");
+    }
+
+    const expiresIn = Math.max(Number(data.expires_in ?? 60), 60);
+    registryBearerTokenCache.set(cacheKey, {
+      expiresAt: Date.now() + expiresIn * 1000 - 10_000,
+      value: token,
+    });
+
+    return token;
+  }
+
+  private async registryV2Get(url: string): Promise<{
+    data: unknown;
+    status: number;
+  }> {
+    const response = await axios({
+      auth: {
+        password: this.config.token,
+        username: "nologin",
+      },
+      headers: {
+        Accept: REGISTRY_V2_MANIFEST_ACCEPT,
+      },
+      method: "GET",
+      url,
+      validateStatus: () => true,
+    });
+
+    if (response.status !== 401) {
+      return response;
+    }
+
+    const challenge = parseRegistryBearerChallenge(
+      response.headers["www-authenticate"] as string | undefined,
+    );
+
+    if (!challenge) {
+      return response;
+    }
+
+    const token = await this.getRegistryV2BearerToken(challenge);
+
+    return axios({
+      headers: {
+        Accept: REGISTRY_V2_MANIFEST_ACCEPT,
+        Authorization: `Bearer ${token}`,
+      },
+      method: "GET",
+      url,
+      validateStatus: () => true,
+    });
+  }
+
+  private async getManifestSizeBytes(
+    repositoryName: string,
+    reference: string,
+    fallbackReference?: string,
+  ): Promise<number> {
+    const references = [reference];
+    if (fallbackReference && fallbackReference !== reference) {
+      references.push(fallbackReference);
+    }
+
+    for (const manifestReference of references) {
+      const size = await this.fetchManifestSizeBytes(
+        repositoryName,
+        this.getRegistryV2ManifestUrl(repositoryName, manifestReference),
+      );
+
+      if (size > 0) {
+        return size;
+      }
+    }
+
+    return 0;
+  }
+
+  private async fetchManifestSizeBytes(
+    repositoryName: string,
+    manifestUrl: string,
+  ): Promise<number> {
+    for (let attempt = 0; attempt <= SCALEWAY_MAX_RETRIES; attempt++) {
+      const response = await this.registryV2Get(manifestUrl);
+
+      if (response.status === 429 && attempt < SCALEWAY_MAX_RETRIES) {
+        await sleep(SCALEWAY_REQUEST_DELAY_MS * 2 ** attempt);
+        continue;
+      }
+
+      if (response.status >= 400) {
+        return 0;
+      }
+
+      const data = response.data as {
+        layers?: Array<{ size: number }>;
+        manifests?: Array<{ digest: string }>;
+      };
+
+      if (data.manifests && data.manifests.length > 0) {
+        const sizes = await mapWithConcurrency(
+          data.manifests,
+          SCALEWAY_MAX_CONCURRENT_REQUESTS,
+          async (manifest) =>
+            this.getManifestSizeBytes(repositoryName, manifest.digest),
+        );
+
+        return sizes.reduce((sum, size) => sum + size, 0);
+      }
+
+      if (data.layers) {
+        return data.layers.reduce((sum, layer) => sum + layer.size, 0);
+      }
+
+      return 0;
+    }
+
+    return 0;
+  }
+
+  private async deleteTag(tagId: string): Promise<void> {
+    await axios({
+      headers: {
+        "X-Auth-Token": `${this.config.token}`,
+      },
+      method: "DELETE",
+      url: `${this.getComputedUrl()}/tags/${tagId}`,
+    });
   }
 
   private async listAllTagsForImage(

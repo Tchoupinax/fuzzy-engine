@@ -23,6 +23,12 @@ export type listRepositoriesTagsAnswer = {
   noTag: boolean;
 };
 
+export type CleanupNonSemverTagsResult = {
+  deleted: number;
+  failed: Array<{ image: string; reason: string; tag: string }>;
+  scanned: number;
+};
+
 export abstract class RegistryApiRepository {
   public name: Provider | undefined;
 
