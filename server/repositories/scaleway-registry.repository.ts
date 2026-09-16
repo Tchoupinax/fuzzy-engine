@@ -102,6 +102,20 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function pickLatestTagByCreatedAt(
+  tags: Array<ScalewayImageTag>,
+): ScalewayImageTag | undefined {
+  if (tags.length === 0) {
+    return undefined;
+  }
+
+  return tags.reduce((latest, tag) =>
+    new Date(tag.created_at).getTime() > new Date(latest.created_at).getTime()
+      ? tag
+      : latest,
+  );
+}
+
 async function mapWithConcurrency<T, R>(
   items: Array<T>,
   concurrency: number,
@@ -397,9 +411,14 @@ export class ScalewayRegistryRepository implements RegistryApiRepository {
 
     for (const image of images) {
       const tags = await this.listAllTagsForImage(image.id);
+      const latestTagId = pickLatestTagByCreatedAt(tags)?.id;
 
       for (const tag of tags) {
         scanned++;
+
+        if (tag.id === latestTagId) {
+          continue;
+        }
 
         if (isSemverTag(tag.name)) {
           continue;
