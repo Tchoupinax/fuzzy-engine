@@ -1294,6 +1294,30 @@
     unctx "^3.0.1"
     verkit "^0.5.0"
 
+"@nuxt/kit@^4.6.0", "@nuxt/kit@^4.6.1":
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/@nuxt/kit/-/kit-4.6.2.tgz#e43baa999dcbb2f415e7ba1ed9e4bed0392d1e4d"
+  integrity sha512-Vn9DJobc30WdR1vrlRcEAFSFy7NV5CWq3o6gxsfrdGb2FmCh0fuDyvbZC30rm2enyiPaOUPafKctFE/ToBjybw==
+  dependencies:
+    consola "^3.4.2"
+    defu "^6.1.7"
+    destr "^2.0.5"
+    errx "^0.2.2"
+    exsolve "^1.1.3"
+    ignore "^7.0.12"
+    klona "^2.0.6"
+    microdiff "^1.6.0"
+    nostics "^1.3.0"
+    package-manager-detector "^1.9.0"
+    pathe "^2.0.3"
+    rc9 "^3.1.0"
+    scule "^1.3.0"
+    std-env "^4.3.0"
+    tinyexec "^1.3.1"
+    tinyglobby "^0.2.17"
+    unctx "^3.0.1"
+    verkit "^0.5.0"
+
 "@nuxt/nitro-server@4.6.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@nuxt/nitro-server/-/nitro-server-4.6.0.tgz#845eb8f72bb2107c4b72e2abd2cba467ba81d448"
@@ -1401,20 +1425,18 @@
     ufo "^1.6.4"
     ultrahtml "^1.7.0"
 
-"@nuxtjs/robots@6.2.4":
-  version "6.2.4"
-  resolved "https://registry.yarnpkg.com/@nuxtjs/robots/-/robots-6.2.4.tgz#626f07ffc8ba49838843f2b98c53ba9ff49f8199"
-  integrity sha512-+MyHUT6fAqJHnGPxzSrPgXCp+giH04A9aS4RwSvjgHDzYQ+xOqpaSy8jb7U7sPlXmPZE2Et3ened9ccfmwGPKA==
+"@nuxtjs/robots@7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@nuxtjs/robots/-/robots-7.0.2.tgz#b076ae276f1151999629670d906993e519cc2819"
+  integrity sha512-J6TD7r/5NBUbnJYLsNoM7d0yIcbksoq/MlAczgrS98eTcooVx8Pv+iq0HHQ04/3ZhIK5gEIkY+v18/HI6xXRPg==
   dependencies:
     "@fingerprintjs/botd" "^2.0.0"
-    "@nuxt/kit" "^4.5.2"
+    "@nuxt/kit" "^4.6.0"
+    "@vueuse/core" "^15.0.0"
     consola "^3.4.2"
     defu "^6.1.7"
-    h3 "^1.15.11"
-    nuxt-site-config "^4.2.3"
-    nuxtseo-shared "^5.3.16"
-    pathe "^2.0.3"
-    pkg-types "^2.3.1"
+    nuxt-site-config "^5.0.0"
+    nuxtseo-shared "^6.0.0"
     ufo "^1.6.4"
 
 "@nuxtjs/sitemap@8.6.1":
@@ -2086,6 +2108,11 @@
   resolved "https://registry.yarnpkg.com/@types/resolve/-/resolve-1.20.2.tgz#97d26e00cd4a0423b4af620abecf3e6f442b7975"
   integrity sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==
 
+"@types/web-bluetooth@^0.0.21":
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/@types/web-bluetooth/-/web-bluetooth-0.0.21.tgz#525433c784aed9b457aaa0ee3d92aeb71f346b63"
+  integrity sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==
+
 "@typescript-eslint/eslint-plugin@^8.66.0":
   version "8.71.1"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.71.1.tgz#b37fe4f6b33c707b183ae93421be10d4fe86e275"
@@ -2560,6 +2587,25 @@
   dependencies:
     js-beautify "^2.0.0"
     vue-component-type-helpers "^3.0.0"
+
+"@vueuse/core@^15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/core/-/core-15.0.0.tgz#d4ca881cbee5ba653bda1a388ce441e8eed4e61d"
+  integrity sha512-Zv67h5mrk7YHDJsRObx+DXaCBz6RKBUpxqLesJ+3xZNPG6yuQs7ja7kg3veFrrouYLWAqydQ7CwGEbLVxB43Ng==
+  dependencies:
+    "@types/web-bluetooth" "^0.0.21"
+    "@vueuse/metadata" "15.0.0"
+    "@vueuse/shared" "15.0.0"
+
+"@vueuse/metadata@15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/metadata/-/metadata-15.0.0.tgz#c143e77d6e5b8f59ec345e1a524824381d33bd7b"
+  integrity sha512-sfWE5LADAKJ0KnjtGliMdSN8Ij/L7uP6rXIZlgPloAI4zvvefbw6H5Lt7KJA6RqQOYgVqWF5Guj50HHMIzygBg==
+
+"@vueuse/shared@15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/shared/-/shared-15.0.0.tgz#9e9332e1345c08601f67f1657e0e82597b42cdef"
+  integrity sha512-vbNXhGrbV53xPOMSyOzMHQRvhMgZf7oNDw2RChUetVxwTIEkInQ1joZ9JbT0G3z2n2AJNjvmCWeM9ySYrnvogA==
 
 abbrev@^3.0.0:
   version "3.0.1"
@@ -5800,6 +5846,15 @@ nuxt-site-config-kit@4.2.3:
     std-env "^4.2.0"
     ufo "^1.6.4"
 
+nuxt-site-config-kit@5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/nuxt-site-config-kit/-/nuxt-site-config-kit-5.0.3.tgz#782c4ea6893bc4bb7d41f83f27ab647cc86372b6"
+  integrity sha512-vM7i0ZxNegKO4ibrHagtAlK+8ZWJsQ/bzG4bzdasMK/afjdcwZSBQy63C7Q6SP2TZrc4KGM61tHtbW21K5De8Q==
+  dependencies:
+    "@nuxt/kit" "^4.6.0"
+    site-config-stack "5.0.3"
+    ufo "^1.6.4"
+
 nuxt-site-config@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/nuxt-site-config/-/nuxt-site-config-4.2.3.tgz#fd79baa777fdde4302a32d986d93aa5a06f8c11a"
@@ -5815,6 +5870,20 @@ nuxt-site-config@^4.2.3:
     pathe "^2.0.3"
     pkg-types "^2.3.1"
     site-config-stack "4.2.3"
+    ufo "^1.6.4"
+
+nuxt-site-config@^5.0.0:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/nuxt-site-config/-/nuxt-site-config-5.0.3.tgz#2d8399749fed1e548dc362dedd30a55f4ea7c41e"
+  integrity sha512-4uLwMBkYcgLtgE2QHV30KdVWT1Ql0fvP38JLAUnfQRum3ui2IUxz9N606BWya/6V+/2NQYhwVFQ98Uj2T1vohw==
+  dependencies:
+    "@nuxt/devalue" "^2.0.2"
+    "@nuxt/kit" "^4.6.0"
+    consola "^3.4.2"
+    defu "^6.1.7"
+    nuxt-site-config-kit "5.0.3"
+    nuxtseo-shared "^6.0.0"
+    site-config-stack "5.0.3"
     ufo "^1.6.4"
 
 nuxt@4.6.0:
@@ -5907,6 +5976,19 @@ nuxtseo-shared@^5.3.12, nuxtseo-shared@^5.3.16:
     radix3 "^1.1.2"
     sirv "^3.0.2"
     std-env "^4.2.0"
+    ufo "^1.6.4"
+
+nuxtseo-shared@^6.0.0:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/nuxtseo-shared/-/nuxtseo-shared-6.0.3.tgz#c93f814929b9a84d0f1326963932d95a59dcde60"
+  integrity sha512-CEpw7RGKS+nzkIDK2ToFXqeUnMF7apgagyq1H4NslVmAJi3/eUL6k2Zvg5T/F4Y4WoL/uvq1XBH0b9+ujAf6iw==
+  dependencies:
+    "@nuxt/kit" "^4.6.1"
+    consola "^3.4.2"
+    defu "^6.1.7"
+    ofetch "^1.5.1"
+    radix3 "^1.1.2"
+    std-env "^4.3.0"
     ufo "^1.6.4"
 
 nypm@^0.6.9:
@@ -7137,6 +7219,13 @@ site-config-stack@4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/site-config-stack/-/site-config-stack-4.2.3.tgz#8fb8da32a42bbd168418425e7b5e74fbcd0cb105"
   integrity sha512-9kJn4YoJvJqbxbE5T1WYl7ibL4SYngcKQ3sP8SfJcgzqtawMMwuBuC2h/DuFSLqVE5ZyMqGtMONm/ax8nSHVrw==
+  dependencies:
+    ufo "^1.6.4"
+
+site-config-stack@5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/site-config-stack/-/site-config-stack-5.0.3.tgz#a8e45e3a50065ffaf9fbcb8685e5a0e755cd72c7"
+  integrity sha512-AE5Hg4DiwpK11s+0gKYV6C2/0GNxhig3BiPwc9OBXfeYmY5O6B69l9ga0uIeNgW4NHL7KFyAjSnI3PUNyL89IA==
   dependencies:
     ufo "^1.6.4"
 
