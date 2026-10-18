@@ -35,7 +35,7 @@
   "dependencies": {
     "@aws-sdk/client-ecr": "3.1152.0",
     "@aws-sdk/client-sts": "3.1152.0",
-    "@nuxtjs/robots": "6.2.4",
+    "@nuxtjs/robots": "7.0.2",
     "@nuxtjs/sitemap": "9.1.0",
     "@swan-io/boxed": "3.2.1",
     "axios": "1.20.0",
