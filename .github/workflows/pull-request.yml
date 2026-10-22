@@ -11,7 +11,7 @@ jobs:
       - name: Check code quality 🫆
         uses: tchoupinax/repo-config/shared-actions/steps/node/lint@v0
         with:
-          nodeVersion: 24
+          nodeVersion: "24.22.1"
           throwOnError: "false"
 
   build:
@@ -21,7 +21,7 @@ jobs:
       - name: Check build success 🦫
         uses: tchoupinax/repo-config/shared-actions/steps/node/build@v0
         with:
-          nodeVersion: 24
+          nodeVersion: "24.22.1"
 
   labels:
     name: Autodetect labels 🔍

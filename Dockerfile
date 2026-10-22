@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:24.22.1-alpine AS builder
 
 RUN  apk add --no-cache --virtual .gyp git
 
@@ -15,7 +15,7 @@ RUN npm run build
 #########################################################
 #########################################################
 
-FROM node:24-alpine
+FROM node:24.22.1-alpine
 
 WORKDIR /app
 
