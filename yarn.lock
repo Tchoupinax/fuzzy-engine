@@ -540,9 +540,9 @@
   integrity sha512-PCqQV3c4CoVm3kdPhyeZ07VmBRdH2EpMFA/pd9OASpOEC3aXNGoqPDAZ80D0cLpMBxnmk0+yNhGsEx31hq7Gtw==
 
 "@devframes/agentic@^1.0.0":
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/@devframes/agentic/-/agentic-1.3.3.tgz#a7e7703fc15d4ec43e0da0514cad48fc020e90ee"
-  integrity sha512-Ij9KU8jXSsEXbAhxP8kFFiFMAiNH3TJblc+39sAEbg+MXZU1pVTk+oUE79qg07Kk6rZNjUyZqjeCnZaKY/9Uvg==
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/@devframes/agentic/-/agentic-1.3.5.tgz#9eb835a4d9f74e39b801fd5b1e5a4db40da60c53"
+  integrity sha512-oAxHbfJ0MxLKRzkkOsEsLCBLdVn4MtCj7MOV+BZ4OHU4Ip88lNu5F1VLbfyvoTOJthLLglj9BqrOMpW7IDTN9A==
   dependencies:
     "@modelcontextprotocol/client" "^2.4.0"
     "@modelcontextprotocol/server" "^2.4.0"
@@ -3415,9 +3415,9 @@ devalue@^6.0.3:
   integrity sha512-3woMEITftG1wKeO/4d/QXH1DVKctTSZg3jNGPpjp9hNr5Hos8MCFF5McTML5ZtgKDObm2R591B0spRp2IVernA==
 
 devframe@^1.0.0:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/devframe/-/devframe-1.3.3.tgz#6f5a23aec7ca49a067fc0dbf3cd579d83ea81af3"
-  integrity sha512-RB9gTSJ5M3TSyxsaqbTyTtHEmyYwjqUtWAYrQz8SJllq5yR4UPzjTvkDCEYrlv1xNCnbIQ/WL8s6jozh/4wdoA==
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/devframe/-/devframe-1.3.5.tgz#c7c95e99661d7d90a87a3dd7245754cdb36ad4a3"
+  integrity sha512-WvMFRU/quCkZFl4ZVd69UDfDoHdSwn1Wd4ThuycOa6YPvy/NRv8vxbraWREEbAGmiBFexWIzLcywyshbAcLc4Q==
   dependencies:
     crossws "^0.4.17"
     h3 "^2.0.8"
@@ -3481,9 +3481,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.5.464:
-  version "1.5.485"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.485.tgz#c679751783f7d6c1415aefd5b3471f833569fbaf"
-  integrity sha512-m3uadzR0Z+sR19HGWgfxoZcKv9hE/edVM9OZ+FJ4wNRyfuFtkwZJIDoehEty5sisYVwmge8lKV1tenWOyClVgw==
+  version "1.5.486"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.486.tgz#8d46dcbd2ec08d98ffd67af164f38f58ff1238da"
+  integrity sha512-rpybw4Ac4ak/An6G1Me2+61xzwobowDGyuJe71QHHOVpkZv4fPVobsLl7WH6zHSKusAMpaHxGKTpOvpy7+r3dQ==
 
 emoji-regex@^10.3.0:
   version "10.6.0"
@@ -6046,9 +6046,9 @@ portfinder@^1.0.26:
     debug "^4.3.6"
 
 postcss-calc@^11.2.2:
-  version "11.2.3"
-  resolved "https://registry.yarnpkg.com/postcss-calc/-/postcss-calc-11.2.3.tgz#be9fb17baafd2defc32aa20b385dfd2b7e855364"
-  integrity sha512-pFW3MR2a4W7uHcSGUiyQGGXZWHon83ljbNwnUJ1mRKublWQbv+3o9NiqhlV4TJfNby+U+zLY2OgiywzhA5eFqw==
+  version "11.3.0"
+  resolved "https://registry.yarnpkg.com/postcss-calc/-/postcss-calc-11.3.0.tgz#b0d961d7aeaf662c024d463b9dffb48c227a4277"
+  integrity sha512-DjOpy9au57PK8MXPrjDbGIVjO6VN4CGy4ADzPGi1vEJ0XOpJ/MxoCB5FRgQ3Hnv58oobpBZtERS/qwQVT3WPWQ==
   dependencies:
     "@csstools/css-tokenizer" "^4.0.2"
 
@@ -7286,9 +7286,9 @@ unimport@^6.4.0, unimport@^6.5.0:
     unplugin-utils "^0.3.2"
 
 unimport@^7.0.2:
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/unimport/-/unimport-7.0.2.tgz#40e59e1c657a2266284759b388df15ec23b50f65"
-  integrity sha512-5yrZs6kHyx5h1ZgeLxK0EgS/JL7Uhwv9HgzQImW8JccGmbYWyXx7Jc4YhU5+sd1Yk31PlfLQhfbZ1oigXipo3A==
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/unimport/-/unimport-7.0.3.tgz#ca72efc79351a4da44d1c467b304872e0a21544c"
+  integrity sha512-sIqAz1PihrUqVg+/aoky+olFmQGmYVuNuybJZIuAQeULHPaakflkqKzR+dI/nDsd+awKIFzbLrd0Z6rhTJ+big==
   dependencies:
     escape-string-regexp "^5.0.0"
     estree-walker "^3.0.3"
