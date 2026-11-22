@@ -72,6 +72,7 @@ describe("registry-config", () => {
       configured: true,
       provider: "scaleway-registry",
       scalewayRegistry: {
+        hasToken: true,
         url: "rg.fr-par.scw.cloud/demo",
       },
     });

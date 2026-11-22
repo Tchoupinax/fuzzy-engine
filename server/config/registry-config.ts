@@ -35,6 +35,7 @@ export type PublicServerConfig = {
     nickname: string;
   };
   scalewayRegistry?: {
+    hasToken: boolean;
     url: string;
   };
 };
@@ -307,7 +308,10 @@ export function getPublicServerConfig(): PublicServerConfig {
   if (provider === "scaleway-registry") {
     const config = resolveScalewayConfig(cookies);
     if (config) {
-      publicConfig.scalewayRegistry = { url: config.url };
+      publicConfig.scalewayRegistry = {
+        hasToken: Boolean(config.token),
+        url: config.url,
+      };
     }
   }
 

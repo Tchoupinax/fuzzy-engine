@@ -461,6 +461,63 @@ export class ScalewayRegistryRepository implements RegistryApiRepository {
     return { deleted, failed, scanned };
   }
 
+  async deleteRepository(repositoryName: string): Promise<void> {
+    const images = await this.listAllImages();
+    const image = images.find((candidate) => candidate.name === repositoryName);
+
+    if (!image) {
+      throw new Error(`Repository ${repositoryName} not found`);
+    }
+
+    await this.deleteImageById(image.id);
+    repositoriesCache.delete(this.getCacheKey());
+    logger.info({ image: repositoryName }, "Scaleway: deleted repository");
+  }
+
+  async deleteAllRepositories(): Promise<{
+    deleted: number;
+    failed: Array<{ image: string; reason: string }>;
+  }> {
+    const images = await this.listAllImages();
+    let deleted = 0;
+    const failed: Array<{ image: string; reason: string }> = [];
+
+    for (const image of images) {
+      try {
+        await this.deleteImageById(image.id);
+        deleted++;
+        logger.info({ image: image.name }, "Scaleway: deleted repository");
+      } catch (err) {
+        const axiosError = err as AxiosError;
+        const reason =
+          typeof axiosError.response?.data === "object"
+            ? JSON.stringify(axiosError.response.data)
+            : String(axiosError.response?.data ?? axiosError.message);
+
+        failed.push({ image: image.name, reason });
+        logger.warn(
+          { error: axiosError.response?.data, image: image.name },
+          "Scaleway: failed to delete repository",
+        );
+      }
+
+      await sleep(SCALEWAY_REQUEST_DELAY_MS);
+    }
+
+    repositoriesCache.delete(this.getCacheKey());
+    return { deleted, failed };
+  }
+
+  private async deleteImageById(imageId: string): Promise<void> {
+    await axios({
+      headers: {
+        "X-Auth-Token": `${this.config.token}`,
+      },
+      method: "DELETE",
+      url: `${this.getComputedUrl()}/images/${imageId}`,
+    });
+  }
+
   private getCacheKey(): string {
     return `${this.config.url}:${this.config.token}:v5`;
   }

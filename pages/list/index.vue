@@ -1,219 +1,220 @@
 <template>
-  <div class="h-full">
+  <div class="list-page min-h-screen pb-24">
     <div
       v-if="syncingInProgress"
-      class="text-theme-default hover:text-theme-default absolute text-2xl right-0 bottom-0 mb-20 shadow-xl mr-6 bg-gray-50 p-2 px-4 rounded-lg"
+      class="sync-toast fixed right-6 bottom-24 z-40 px-4 py-2 text-sm font-bold text-theme-default bg-white/90 border border-theme-default/40 rounded-lg backdrop-blur"
     >
-      Sync in progress...
+      Sync in progress…
     </div>
 
-    <section id="actions" class="flex justify-between pt-6 ml-8">
-      <NuxtLink to="/">
-        <button class="font-bold text-theme-default hover:text-theme-default">
-          Home
-        </button>
+    <section
+      id="actions"
+      class="flex items-center justify-between gap-4 px-6 pt-6 lg:px-10"
+    >
+      <NuxtLink
+        to="/"
+        class="font-bold text-theme-default transition-opacity hover:opacity-70"
+      >
+        ← Home
       </NuxtLink>
 
       <button
         v-if="isScaleway && !loading"
         type="button"
-        class="mr-8 font-bold text-theme-default hover:text-theme-default"
+        class="px-3 py-1.5 text-sm font-bold text-theme-default border border-theme-default rounded-md transition-colors hover:bg-theme-default hover:text-white"
         @click="showCleanupModal = true"
       >
         Tag cleanup
       </button>
-
-      <!--<div class="mr-8">
-        <button
-          class="flex items-center font-bold text-theme-default hover:text-theme-default"
-          @click="toggleHiddingRepoMode"
-        >
-          <div v-if="!hiddingRepoMode" class="w-4 mr-1">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-          </div>
-          <div v-else class="w-4 mr-1">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          {{ !hiddingRepoMode ? 'Edit mode' : 'Validate' }}
-        </button>
-      </div>-->
     </section>
 
-    <div class="flex flex-col h-full items-center mb-40 pt-4">
-      <div class="w-full h-full lg:w-8/12">
-        <div class="flex flex-col items-center mb-40 text-theme-default">
-          <div v-if="!loading" class="mb-8 mt-4 xl:mt-0 text-4xl text-center">
-            <p>{{ url }}</p>
-
-            <NuxtLink to="/list/last" class="text-sm underline">
-              View last pushed images
-            </NuxtLink>
-          </div>
-
-          <div
-            v-if="!loading && filteredRepositories.length > 0"
-            class="grid w-full grid-cols-2 gap-4 px-4 mb-10 lg:grid-cols-4"
+    <div class="flex flex-col items-center px-4 pt-6 mb-24">
+      <div class="w-full max-w-5xl text-theme-default">
+        <header v-if="!loading" class="mb-10 text-center">
+          <p class="text-xs font-bold tracking-[0.2em] uppercase text-theme-lighter">
+            Registry
+          </p>
+          <h1 class="mt-2 text-3xl font-bold tracking-tight lg:text-4xl break-all">
+            {{ url }}
+          </h1>
+          <NuxtLink
+            to="/list/last"
+            class="inline-block mt-3 text-sm font-bold text-theme-default underline decoration-theme-lighter underline-offset-4 transition-colors hover:decoration-theme-default"
           >
-            <div
-              v-for="stat in statistics"
-              :key="stat.label"
-              class="flex flex-col items-center p-4 border-2 border-theme-default rounded-lg"
-            >
-              <span class="text-3xl font-bold">{{ stat.value }}</span>
-              <span class="mt-1 text-sm font-medium text-theme-lighter">
-                {{ stat.label }}
-              </span>
-            </div>
-          </div>
+            View last pushed images
+          </NuxtLink>
+        </header>
 
-          <div v-if="loading" class="flex flex-col items-center justify-center py-16">
-            <div class="lds-ring">
-              <div />
-              <div />
-              <div />
-              <div />
-            </div>
-
-            <div class="mt-16 text-xl">
-              <p>
-                We sent our messengers to get the list of repositories. Please
-                be patient
-              </p>
-            </div>
-          </div>
-
-          <div v-if="!loading" class="w-1/2 mb-10">
-            <input
-              v-model="imageName"
-              type="text"
-              class="w-full p-1 px-2 mb-4 text-xl font-bold border rounded text-theme-default border-theme-default placeholder-theme-lighter"
-              placeholder="image name"
-              @keyup="searchImageByNameDebounce"
-            />
-          </div>
-
+        <div
+          v-if="!loading && filteredRepositories.length > 0"
+          class="grid grid-cols-2 gap-3 mb-8 lg:grid-cols-4"
+        >
           <div
+            v-for="stat in statistics"
+            :key="stat.label"
+            class="stat-tile flex flex-col items-center justify-center px-3 py-4 rounded-xl border border-theme-default/30"
+          >
+            <span class="text-2xl font-bold tabular-nums lg:text-3xl">
+              {{ stat.value }}
+            </span>
+            <span class="mt-1 text-xs font-medium text-theme-lighter">
+              {{ stat.label }}
+            </span>
+          </div>
+        </div>
+
+        <div
+          v-if="loading"
+          class="flex flex-col items-center justify-center py-20"
+        >
+          <div class="lds-ring">
+            <div />
+            <div />
+            <div />
+            <div />
+          </div>
+          <p class="mt-10 max-w-md text-center text-lg font-medium text-theme-lighter">
+            We sent our messengers to get the list of repositories. Please be
+            patient.
+          </p>
+        </div>
+
+        <div v-if="!loading" class="mb-6">
+          <label class="sr-only" for="repo-search">Search repositories</label>
+          <input
+            id="repo-search"
+            v-model="imageName"
+            type="search"
+            class="search-input w-full px-4 py-3 text-lg font-bold bg-white/80 border border-theme-default/40 rounded-xl text-theme-default placeholder-theme-lighter transition-shadow focus:outline-none focus:border-theme-default focus:ring-2 focus:ring-theme-lighter/50"
+            placeholder="Search by image name…"
+            @keyup="searchImageByNameDebounce"
+          />
+        </div>
+
+        <div
+          v-if="!loading && filteredRepositories.length === 0"
+          class="py-16 text-center text-theme-lighter font-medium"
+        >
+          No repositories found.
+        </div>
+
+        <ul v-if="!loading" class="repo-list divide-y divide-theme-default/20">
+          <li
             v-for="(repo, index) of filteredRepositories"
             :key="index"
-            class="flex pl-16 xl:pl-4 pr-16 xl:pr-4 items-center justify-between w-full px-4 py-4 text-sm font-bold text-center whitespace-no-wrap border-b border-theme-default"
+            class="repo-row group flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"
             :class="{ 'opacity-50': hiddingRepositories.includes(repo.name) }"
           >
-            <div class="w-5/12 text-xl text-left truncate flex items-center gap-3">
-              <span class="truncate">{{ repo.name }}</span>
-              <span
-                v-if="repo.size"
-                class="xl:hidden text-sm font-medium text-theme-lighter whitespace-nowrap"
-              >
-                {{ repo.size }}
-              </span>
-            </div>
-
-            <!-- Right -->
-            <div class="flex items-center">
-              <div class="xl:flex mr-8 hidden items-center">
+            <div class="min-w-0 flex-1 text-left">
+              <div class="flex items-baseline gap-3">
+                <span class="text-lg font-bold truncate sm:text-xl">
+                  {{ repo.name }}
+                </span>
                 <span
                   v-if="repo.size"
-                  class="w-20 shrink-0 text-right text-sm font-medium text-theme-lighter mr-3"
+                  class="shrink-0 text-sm font-medium text-theme-lighter"
                 >
                   {{ repo.size }}
                 </span>
-                <div class="flex">
-                  <input
-                    class="px-2 text-xs bg-gray-50 text-theme-default border border-theme-default rounded-l docker-pull"
-                    type="text"
-                    :value="downloadUrl(repo.name)"
-                  />
+              </div>
+            </div>
 
-                  <button
-                    class="p-2 px-4 bg-gray-100 border border-l-0 border-theme-default rounded-r"
-                    type="button"
-                    @click="onCopy(repo.name)"
-                  >
-                    <img
-                      class="w-4"
-                      src="https://clipboardjs.com/assets/images/clippy.svg"
-                      alt=""
-                    />
-                  </button>
-                </div>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div class="hidden xl:flex items-center">
+                <input
+                  class="docker-pull px-2 py-1.5 text-xs bg-white/70 text-theme-default border border-theme-default/40 rounded-l-md"
+                  type="text"
+                  readonly
+                  :value="downloadUrl(repo.name)"
+                />
+                <button
+                  class="px-3 py-1.5 bg-theme-lighter/20 border border-l-0 border-theme-default/40 rounded-r-md transition-colors hover:bg-theme-lighter/40"
+                  type="button"
+                  title="Copy pull URL"
+                  @click="onCopy(repo.name)"
+                >
+                  <img
+                    class="w-4 opacity-70"
+                    src="https://clipboardjs.com/assets/images/clippy.svg"
+                    alt=""
+                  />
+                </button>
               </div>
 
-              <div class="flex items-center justify-end text-right w-40">
-                <!-- https://github.com/nuxt/nuxt/discussions/15995#discussioncomment-3199782 -->
-                <NuxtLink
-                  v-if="repo?.name"
-                  :external="true"
-                  :to="`/${repo.name?.replace(/\//g, '--slash--')}/tags`"
-                >
-                  Show tags ({{ repo.countOfTags }})
-                </NuxtLink>
-              </div>
-
-              <button v-show="hiddingRepoMode" class="w-6 ml-4">
-                <svg
-                  v-if="hiddingRepositories.includes(repo.name)"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  @click="showRepo(repo.name)"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-
-                <svg
-                  v-else
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  @click="hideRepo(repo.name)"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                  />
-                </svg>
-              </button>
+              <NuxtLink
+                v-if="repo?.name"
+                :external="true"
+                :to="`/${repo.name?.replace(/\//g, '--slash--')}/tags`"
+                class="px-3 py-1.5 text-sm font-bold whitespace-nowrap rounded-md border border-transparent transition-colors hover:border-theme-default/40 hover:bg-theme-lighter/15"
+              >
+                Show tags
+                <span class="text-theme-lighter">({{ repo.countOfTags }})</span>
+              </NuxtLink>
 
               <button
-                v-show="hiddingRepoMode"
-                class="w-6 ml-2"
-                @click="deleteAllImage(repo.name)"
+                v-if="isScaleway"
+                type="button"
+                class="p-1.5 rounded-md text-theme-lighter transition-colors hover:text-red-600 hover:bg-red-50 disabled:opacity-40"
+                :disabled="deletingRepositories.includes(repo.name)"
+                title="Remove repository"
+                aria-label="Remove repository"
+                @click="deleteRepository(repo.name)"
               >
                 <svg
+                  class="w-5 h-5"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
                   <path
                     fill-rule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
                     clip-rule="evenodd"
                   />
                 </svg>
               </button>
             </div>
-            <!-- END # Right -->
+          </li>
+        </ul>
+
+        <section
+          v-if="isScaleway && !loading"
+          class="danger-zone mt-16 mb-8"
+          aria-labelledby="danger-zone-title"
+        >
+          <div class="danger-zone-inner px-5 py-6 sm:px-6">
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+              <div class="max-w-xl">
+                <p class="text-xs font-bold tracking-[0.18em] uppercase text-red-600">
+                  Irreversible
+                </p>
+                <h2
+                  id="danger-zone-title"
+                  class="mt-1 text-xl font-bold text-red-700 sm:text-2xl"
+                >
+                  Danger zone
+                </h2>
+                <p class="mt-2 text-sm font-medium text-stone-600 leading-relaxed">
+                  Permanently delete every repository in this registry, including
+                  all tags.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                class="self-start shrink-0 px-4 py-2.5 text-sm font-bold text-white bg-red-600 rounded-md transition-all hover:bg-red-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100"
+                :disabled="deleteAllInProgress || repositories.length === 0"
+                @click="deleteAllRepositories"
+              >
+                {{
+                  deleteAllInProgress
+                    ? "Deleting all repositories…"
+                    : "Delete all repositories"
+                }}
+              </button>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
 
@@ -310,6 +311,8 @@ type State = {
   cleanupDurationUnit: "days" | "months" | "weeks";
   cleanupDurationValue: number;
   cleanupInProgress: boolean;
+  deleteAllInProgress: boolean;
+  deletingRepositories: Array<string>;
   showCleanupModal: boolean;
   fetchAdditionalRepositoriesLoading: boolean;
   githubRegistry: { nickname: string; token: string };
@@ -355,6 +358,8 @@ export default {
       cleanupDurationUnit: "days",
       cleanupDurationValue: 30,
       cleanupInProgress: false,
+      deleteAllInProgress: false,
+      deletingRepositories: [],
       showCleanupModal: false,
       fetchAdditionalRepositoriesLoading: false,
       hasNext: false,
@@ -479,6 +484,82 @@ export default {
       this.repositories = [...repositories];
       this.syncingInProgress = false;
       this.loading = false;
+    },
+    async deleteRepository(repositoryName: string) {
+      if (
+        !window.confirm(
+          `Delete repository ${repositoryName} and all its tags? This cannot be undone.`,
+        )
+      ) {
+        return;
+      }
+
+      this.deletingRepositories = [
+        ...this.deletingRepositories,
+        repositoryName,
+      ];
+
+      try {
+        await $fetch(
+          `${new URL(window.location.toString()).origin}/api/repositories/${repositoryName.replace(/\//g, "--slash--")}`,
+          {
+            credentials: "include",
+            method: "DELETE",
+          },
+        );
+
+        this.repositories = this.repositories.filter(
+          (repo) => repo.name !== repositoryName,
+        );
+        this.deleteAllSuccess();
+      } catch {
+        this.deleteRepositoryFailed();
+      } finally {
+        this.deletingRepositories = this.deletingRepositories.filter(
+          (name) => name !== repositoryName,
+        );
+      }
+    },
+    async deleteAllRepositories() {
+      const count = this.repositories.length;
+      if (
+        !window.confirm(
+          `Delete ALL ${count} repositories and every tag in this registry? This cannot be undone.`,
+        )
+      ) {
+        return;
+      }
+
+      if (
+        !window.confirm(
+          "Final confirmation: permanently delete every repository?",
+        )
+      ) {
+        return;
+      }
+
+      this.deleteAllInProgress = true;
+
+      try {
+        const result = await $fetch(
+          `${new URL(window.location.toString()).origin}/api/repositories/delete-all`,
+          {
+            body: { confirm: "DELETE ALL" },
+            credentials: "include",
+            method: "POST",
+          },
+        );
+
+        const failedCount = result.failed?.length ?? 0;
+        this.deleteAllRepositoriesSuccess({
+          message: `Deleted ${result.deleted} repository(ies)${failedCount > 0 ? ` (${failedCount} failed)` : ""}`,
+        });
+        await this.loadRepositories();
+      } catch {
+        this.deleteAllRepositoriesFailed();
+      } finally {
+        this.deleteAllInProgress = false;
+      }
     },
     async cleanupNonSemverTags() {
       if (
@@ -605,8 +686,23 @@ export default {
     },
     deleteAllSuccess: {
       title: "Delete",
-      message: "Sucessfully deleted all the image for this repo",
+      message: "Successfully deleted the repository",
       type: "success",
+    },
+    deleteRepositoryFailed: {
+      title: "Delete failed",
+      message: "Could not delete the repository",
+      type: "error",
+    },
+    deleteAllRepositoriesSuccess: {
+      title: "Delete all complete",
+      message: "Repositories deleted",
+      type: "success",
+    },
+    deleteAllRepositoriesFailed: {
+      title: "Delete all failed",
+      message: "Could not delete all repositories",
+      type: "error",
     },
     cleanupSuccess: {
       title: "Cleanup complete",
@@ -623,15 +719,63 @@ export default {
 </script>
 
 <style scoped>
-.docker-pull {
-  width: 20rem;
+.list-page {
+  background:
+    radial-gradient(
+      1200px 500px at 50% -10%,
+      color-mix(in srgb, var(--color-theme-lighter) 28%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, #fafafa 0%, #ffffff 40%, #f7f7f8 100%);
 }
+
+.stat-tile {
+  background: color-mix(in srgb, var(--color-theme-lighter) 12%, white);
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.stat-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-theme);
+}
+
+.repo-row {
+  transition: background-color 160ms ease;
+  border-radius: 0.75rem;
+  padding-inline: 0.75rem;
+  margin-inline: -0.75rem;
+}
+
+.repo-row:hover {
+  background: color-mix(in srgb, var(--color-theme-lighter) 10%, transparent);
+}
+
+.danger-zone-inner {
+  border: 1.5px dashed color-mix(in srgb, #ef4444 55%, transparent);
+  border-radius: 1rem;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, #ef4444 6%, white),
+      color-mix(in srgb, #ef4444 2%, white)
+    );
+}
+
+.sync-toast {
+  animation: sync-in 220ms ease-out;
+}
+
+.docker-pull {
+  width: 18rem;
+}
+
 .lds-ring {
   display: inline-block;
   position: relative;
   width: 80px;
   height: 80px;
 }
+
 .lds-ring div {
   box-sizing: border-box;
   display: block;
@@ -644,21 +788,36 @@ export default {
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   border-color: var(--color-theme) transparent transparent transparent;
 }
+
 .lds-ring div:nth-child(1) {
   animation-delay: -0.45s;
 }
+
 .lds-ring div:nth-child(2) {
   animation-delay: -0.3s;
 }
+
 .lds-ring div:nth-child(3) {
   animation-delay: -0.15s;
 }
+
 @keyframes lds-ring {
   0% {
     transform: rotate(0deg);
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes sync-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>

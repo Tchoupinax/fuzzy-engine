@@ -21,6 +21,7 @@ type PublicServerConfig = {
     nickname: string;
   };
   scalewayRegistry?: {
+    hasToken: boolean;
     url: string;
   };
 };
