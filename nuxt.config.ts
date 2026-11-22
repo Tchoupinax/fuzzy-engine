@@ -1,5 +1,5 @@
 // https://v3.nuxtjs.org/api/configuration/nuxt.config
-// import eslint from 'vite-plugin-eslint'
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
   ssr: true,
@@ -25,12 +25,12 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxtjs/tailwindcss", "@nuxtjs/robots", "@nuxt/eslint"],
+  css: ["~/assets/css/tailwind.css"],
+
+  modules: ["@nuxtjs/robots", "@nuxt/eslint"],
 
   vite: {
-    plugins: [
-      // eslint()
-    ],
+    plugins: [tailwindcss()],
   },
 
   compatibilityDate: "2024-08-08",

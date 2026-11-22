@@ -1,6 +1,9 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+
+@theme inline {
+  --color-theme-default: var(--color-theme);
+  --color-theme-lighter: var(--color-theme-lighter);
+}
 
 * {
   font-family:

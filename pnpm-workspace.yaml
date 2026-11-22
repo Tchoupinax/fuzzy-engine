@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: true
+overrides:
+  bowser: 2.15.0
+  pkce-challenge: 5.0.1

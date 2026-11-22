@@ -348,6 +348,7 @@
                   class="w-full p-1 px-2 text-xl font-bold border rounded-l text-theme-default border-theme-default docker-pull placeholder-theme-lighter"
                   :type="revealed ? 'text' : 'password'"
                   placeholder="secretKey"
+                  :readonly="serverConfigured"
                   @keyup="saveData"
                 />
                 <button
@@ -595,6 +596,10 @@ export default {
       this.scalewayRegistry.token = token;
     }
 
+    if (serverConfig.scalewayRegistry?.hasToken) {
+      this.scalewayRegistry.token = "*******";
+    }
+
     if (this.$route.query.provider) {
       setCookie("fuzzy-engine-provider", this.$route.query.provider);
     }
@@ -616,7 +621,15 @@ export default {
       );
       setCookie(
         "fuzzy-engine-scaleway-registry",
-        btoa(JSON.stringify(this.scalewayRegistry)),
+        btoa(
+          JSON.stringify({
+            ...this.scalewayRegistry,
+            token:
+              this.scalewayRegistry.token === "*******"
+                ? ""
+                : this.scalewayRegistry.token,
+          }),
+        ),
       );
     },
     openList(e) {
